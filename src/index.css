@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body {
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+		"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+		"Helvetica Neue", sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+.w-full {
+	width: 100%;
+}
+code {
+	font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+		monospace;
+}
+.mantine-okfgi9 {
+	padding-top: calc(var(--mantine-header-height, 0px) + 70px);
+}
+.mantine-1yi5du7 {
+	height: 100px;
+	max-height: 100px;
+}
+.mantine-o7jkpg {
+	margin-top: 2.5rem;
+}
+/* .mantine-10f0say{
+  max-height: 486px;
+  overflow-y: scroll;
+} */
+.mantine-nbkfgy {
+	max-height: 486px;
+	overflow-y: scroll;
+}
+.mantine-18h5m8g {
+	background-color: #14372fe4;
+}
+.mantine-1h84nv {
+	background-color: #14372fe4;
+}
+.mantine-1ivg9cl {
+	color: #14372fe4;
+}
+.mantine-ikz8w1 {
+	color: #14372fe4;
+}
+.mantine-uu9f98 {
+	color: #14372fe4;
+}
+/* .mantine-upyjig {
+  background-color: #14372fe4;
+}
+.mantine-nsdj {
+  background-color: #14372fe4;
+} */
+.element.style {
+	position: fixed;
+	padding: 0;
+	margin: 0;
+	right: 0;
+	left: 0;
+	top: 0;
+	z-index: 100001;
+	visibility: hidden; /* Sử dụng visibility thay vì display */
+	opacity: 0.1; /* Tăng giá trị opacity để tăng khả năng hiển thị */
+	transition: visibility 0s linear 0.3s, opacity 0.3s; /* Thêm hiệu ứng chuyển đổi */
+}
