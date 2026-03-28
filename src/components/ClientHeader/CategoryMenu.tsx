@@ -56,7 +56,6 @@ function CategoryMenu({ setOpenedCategoryMenu }: { setOpenedCategoryMenu: Dispat
         <h3 className="text-gray-500 dark:text-gray-400 font-bold text-lg mb-2 pl-4 uppercase">Danh mục sản phẩm</h3>
         {categoryResponses?.content.map((firstCategory, index) => {
           const isActive = activeTab === index;
-          
           return (
             <button
               key={index}
@@ -67,7 +66,7 @@ function CategoryMenu({ setOpenedCategoryMenu }: { setOpenedCategoryMenu: Dispat
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-500'
               }`}
             >
-              <span className="flex-1 line-clamp-2">{firstCategory.categoryName}</span>
+              <span className="flex-1 whitespace-nowrap">{firstCategory.categoryName}</span>
             </button>
           );
         })}
@@ -77,10 +76,9 @@ function CategoryMenu({ setOpenedCategoryMenu }: { setOpenedCategoryMenu: Dispat
       <div className="flex-1 p-6 overflow-auto bg-white dark:bg-gray-900" style={{ maxHeight: '600px' }}>
         {categoryResponses?.content.map((firstCategory, index) => {
           if (activeTab !== index) return null;
-          
           return (
             <div key={index} className="flex flex-col">
-              {/* Tiêu đề góc trên cùng bên phải */}
+              {/* Tiêu đề */}
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-5 h-5 flex items-center justify-center bg-red-600 rounded-[3px] flex-shrink-0">
                   <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>
@@ -88,12 +86,12 @@ function CategoryMenu({ setOpenedCategoryMenu }: { setOpenedCategoryMenu: Dispat
                 <Link
                   to={'/category/' + firstCategory.categorySlug}
                   onClick={() => handleAnchor('/category/' + firstCategory.categorySlug)}
-                  className="text-2xl font-bold text-gray-900 dark:text-gray-100 hover:text-red-600 transition-colors"
+                  className="text-2xl font-bold text-gray-900 dark:text-gray-100 hover:text-red-600 transition-colors whitespace-nowrap"
                 >
                   {firstCategory.categoryName}
                 </Link>
               </div>
-              
+
               {/* Lưới Level 2 & 3 */}
               <div className="overflow-auto" style={{ maxHeight: '500px' }}>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-8">
@@ -102,17 +100,17 @@ function CategoryMenu({ setOpenedCategoryMenu }: { setOpenedCategoryMenu: Dispat
                       <Link
                         to={'/category/' + secondCategory.categorySlug}
                         onClick={() => handleAnchor('/category/' + secondCategory.categorySlug)}
-                        className="font-bold text-gray-800 dark:text-gray-200 uppercase text-[15px] hover:text-red-600 transition-colors"
+                        className="font-bold text-gray-800 dark:text-gray-200 uppercase text-[15px] hover:text-red-600 transition-colors whitespace-nowrap"
                       >
                         {secondCategory.categoryName}
                       </Link>
                       <div className="flex flex-col gap-2">
-                        {secondCategory.categoryChildren.map((thirdCategory, thirdIndex) => (
+                        {secondCategory.categoryChildren.slice(0, 8).map((thirdCategory, thirdIndex) => (
                           <Link
                             key={thirdIndex}
                             to={'/category/' + thirdCategory.categorySlug}
                             onClick={() => handleAnchor('/category/' + thirdCategory.categorySlug)}
-                            className="text-[14px] text-gray-600 dark:text-gray-400 hover:text-red-600 transition-colors truncate block"
+                            className="text-[14px] text-gray-600 dark:text-gray-400 hover:text-red-600 transition-colors whitespace-nowrap block"
                           >
                             {thirdCategory.categoryName}
                           </Link>
@@ -120,9 +118,14 @@ function CategoryMenu({ setOpenedCategoryMenu }: { setOpenedCategoryMenu: Dispat
                         <Link
                           to={'/category/' + secondCategory.categorySlug}
                           onClick={() => handleAnchor('/category/' + secondCategory.categorySlug)}
-                          className="text-[14px] text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 font-medium mt-1"
+                          className="text-[14px] text-orange-500 dark:text-orange-400 hover:text-orange-600 font-semibold mt-1 flex items-center gap-1 whitespace-nowrap"
                         >
                           Xem tất cả
+                          {secondCategory.categoryChildren.length > 8 && (
+                            <span className="text-[12px] text-gray-400">
+                              (+{secondCategory.categoryChildren.length - 8})
+                            </span>
+                          )}
                         </Link>
                       </div>
                     </div>

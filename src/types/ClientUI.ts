@@ -32,7 +32,11 @@ export interface ClientListedProductResponse {
 interface ClientListedVariantResponse {
   variantId: number;
   variantPrice: number;
+  variantCost?: number;
+  variantSku?: string;
   variantProperties: CollectionWrapper<VariantPropertyItem> | null;
+  variantImages?: any | null;
+  variantStatus?: number;
   quantity: number;
   inventoryStatus: string;
 }

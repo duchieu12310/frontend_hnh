@@ -74,6 +74,7 @@ class ResourceURL {
   // CLIENT
   static CLIENT_CATEGORY = clientApiPath + '/categories';
   static CLIENT_PRODUCT = clientApiPath + '/products';
+  static CLIENT_PRODUCT_BY_CATEGORY = (slug: string) => clientApiPath + `/products/category/${slug}`;
   static CLIENT_FILTER_CATEGORY = clientApiPath + '/filters/category';
   static CLIENT_FILTER_SEARCH = clientApiPath + '/filters/search';
   static CLIENT_USER_INFO = clientApiPath + '/users/info';

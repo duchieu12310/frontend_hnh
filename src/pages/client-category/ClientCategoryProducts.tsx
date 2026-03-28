@@ -1,5 +1,4 @@
 import React from 'react';
-import { Grid, Group, Pagination, Skeleton, Stack, Text, useMantineTheme } from '@mantine/core';
 import { ClientProductCard } from 'components';
 import ApplicationConstants from 'constants/ApplicationConstants';
 import { useQuery } from 'react-query';
@@ -15,8 +14,6 @@ interface ClientCategoryProductsProps {
 }
 
 function ClientCategoryProducts({ categorySlug }: ClientCategoryProductsProps) {
-  const theme = useMantineTheme();
-
   const { activePage, activeSearch, updateActivePage } = useClientCategoryStore();
 
   const {
@@ -28,53 +25,77 @@ function ClientCategoryProducts({ categorySlug }: ClientCategoryProductsProps) {
 
   if (isLoadingProductResponses) {
     return (
-      <Stack>
-        {Array(5).fill(0).map((_, index) => (
-          <Skeleton key={index} height={50} radius="md"/>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        {Array(6).fill(0).map((_, index) => (
+          <div key={index} className="rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse h-64"/>
         ))}
-      </Stack>
+      </div>
     );
   }
 
   if (isErrorProductResponses) {
     return (
-      <Stack my={theme.spacing.xl} sx={{ alignItems: 'center', color: theme.colors.pink[6] }}>
-        <AlertTriangle size={125} strokeWidth={1}/>
-        <Text size="xl" weight={500}>Đã có lỗi xảy ra</Text>
-      </Stack>
+      <div className="flex flex-col items-center gap-4 py-16 text-pink-600 dark:text-pink-400">
+        <AlertTriangle size={80} strokeWidth={1}/>
+        <p className="text-xl font-medium">Đã có lỗi xảy ra</p>
+      </div>
     );
   }
 
   if (products.totalElements === 0) {
     return (
-      <Stack my={theme.spacing.xl} sx={{ alignItems: 'center', color: theme.colors.blue[6] }}>
-        <Marquee size={125} strokeWidth={1}/>
-        <Text size="xl" weight={500}>Không có sản phẩm</Text>
-      </Stack>
+      <div className="flex flex-col items-center gap-4 py-16 text-blue-600 dark:text-blue-400">
+        <Marquee size={80} strokeWidth={1}/>
+        <p className="text-xl font-medium">Không có sản phẩm</p>
+      </div>
     );
   }
 
   return (
     <>
-      <Grid>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {products.content.map((product, index) => (
-          <Grid.Col key={index} span={6} sm={4}>
+          <div key={index}>
             <ClientProductCard product={product} search={activeSearch || ''}/>
-          </Grid.Col>
+          </div>
         ))}
-      </Grid>
+      </div>
 
-      <Group position="apart" mt={theme.spacing.lg}>
-        <Pagination
-          page={activePage}
-          total={products.totalPages}
-          onChange={(page: number) => (page !== activePage) && updateActivePage(page)}
-        />
-        <Text>
-          <Text component="span" weight={500}>Trang {activePage}</Text>
+      <div className="flex items-center justify-between mt-6">
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => activePage > 1 && updateActivePage(activePage - 1)}
+            disabled={activePage <= 1}
+            className="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            ‹
+          </button>
+          {Array.from({ length: products.totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => page !== activePage && updateActivePage(page)}
+              className={`px-3 py-1 rounded border text-sm transition-colors ${
+                page === activePage
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+          <button
+            onClick={() => activePage < products.totalPages && updateActivePage(activePage + 1)}
+            disabled={activePage >= products.totalPages}
+            className="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            ›
+          </button>
+        </div>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          <span className="font-medium">Trang {activePage}</span>
           <span> / {products.totalPages}</span>
-        </Text>
-      </Group>
+        </p>
+      </div>
     </>
   );
 }
@@ -94,10 +115,9 @@ function useGetAllCategoryProductsApi(categorySlug: string) {
   const requestParams = {
     page: activePage,
     size: ApplicationConstants.DEFAULT_CLIENT_CATEGORY_PAGE_SIZE,
-    filter: [`category.slug==${categorySlug}`, activeBrandFilter, activePriceFilter].filter(Boolean).join(';'),
+    filter: [activeBrandFilter, activePriceFilter].filter(Boolean).join(';') || undefined,
     sort: activeSort,
     search: activeSearch,
-    newable: true,
     saleable: activeSaleable,
   };
 
@@ -106,8 +126,8 @@ function useGetAllCategoryProductsApi(categorySlug: string) {
     isLoading: isLoadingProductResponses,
     isError: isErrorProductResponses,
   } = useQuery<ListResponse<ClientListedProductResponse>, ErrorMessage>(
-    ['client-api', 'products', 'getAllProducts', requestParams],
-    () => FetchUtils.get(ResourceURL.CLIENT_PRODUCT, requestParams),
+    ['client-api', 'products', 'getProductsByCategory', categorySlug, requestParams],
+    () => FetchUtils.get(ResourceURL.CLIENT_PRODUCT_BY_CATEGORY(categorySlug), requestParams),
     {
       onSuccess: (productResponses) =>
         (totalProducts !== productResponses.totalElements) && updateTotalProducts(productResponses.totalElements),

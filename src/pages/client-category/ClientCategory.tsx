@@ -11,6 +11,7 @@ import NotifyUtils from 'utils/NotifyUtils';
 import { ClientCategoryResponse, ClientFilterResponse } from 'types';
 import ClientCategorySkeleton from 'pages/client-category/ClientCategorySkeleton';
 import ClientCategoryProducts from 'pages/client-category/ClientCategoryProducts';
+import ClientCategorySidebarTree from 'pages/client-category/ClientCategorySidebarTree';
 import useClientCategoryStore from 'stores/use-client-category-store';
 import { useDebouncedValue } from 'hooks/use-debounced-value';
 
@@ -70,11 +71,11 @@ function ClientCategory() {
   const isError = isErrorCategoryResponse || isErrorFilterResponse;
 
   if (isLoading) {
-    return <ClientCategorySkeleton/>;
+    return <ClientCategorySkeleton />;
   }
 
-  if (isError) {
-    return <ClientError/>;
+  if (isError || !category || !filter) {
+    return <ClientError />;
   }
 
   const handlePriceOptionChips = (priceOptions: string[]) => {
@@ -114,54 +115,40 @@ function ClientCategory() {
 
   return (
     <main>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="flex flex-col gap-6">
 
-          <div className="p-6 rounded-md shadow-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-            <div className="flex flex-col gap-4">
-              <nav className="flex items-center gap-2 text-sm">
-                <Link to="/" className="text-blue-600 dark:text-blue-400 hover:underline">
-                  Trang chủ
+          {/* Breadcrumb floating at the top */}
+          <nav className="flex items-center gap-2 text-[13px] text-gray-500 uppercase tracking-wide">
+            <Link to="/" className="hover:text-orange-500 transition-colors">
+              Trang chủ
+            </Link>
+            {MiscUtils.makeCategoryBreadcrumbs(category).slice(0, -1).map(c => (
+              <React.Fragment key={c.categorySlug}>
+                <span className="text-gray-300">›</span>
+                <Link to={'/category/' + c.categorySlug} className="hover:text-orange-500 transition-colors">
+                  {c.categoryName}
                 </Link>
-                {MiscUtils.makeCategoryBreadcrumbs(category).slice(0, -1).map(c => (
-                  <React.Fragment key={c.categorySlug}>
-                    <span className="text-gray-400">/</span>
-                    <Link to={'/category/' + c.categorySlug} className="text-blue-600 dark:text-blue-400 hover:underline">
-                      {c.categoryName}
-                    </Link>
-                  </React.Fragment>
-                ))}
-                <span className="text-gray-400">/</span>
-                <span className="text-gray-600 dark:text-gray-400">
-                  {category.categoryName}
-                </span>
-              </nav>
+              </React.Fragment>
+            ))}
+            <span className="text-gray-300">›</span>
+            <span className="text-orange-500 font-medium">
+              {category.categoryName}
+            </span>
+          </nav>
 
-              <div className="flex items-baseline gap-2">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{category.categoryName}</h2>
-                {category.categoryChildren.length > 0 && (
-                  <>
-                    <ChevronRight size={14} className="text-gray-400" />
-                    <nav className="flex items-center gap-1 text-sm">
-                      {category.categoryChildren.map((c, index) => (
-                        <React.Fragment key={c.categorySlug}>
-                          {index > 0 && <span className="text-gray-400">·</span>}
-                          <Link to={'/category/' + c.categorySlug} className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
-                            {c.categoryName}
-                          </Link>
-                        </React.Fragment>
-                      ))}
-                    </nav>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             <div className="md:col-span-3 mb-8">
-              <div className="flex flex-col gap-6">
-                <div className="flex items-center justify-between">
+              {/* Box chứa các filter bên trái */}
+              <div className="flex flex-col gap-0 bg-white dark:bg-gray-800 rounded-md shadow-sm border border-gray-100 dark:border-gray-700">
+
+                {/* ── NHÓM SẢN PHẨM ── */}
+                <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+                  <h3 className="font-bold text-[14px] text-gray-800 dark:text-gray-200 uppercase mb-3">Nhóm sản phẩm</h3>
+                  <ClientCategorySidebarTree currentSlug={slug as string} />
+                </div>
+
+                <div className="p-4 flex flex-col gap-6">
                   <div className="flex items-center gap-2">
                     <ChartCandle size={20} />
                     <p className="font-medium text-gray-900 dark:text-gray-100">Bộ lọc</p>
@@ -192,8 +179,8 @@ function ClientCategory() {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-2">
-                  <p className="font-medium text-gray-900 dark:text-gray-100">Khoảng giá</p>
+                <div className="flex flex-col gap-3">
+                  <p className="font-bold text-[14px] text-gray-800 dark:text-gray-200 uppercase">Giá</p>
                   <div className="flex flex-wrap gap-2">
                     {MiscUtils.generatePriceOptions(filter.filterPriceQuartiles).map((priceOption, index) => {
                       const priceOptionValue = priceOption.join('-');
@@ -207,11 +194,10 @@ function ClientCategory() {
                               : [...priceOptions, priceOptionValue];
                             handlePriceOptionChips(newOptions);
                           }}
-                          className={`px-3 py-1 text-sm rounded-md transition-colors ${
-                            isSelected
+                          className={`px-3 py-1 text-sm rounded-md transition-colors ${isSelected
                               ? 'bg-blue-600 text-white'
                               : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                          }`}
+                            }`}
                         >
                           {MiscUtils.readablePriceOption(priceOption)}
                         </button>
@@ -237,11 +223,10 @@ function ClientCategory() {
                                   : [...brandOptions, brandIdStr];
                                 handleBrandChips(newOptions);
                               }}
-                              className={`px-3 py-1 text-sm rounded-md transition-colors ${
-                                isSelected
+                              className={`px-3 py-1 text-sm rounded-md transition-colors ${isSelected
                                   ? 'bg-blue-600 text-white'
                                   : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                              }`}
+                                }`}
                             >
                               {brand.brandName}
                             </button>
@@ -266,60 +251,59 @@ function ClientCategory() {
               </div>
             </div>
 
-            <div className="md:col-span-9">
-              <div className="flex flex-col gap-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <ArrowsDownUp size={20} />
-                    <p className="font-medium text-gray-900 dark:text-gray-100 mr-2">Sắp xếp theo</p>
-                    <div className="flex items-center gap-4">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="sort"
-                          value=""
-                          checked={activeSort === null}
-                          onChange={(e) => updateActiveSort((e.target.value as '' | 'lowest-price' | 'highest-price') || null)}
-                          className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                        />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">Mới nhất</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="sort"
-                          value="lowest-price"
-                          checked={activeSort === 'lowest-price'}
-                          onChange={(e) => updateActiveSort((e.target.value as '' | 'lowest-price' | 'highest-price') || null)}
-                          className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                        />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">Giá thấp → cao</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="sort"
-                          value="highest-price"
-                          checked={activeSort === 'highest-price'}
-                          onChange={(e) => updateActiveSort((e.target.value as '' | 'lowest-price' | 'highest-price') || null)}
-                          className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                        />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">Giá cao → thấp</span>
-                      </label>
-                    </div>
+          <div className="md:col-span-9">
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <ArrowsDownUp size={20} />
+                  <p className="font-medium text-gray-900 dark:text-gray-100 mr-2">Sắp xếp theo</p>
+                  <div className="flex items-center gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="sort"
+                        value=""
+                        checked={activeSort === null}
+                        onChange={(e) => updateActiveSort((e.target.value as '' | 'lowest-price' | 'highest-price') || null)}
+                        className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Mới nhất</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="sort"
+                        value="lowest-price"
+                        checked={activeSort === 'lowest-price'}
+                        onChange={(e) => updateActiveSort((e.target.value as '' | 'lowest-price' | 'highest-price') || null)}
+                        className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Giá thấp → cao</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="sort"
+                        value="highest-price"
+                        checked={activeSort === 'highest-price'}
+                        onChange={(e) => updateActiveSort((e.target.value as '' | 'lowest-price' | 'highest-price') || null)}
+                        className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Giá cao → thấp</span>
+                    </label>
                   </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">{totalProducts} sản phẩm</p>
                 </div>
-
-                <ClientCategoryProducts categorySlug={category.categorySlug}/>
+                <p className="text-sm text-gray-700 dark:text-gray-300">{totalProducts} sản phẩm</p>
               </div>
+
+                <ClientCategoryProducts categorySlug={category.categorySlug} />
             </div>
           </div>
-
         </div>
       </div>
-    </main>
-  );
+    </div>
+  </main >
+);
 }
 
 function useGetCategoryApi(categorySlug: string) {

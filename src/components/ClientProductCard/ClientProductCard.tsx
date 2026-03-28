@@ -123,27 +123,31 @@ function ClientProductCard({ product, search }: ClientProductCardProps) {
               <HeartPlus size={18}/>
             </button>
             {product.productVariants.length > 0 && (
-              product.productSaleable
-                ? (
-                  <button
-                    type="button"
-                    onClick={handleAddToCartButton}
-                    title="Thêm vào giỏ hàng"
-                    className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
-                  >
-                    <ShoppingCartPlus size={18}/>
-                  </button>
-                )
-                : (
-                  <button
-                    type="button"
-                    onClick={handleCreatePreorderButton}
-                    title="Thông báo khi có hàng"
-                    className="p-2 bg-teal-600 text-white rounded-full hover:bg-teal-700 transition-colors"
-                  >
-                    <BellPlus size={18}/>
-                  </button>
-                )
+              (() => {
+                const totalQty = product.productVariants.reduce((sum, v) => sum + (v.quantity || 0), 0);
+                const isSaleable = product.productSaleable || totalQty > 0;
+                return isSaleable
+                  ? (
+                    <button
+                      type="button"
+                      onClick={handleAddToCartButton}
+                      title="Thêm vào giỏ hàng"
+                      className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                    >
+                      <ShoppingCartPlus size={18}/>
+                    </button>
+                  )
+                  : (
+                    <button
+                      type="button"
+                      onClick={handleCreatePreorderButton}
+                      title="Thông báo khi có hàng"
+                      className="p-2 bg-teal-600 text-white rounded-full hover:bg-teal-700 transition-colors"
+                    >
+                      <BellPlus size={18}/>
+                    </button>
+                  );
+              })()
             )}
           </div>
         </div>
@@ -152,11 +156,27 @@ function ClientProductCard({ product, search }: ClientProductCardProps) {
             <p className="font-medium">
               {search ? highlightText(product.productName, search) : product.productName}
             </p>
-            {!product.productSaleable && (
-              <span className="px-2 py-0.5 text-xs font-semibold text-white bg-red-600 rounded">
-                Hết hàng
-              </span>
-            )}
+            {(() => {
+              const totalQty = product.productVariants.reduce((sum, v) => sum + (v.quantity || 0), 0);
+              const isSaleable = product.productSaleable || totalQty > 0;
+              
+              if (!isSaleable) {
+                return (
+                  <span className="px-2 py-0.5 text-xs font-semibold text-white bg-red-600 rounded whitespace-nowrap">
+                    Hết hàng
+                  </span>
+                );
+              }
+              
+              if (totalQty > 0 && product.productVariants[0]?.inventoryStatus) {
+                return (
+                  <span className="px-2 py-0.5 text-xs font-semibold text-white bg-green-600 rounded whitespace-nowrap">
+                    {product.productVariants[0].inventoryStatus}: {totalQty}
+                  </span>
+                );
+              }
+              return null;
+            })()}
           </div>
           <p className="font-medium text-pink-600">
             {product.productPriceRange
