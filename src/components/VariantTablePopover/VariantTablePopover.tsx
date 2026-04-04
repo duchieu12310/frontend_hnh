@@ -16,11 +16,14 @@ function VariantTablePopover({
   const [opened, setOpened] = useState(false);
 
   const variantStatusBadgeFragment = (status: number) => {
-    if (status === 1) {
-      return <span className="px-2 py-1 text-xs font-medium border border-gray-300 dark:border-gray-600 rounded text-gray-700 dark:text-gray-300">Có hiệu lực</span>;
-    }
-
-    return <span className="px-2 py-1 text-xs font-medium border border-red-300 dark:border-red-600 rounded text-red-700 dark:text-red-400">Vô hiệu lực</span>;
+    const isActive = status === 1;
+    return (
+      <div className="inline-flex cursor-default" title={isActive ? 'Bật (Có hiệu lực)' : 'Tắt (Vô hiệu lực)'}>
+        <div className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${isActive ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
+          <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${isActive ? 'translate-x-[18px]' : 'translate-x-[2px]'}`} />
+        </div>
+      </div>
+    );
   };
 
   if (!variants || variants.length === 0) {
@@ -31,7 +34,7 @@ function VariantTablePopover({
     <Popover className="relative">
       <Popover.Button
         onClick={() => setOpened(!opened)}
-        className="px-3 py-1 text-xs font-medium text-white bg-teal-600 hover:bg-teal-700 rounded transition-colors"
+        className="text-[13px] font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 border-b border-dashed border-slate-400 hover:border-slate-900 transition-colors bg-transparent border-t-0 border-l-0 border-r-0 pb-0.5"
       >
         {variants.length + ' phiên bản'}
       </Popover.Button>

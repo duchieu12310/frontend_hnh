@@ -7,7 +7,8 @@ import {
   ManageMain,
   ManagePagination,
   ManageTable,
-  SearchPanel
+  SearchPanel,
+  StatusToggle
 } from 'components';
 import DateUtils from 'utils/DateUtils';
 import { OrderResponse } from 'models/Order';
@@ -110,13 +111,13 @@ function OrderManage() {
             <Plus size={20} />
           </a>
         </td>
+      
         <td>
           <div className="flex flex-col gap-1 items-start">
             {OrderConfigs.orderStatusBadgeFragment(entity.status)}
             {OrderConfigs.orderPaymentStatusBadgeFragment(entity.paymentStatus)}
           </div>
-        </td>
-      </>
+        </td></>
     );
   };
 

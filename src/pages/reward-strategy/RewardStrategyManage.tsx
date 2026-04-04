@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import useResetManagePageState from 'hooks/use-reset-manage-page-state';
 import { useForm, zodResolver } from '@mantine/form';
-import { ManageHeader, ManageHeaderTitle } from 'components';
+import {
+ ManageHeader, ManageHeaderTitle,   StatusToggle,
+} from 'components';
 import RewardStrategyConfigs from 'pages/reward-strategy/RewardStrategyConfigs';
 import { MathFunction } from 'tabler-icons-react';
 import { RewardStrategyRequest, RewardStrategyResponse } from 'models/RewardStrategy';
@@ -73,16 +75,7 @@ function RewardStrategyManage() {
     setRewardStrategies(newRewardStrategies);
   };
 
-  const rewardStrategyStatusBadgeFragment = (status: number) => {
-    switch (status) {
-    case 1:
-      return <span className="px-2 py-1 text-xs font-medium bg-blue-500 text-white rounded">Đang kích hoạt</span>;
-    case 2:
-      return <span className="px-2 py-1 text-xs font-medium bg-pink-500 text-white rounded">Không kích hoạt</span>;
-    }
-  };
-
-  const entitiesTableHeadsFragment = (
+    const entitiesTableHeadsFragment = (
     <tr>
       <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Kích hoạt</th>
       <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Chiến lược điểm thưởng</th>
@@ -121,7 +114,7 @@ function RewardStrategyManage() {
           </button>
         </div>
       </td>
-      <td className="px-4 py-2">{rewardStrategyStatusBadgeFragment(entity.status)}</td>
+      <td className="px-4 py-2"><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={RewardStrategyConfigs.resourceUrl} resourceKey={RewardStrategyConfigs.resourceKey} /></td>
     </tr>
   ));
 

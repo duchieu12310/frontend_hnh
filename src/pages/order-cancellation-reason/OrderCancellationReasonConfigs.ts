@@ -27,6 +27,7 @@ class OrderCancellationReasonConfigs extends Configs {
       label: 'Ghi chú lý do hủy đơn hàng',
       type: EntityPropertyType.STRING,
     },
+  
     status: {
       label: 'Trạng thái lý do hủy đơn hàng',
       type: EntityPropertyType.NUMBER,

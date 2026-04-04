@@ -52,6 +52,7 @@ class PurchaseOrderConfigs extends Configs {
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
     },
+  
     status: {
       label: 'Trạng thái đơn mua hàng',
       type: EntityPropertyType.NUMBER,

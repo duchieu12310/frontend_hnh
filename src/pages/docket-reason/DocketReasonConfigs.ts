@@ -23,6 +23,7 @@ class DocketReasonConfigs extends Configs {
       type: EntityPropertyType.STRING,
       isShowInTable: true,
     },
+  
     status: {
       label: 'Trạng thái lý do phiếu NXK',
       type: EntityPropertyType.NUMBER,

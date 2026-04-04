@@ -38,16 +38,17 @@ class CategoryConfigs extends Configs {
       type: EntityPropertyType.STRING,
       isShowInTable: true,
     },
-    status: {
-      label: 'Trạng thái thể loại',
-      type: EntityPropertyType.NUMBER,
-      isShowInTable: true,
-    },
     parentCategoryId: {
       label: 'Thể loại cha',
       type: EntityPropertyType.NUMBER,
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
+    },
+  
+    status: {
+      label: 'Trạng thái thể loại',
+      type: EntityPropertyType.NUMBER,
+      isShowInTable: true,
     },
   };
 

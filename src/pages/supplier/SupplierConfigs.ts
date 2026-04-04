@@ -99,6 +99,7 @@ class SupplierConfigs extends Configs {
       label: 'Ghi chú công ty',
       type: EntityPropertyType.STRING,
     },
+  
     status: {
       label: 'Trạng thái nhà xuất bản',
       type: EntityPropertyType.NUMBER,

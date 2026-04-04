@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Divider, Grid, Group, Paper, Select, Stack, Textarea, TextInput } from '@mantine/core';
+import { Switch,  Button, Divider, Grid, Group, Paper, Select, Stack, Textarea, TextInput  } from '@mantine/core';
 import { CreateUpdateTitle, DefaultPropertyPanel } from 'components';
 import BrandConfigs from 'pages/brand/BrandConfigs';
 import useBrandCreateViewModel from 'pages/brand/BrandCreate.vm';
@@ -45,12 +45,11 @@ function BrandCreate() {
                 />
               </Grid.Col>
               <Grid.Col xs={6}>
-                <Select
-                  required
+                <Switch
+                  size="md"
                   label={BrandConfigs.properties.status.label}
-                  placeholder="--"
-                  data={statusSelectList}
-                  {...form.getInputProps('status')}
+                  checked={form.values.status === '1'}
+                  onChange={(event) => form.setFieldValue('status', event.currentTarget.checked ? '1' : '0')}
                 />
               </Grid.Col>
             </Grid>

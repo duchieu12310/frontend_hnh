@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Divider, Grid, Group, Paper, Select, Stack, Textarea, TextInput } from '@mantine/core';
+import { Switch,  Button, Divider, Grid, Group, Paper, Select, Stack, Textarea, TextInput  } from '@mantine/core';
 import { useParams } from 'react-router-dom';
 import { CreateUpdateTitle, DefaultPropertyPanel } from 'components';
 import OrderCancellationReasonConfigs from 'pages/order-cancellation-reason/OrderCancellationReasonConfigs';
@@ -52,12 +52,11 @@ function OrderCancellationReasonUpdate() {
                 />
               </Grid.Col>
               <Grid.Col xs={6}>
-                <Select
-                  required
+                <Switch
+                  size="md"
                   label={OrderCancellationReasonConfigs.properties.status.label}
-                  placeholder="--"
-                  data={statusSelectList}
-                  {...form.getInputProps('status')}
+                  checked={form.values.status === '1'}
+                  onChange={(event) => form.setFieldValue('status', event.currentTarget.checked ? '1' : '0')}
                 />
               </Grid.Col>
             </Grid>

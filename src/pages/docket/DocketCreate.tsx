@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Divider, Grid, Group, Loader, Paper, Select, Stack, Textarea, TextInput } from '@mantine/core';
+import { Switch,  Button, Divider, Grid, Group, Loader, Paper, Select, Stack, Textarea, TextInput  } from '@mantine/core';
 import { CreateUpdateTitle, DefaultPropertyPanel, VariantFinder, VariantTable } from 'components';
 import DocketConfigs from 'pages/docket/DocketConfigs';
 import useDocketCreateViewModel from 'pages/docket/DocketCreate.vm';
@@ -163,13 +163,12 @@ function DocketCreate() {
                     />
                   </Grid.Col>
                   <Grid.Col>
-                    <Select
-                      required
-                      label={DocketConfigs.properties.status.label}
-                      placeholder="--"
-                      data={statusSelectList}
-                      {...form.getInputProps('status')}
-                    />
+                    <Switch
+                  size="md"
+                  label={DocketConfigs.properties.status.label}
+                  checked={form.values.status === '1'}
+                  onChange={(event) => form.setFieldValue('status', event.currentTarget.checked ? '1' : '0')}
+                />
                   </Grid.Col>
                 </Grid>
 

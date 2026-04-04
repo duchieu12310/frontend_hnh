@@ -27,6 +27,7 @@ class GuaranteeConfigs extends Configs {
       label: 'Mô tả bảo hành',
       type: EntityPropertyType.STRING,
     },
+  
     status: {
       label: 'Trạng thái bảo hành',
       type: EntityPropertyType.NUMBER,

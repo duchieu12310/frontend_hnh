@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import {
+
   EntityDetailTable,
   FilterPanel,
   ManageHeader,
@@ -9,7 +10,8 @@ import {
   ManageMain,
   ManagePagination,
   ManageTable,
-  SearchPanel
+  SearchPanel,
+  StatusToggle,
 } from 'components';
 import DateUtils from 'utils/DateUtils';
 import { WaybillResponse } from 'models/Waybill';
@@ -36,24 +38,7 @@ function WaybillManage() {
 
   const [viewOrderModalId, setViewOrderModalId] = useState<number | null>(null);
 
-  const waybillStatusBadgeFragment = (status: number) => {
-    switch (status) {
-    case 1:
-      return <span className="px-2 py-1 text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded">Đợi lấy hàng</span>;
-    case 2:
-      return <span className="px-2 py-1 text-xs font-medium border border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-400 rounded">Đang giao</span>;
-    case 3:
-      return <span className="px-2 py-1 text-xs font-medium border border-green-300 dark:border-green-600 text-green-700 dark:text-green-400 rounded">Đã giao</span>;
-    case 4:
-      return <span className="px-2 py-1 text-xs font-medium border border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 rounded">Hủy</span>;
-    }
-  };
-
-  const handleViewOrderAnchor = (orderId: number) => {
-    setViewOrderModalId(orderId);
-  };
-
-  const highlightText = (text: string, highlight: string) => {
+    const highlightText = (text: string, highlight: string) => {
     if (!highlight) return text;
     const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
     return parts.map((part, i) =>
@@ -79,7 +64,7 @@ function WaybillManage() {
         <td>
           <div className="flex flex-col gap-1">
             <button
-              onClick={() => handleViewOrderAnchor(entity.order.id)}
+              onClick={() => setViewOrderModalId(entity.order.id)}
               className="text-blue-600 dark:text-blue-400 hover:underline text-sm font-mono text-left"
             >
               {highlightText(entity.order.code, searchToken)}
@@ -89,7 +74,6 @@ function WaybillManage() {
         </td>
         <td>{DateUtils.isoDateToString(entity.shippingDate, 'DD/MM/YYYY')}</td>
         <td>{DateUtils.isoDateToString(entity.expectedDeliveryTime, 'DD/MM/YYYY')}</td>
-        <td>{waybillStatusBadgeFragment(entity.status)}</td>
         <td className="text-right">{MiscUtils.formatPrice(entity.codAmount) + ' ₫'}</td>
         <td className="text-right">{MiscUtils.formatPrice(entity.shippingFee) + ' ₫'}</td>
         <td>
@@ -100,7 +84,8 @@ function WaybillManage() {
             <p className="text-xs">Chiều cao: <b>{entity.height}</b> (cm)</p>
           </div>
         </td>
-      </>
+      
+        <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={WaybillConfigs.resourceUrl} resourceKey={WaybillConfigs.resourceKey} /></td></>
     );
   };
 
@@ -136,7 +121,7 @@ function WaybillManage() {
       </tr>
       <tr>
         <td>{WaybillConfigs.properties.status.label}</td>
-        <td>{waybillStatusBadgeFragment(entity.status)}</td>
+        <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={WaybillConfigs.resourceUrl} resourceKey={WaybillConfigs.resourceKey} /></td>
       </tr>
       <tr>
         <td>{WaybillConfigs.properties.codAmount.label}</td>

@@ -40,17 +40,18 @@ class PromotionConfigs extends Configs {
       type: EntityPropertyType.NUMBER,
       isShowInTable: true,
     },
-    status: {
-      label: 'Trạng thái khuyến mãi',
-      type: EntityPropertyType.NUMBER,
-      isShowInTable: true,
-    },
     numberOfProducts: {
       label: 'Số sản phẩm',
       type: EntityPropertyType.PLACEHOLDER,
       isShowInTable: true,
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
+    },
+  
+    status: {
+      label: 'Trạng thái khuyến mãi',
+      type: EntityPropertyType.NUMBER,
+      isShowInTable: true,
     },
   };
 

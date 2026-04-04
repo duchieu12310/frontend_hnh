@@ -39,6 +39,7 @@ class CustomerGroupConfigs extends Configs {
       type: EntityPropertyType.STRING,
       isShowInTable: true,
     },
+  
     status: {
       label: 'Trạng thái nhóm khách hàng',
       type: EntityPropertyType.NUMBER,

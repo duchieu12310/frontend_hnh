@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {
+import { Switch, 
   Button,
   Divider,
   Grid,
@@ -12,7 +12,7 @@ import {
   Text,
   Textarea,
   TextInput
-} from '@mantine/core';
+ } from '@mantine/core';
 import { useParams } from 'react-router-dom';
 import { CreateUpdateTitle, DefaultPropertyPanel, VariantFinder, VariantTable } from 'components';
 import OrderConfigs from 'pages/order/OrderConfigs';
@@ -182,13 +182,12 @@ function OrderUpdate() {
                     />
                   </Grid.Col>
                   <Grid.Col>
-                    <Select
-                      required
-                      label={OrderConfigs.properties.status.label}
-                      placeholder="--"
-                      data={statusSelectList}
-                      {...form.getInputProps('status')}
-                    />
+                    <Switch
+                  size="md"
+                  label={OrderConfigs.properties.status.label}
+                  checked={form.values.status === '1'}
+                  onChange={(event) => form.setFieldValue('status', event.currentTarget.checked ? '1' : '0')}
+                />
                   </Grid.Col>
                   <Grid.Col>
                     <TextInput

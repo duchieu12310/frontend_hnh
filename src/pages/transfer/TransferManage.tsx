@@ -32,20 +32,8 @@ function TransferManage() {
 
   const { searchToken } = useAppStore();
 
-  const docketStatusBadgeFragment = (status: number) => {
-    switch (status) {
-    case 1:
-      return <span className="px-2 py-1 text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded">Mới</span>;
-    case 2:
-      return <span className="px-2 py-1 text-xs font-medium border border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-400 rounded">Đang xử lý</span>;
-    case 3:
-      return <span className="px-2 py-1 text-xs font-medium border border-green-300 dark:border-green-600 text-green-700 dark:text-green-400 rounded">Hoàn thành</span>;
-    case 4:
-      return <span className="px-2 py-1 text-xs font-medium border border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 rounded">Hủy bỏ</span>;
-    }
-  };
-
   const highlightText = (text: string, highlight: string) => {
+    if (!text) return '';
     if (!highlight) return text;
     const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
     return parts.map((part, i) =>
@@ -57,6 +45,17 @@ function TransferManage() {
     );
   };
 
+  const docketStatusBadgeFragment = (status: number) => {
+    const isActive = status === 1;
+    return (
+      <div className="inline-flex cursor-default" title={isActive ? 'Bật (Có hiệu lực)' : 'Tắt (Vô hiệu lực)'}>
+        <div className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${isActive ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
+          <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${isActive ? 'translate-x-[18px]' : 'translate-x-[2px]'}`} />
+        </div>
+      </div>
+    );
+  };
+
   const showedPropertiesFragment = (entity: TransferResponse) => (
     <>
       <td>{entity.id}</td>
@@ -65,11 +64,11 @@ function TransferManage() {
         {highlightText(entity.code, searchToken)}
       </td>
       <td>{entity.exportDocket.warehouse.name}</td>
-      <td>{docketStatusBadgeFragment(entity.exportDocket.status)}</td>
       <td><ArrowNarrowRight size={18} className="text-gray-400" /></td>
       <td>{entity.importDocket.warehouse.name}</td>
       <td>{docketStatusBadgeFragment(entity.importDocket.status)}</td>
-    </>
+    
+      <td>{docketStatusBadgeFragment(entity.exportDocket.status)}</td></>
   );
 
   const entityDetailTableRowsFragment = (entity: TransferResponse) => (

@@ -52,6 +52,7 @@ class DocketConfigs extends Configs {
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
     },
+  
     status: {
       label: 'Trạng thái phiếu NXK',
       type: EntityPropertyType.NUMBER,

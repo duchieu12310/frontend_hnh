@@ -25,6 +25,7 @@ class JobLevelConfigs extends Configs {
       type: EntityPropertyType.STRING,
       isShowInTable: true,
     },
+  
     status: {
       label: 'Trạng thái cấp bậc công việc',
       type: EntityPropertyType.NUMBER,

@@ -32,6 +32,7 @@ class PropertyConfigs extends Configs {
       label: 'Mô tả',
       type: EntityPropertyType.STRING,
     },
+  
     status: {
       label: 'Trạng thái hiển thị',
       type: EntityPropertyType.NUMBER,

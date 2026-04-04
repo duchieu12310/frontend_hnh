@@ -72,11 +72,6 @@ class WarehouseConfigs extends Configs {
       label: 'Tên quận huyện',
       type: EntityPropertyType.STRING,
     },
-    status: {
-      label: 'Trạng thái nhà kho',
-      type: EntityPropertyType.NUMBER,
-      isShowInTable: true,
-    },
     'address.provinceId': {
       label: 'Tỉnh thành',
       type: EntityPropertyType.NUMBER,
@@ -88,6 +83,12 @@ class WarehouseConfigs extends Configs {
       type: EntityPropertyType.NUMBER,
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
+    },
+  
+    status: {
+      label: 'Trạng thái nhà kho',
+      type: EntityPropertyType.NUMBER,
+      isShowInTable: true,
     },
   };
 

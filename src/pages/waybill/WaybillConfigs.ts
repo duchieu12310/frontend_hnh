@@ -43,11 +43,6 @@ class WaybillConfigs extends Configs {
       type: EntityPropertyType.DATE,
       isShowInTable: true,
     },
-    status: {
-      label: 'Trạng thái vận đơn',
-      type: EntityPropertyType.NUMBER,
-      isShowInTable: true,
-    },
     codAmount: {
       label: 'Tiền thu hộ',
       type: EntityPropertyType.NUMBER,
@@ -64,6 +59,12 @@ class WaybillConfigs extends Configs {
       isShowInTable: true,
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
+    },
+  
+    status: {
+      label: 'Trạng thái vận đơn',
+      type: EntityPropertyType.NUMBER,
+      isShowInTable: true,
     },
   };
 

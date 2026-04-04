@@ -23,6 +23,7 @@ class UnitConfigs extends Configs {
       type: EntityPropertyType.STRING,
       isShowInTable: true,
     },
+  
     status: {
       label: 'Trạng thái đơn vị tính',
       type: EntityPropertyType.NUMBER,

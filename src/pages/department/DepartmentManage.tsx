@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+
   FilterPanel,
   ManageHeader,
   ManageHeaderButtons,
@@ -7,7 +8,8 @@ import {
   ManageMain,
   ManagePagination,
   ManageTable,
-  SearchPanel
+  SearchPanel,
+  StatusToggle,
 } from 'components';
 import DateUtils from 'utils/DateUtils';
 import { DepartmentResponse } from 'models/Department';
@@ -30,19 +32,7 @@ function DepartmentManage() {
 
   const { searchToken } = useAppStore();
 
-  const departmentStatusBadgeFragment = (status: number) => {
-    if (status === 1) {
-      return <span className="px-2 py-1 text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded">Đang hoạt động</span>;
-    }
-
-    if (status === 2) {
-      return <span className="px-2 py-1 text-xs font-medium border border-teal-300 dark:border-teal-600 text-teal-700 dark:text-teal-400 rounded">Ít hoạt động</span>;
-    }
-
-    return <span className="px-2 py-1 text-xs font-medium border border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 rounded">Không hoạt động</span>;
-  };
-
-  const highlightText = (text: string, highlight: string) => {
+    const highlightText = (text: string, highlight: string) => {
     if (!highlight) return text;
     const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
     return parts.map((part, i) =>
@@ -62,8 +52,8 @@ function DepartmentManage() {
       <td className="text-sm">
         {highlightText(entity.name, searchToken)}
       </td>
-      <td>{departmentStatusBadgeFragment(entity.status)}</td>
-    </>
+    
+      <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={DepartmentConfigs.resourceUrl} resourceKey={DepartmentConfigs.resourceKey} /></td></>
   );
 
   const entityDetailTableRowsFragment = (entity: DepartmentResponse) => (
@@ -86,7 +76,7 @@ function DepartmentManage() {
       </tr>
       <tr>
         <td>{DepartmentConfigs.properties.status.label}</td>
-        <td>{departmentStatusBadgeFragment(entity.status)}</td>
+        <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={DepartmentConfigs.resourceUrl} resourceKey={DepartmentConfigs.resourceKey} /></td>
       </tr>
     </>
   );

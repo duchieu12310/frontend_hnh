@@ -36,6 +36,7 @@ class CountConfigs extends Configs {
       type: EntityPropertyType.STRING,
       isShowInTable: true,
     },
+  
     status: {
       label: 'Trạng thái phiếu kiểm kho',
       type: EntityPropertyType.NUMBER,

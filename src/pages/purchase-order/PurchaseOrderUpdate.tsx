@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Divider, Grid, Group, Paper, Select, Stack, Text, Textarea, TextInput } from '@mantine/core';
+import { Switch,  Button, Divider, Grid, Group, Paper, Select, Stack, Text, Textarea, TextInput  } from '@mantine/core';
 import { useParams } from 'react-router-dom';
 import { CreateUpdateTitle, DefaultPropertyPanel, VariantFinder, VariantTable } from 'components';
 import PurchaseOrderConfigs from 'pages/purchase-order/PurchaseOrderConfigs';
@@ -112,13 +112,12 @@ function PurchaseOrderUpdate() {
                     />
                   </Grid.Col>
                   <Grid.Col>
-                    <Select
-                      required
-                      label={PurchaseOrderConfigs.properties.status.label}
-                      placeholder="--"
-                      data={statusSelectList}
-                      {...form.getInputProps('status')}
-                    />
+                    <Switch
+                  size="md"
+                  label={PurchaseOrderConfigs.properties.status.label}
+                  checked={form.values.status === '1'}
+                  onChange={(event) => form.setFieldValue('status', event.currentTarget.checked ? '1' : '0')}
+                />
                   </Grid.Col>
                 </Grid>
 

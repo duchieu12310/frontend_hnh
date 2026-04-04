@@ -39,6 +39,7 @@ class CustomerResourceConfigs extends Configs {
       type: EntityPropertyType.STRING,
       isShowInTable: true,
     },
+  
     status: {
       label: 'Trạng thái nguồn khách hàng',
       type: EntityPropertyType.NUMBER,

@@ -35,8 +35,8 @@ function ManageTable<T extends BaseResponse>(props: ManageTableProps<T>) {
   const isIndeterminate = selection.length > 0 && selection.length !== listResponse.content.length;
 
   const entitiesTableHeadsFragment = (
-    <tr>
-      <th style={{ width: 40 }}>
+    <tr className="divide-x divide-slate-500">
+      <th style={{ width: 40 }} className="px-3 py-3">
         <input
           type="checkbox"
           onChange={handleToggleAllRowsCheckbox}
@@ -44,15 +44,15 @@ function ManageTable<T extends BaseResponse>(props: ManageTableProps<T>) {
           ref={(input) => {
             if (input) input.indeterminate = isIndeterminate;
           }}
-          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+          className="w-4 h-4 text-blue-600 bg-slate-700/50 border-slate-600 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2"
         />
       </th>
       {tableHeads.map((item) => (
-        <th key={item} className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+        <th key={item} className="px-3 py-3 text-center text-[12px] font-semibold text-white/90 uppercase tracking-wider">
           {item}
         </th>
       ))}
-      <th style={{ width: 120 }} className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+      <th style={{ width: 120 }} className="px-3 py-3 text-center text-[12px] font-semibold text-white/90 uppercase tracking-wider">
         Thao tác
       </th>
     </tr>
@@ -64,13 +64,13 @@ function ManageTable<T extends BaseResponse>(props: ManageTableProps<T>) {
     return (
       <tr
         key={entity.id}
-        className={`border-b border-gray-200 dark:border-gray-700 ${
+        className={`border-b border-gray-300 dark:border-gray-600 divide-x divide-gray-300 dark:divide-gray-600 transition-colors duration-200 ${
           selected
-            ? 'bg-blue-50 dark:bg-blue-900/20'
-            : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700'
+            ? 'bg-blue-50/50 dark:bg-blue-900/20'
+            : 'bg-white dark:bg-gray-800 hover:bg-slate-50 dark:hover:bg-gray-700/50'
         }`}
       >
-        <td className="px-3 py-2">
+        <td className="px-3 py-4">
           <input
             type="checkbox"
             checked={selection.includes(entity.id)}
@@ -79,38 +79,38 @@ function ManageTable<T extends BaseResponse>(props: ManageTableProps<T>) {
           />
         </td>
         {props.showedPropertiesFragment(entity as T)}
-        <td className="px-3 py-2">
-          <div className="flex items-center gap-2">
+        <td className="px-3 py-4">
+          <div className="flex items-center justify-center gap-3">
             {props.customViewEntityLink ? (
               <Link
                 to={props.customViewEntityLink(entity as T)}
                 title="Xem"
-                className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                className="p-1.5 text-blue-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"
               >
-                <Eye size={16}/>
+                <Eye size={18}/>
               </Link>
             ) : (
               <button
                 onClick={() => handleViewEntityButton(entity.id)}
                 title="Xem"
-                className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                className="p-1.5 text-blue-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"
               >
-                <Eye size={16}/>
+                <Eye size={18}/>
               </button>
             )}
             <Link
               to={'update/' + entity.id}
               title="Cập nhật"
-              className="p-1.5 text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/20 rounded transition-colors"
+              className="p-1.5 text-orange-400 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-md transition-colors"
             >
-              <Edit size={16}/>
+              <Edit size={18}/>
             </Link>
             <button
               onClick={() => handleDeleteEntityButton(entity.id)}
               title="Xóa"
-              className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+              className="p-1.5 text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
             >
-              <Trash size={16}/>
+              <Trash size={18}/>
             </button>
             {props.actionButtonsFragment && props.actionButtonsFragment(entity as T)}
           </div>
@@ -121,12 +121,12 @@ function ManageTable<T extends BaseResponse>(props: ManageTableProps<T>) {
 
   return (
     <>
-      <div className="rounded-md overflow-hidden border border-gray-200 dark:border-gray-700">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-50 dark:bg-gray-900">
+      <div className="rounded-[12px] overflow-hidden bg-white dark:bg-gray-800 border border-[#e2e8f0] dark:border-gray-700" style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
+        <table className="min-w-full">
+          <thead className="bg-[#1e293b] text-center">
             {entitiesTableHeadsFragment}
           </thead>
-          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody className="bg-white dark:bg-gray-800 text-center">
             {entitiesTableRowsFragment}
           </tbody>
         </table>

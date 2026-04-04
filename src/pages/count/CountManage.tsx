@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+
   FilterPanel,
   ManageHeader,
   ManageHeaderButtons,
@@ -7,7 +8,8 @@ import {
   ManageMain,
   ManagePagination,
   ManageTable,
-  SearchPanel
+  SearchPanel,
+  StatusToggle,
 } from 'components';
 import DateUtils from 'utils/DateUtils';
 import { CountResponse } from 'models/Count';
@@ -31,20 +33,8 @@ function CountManage() {
 
   const { searchToken } = useAppStore();
 
-  const countStatusBadgeFragment = (status: number) => {
-    switch (status) {
-    case 1:
-      return <span className="px-2 py-1 text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded">Mới</span>;
-    case 2:
-      return <span className="px-2 py-1 text-xs font-medium border border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-400 rounded">Đang xử lý</span>;
-    case 3:
-      return <span className="px-2 py-1 text-xs font-medium border border-green-300 dark:border-green-600 text-green-700 dark:text-green-400 rounded">Hoàn thành</span>;
-    case 4:
-      return <span className="px-2 py-1 text-xs font-medium border border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 rounded">Hủy bỏ</span>;
-    }
-  };
-
   const highlightText = (text: string, highlight: string) => {
+    if (!text) return '';
     if (!highlight) return text;
     const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
     return parts.map((part, i) =>
@@ -56,7 +46,7 @@ function CountManage() {
     );
   };
 
-  const showedPropertiesFragment = (entity: CountResponse) => (
+    const showedPropertiesFragment = (entity: CountResponse) => (
     <>
       <td>{entity.id}</td>
       <td>{DateUtils.isoDateToString(entity.createdAt)}</td>
@@ -69,8 +59,8 @@ function CountManage() {
       <td className="text-sm">
         {highlightText(entity.warehouse.name, searchToken)}
       </td>
-      <td>{countStatusBadgeFragment(entity.status)}</td>
-    </>
+    
+      <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={CountConfigs.resourceUrl} resourceKey={CountConfigs.resourceKey} /></td></>
   );
 
   const entityDetailTableRowsFragment = (entity: CountResponse) => (
@@ -105,7 +95,7 @@ function CountManage() {
       </tr>
       <tr>
         <td>{CountConfigs.properties.status.label}</td>
-        <td>{countStatusBadgeFragment(entity.status)}</td>
+        <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={CountConfigs.resourceUrl} resourceKey={CountConfigs.resourceKey} /></td>
       </tr>
     </>
   );

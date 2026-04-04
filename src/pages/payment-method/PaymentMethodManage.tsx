@@ -5,7 +5,9 @@ import useGetAllApi from 'hooks/use-get-all-api';
 import { PaymentMethodRequest, PaymentMethodResponse } from 'models/PaymentMethod';
 import PaymentMethodConfigs from 'pages/payment-method/PaymentMethodConfigs';
 import useResetManagePageState from 'hooks/use-reset-manage-page-state';
-import { ManageHeader, ManageHeaderTitle } from 'components';
+import {
+ ManageHeader, ManageHeaderTitle,   StatusToggle,
+} from 'components';
 import { AlertCircle } from 'tabler-icons-react';
 import { formList, useForm } from '@mantine/form';
 import MiscUtils from 'utils/MiscUtils';
@@ -65,16 +67,7 @@ function PaymentMethodManage() {
     }
   };
 
-  const paymentMethodStatusBadgeFragment = (status: number) => {
-    switch (status) {
-    case 1:
-      return <span className="px-2 py-1 text-xs font-medium bg-blue-500 text-white rounded">Đang sử dụng</span>;
-    case 2:
-      return <span className="px-2 py-1 text-xs font-medium bg-pink-500 text-white rounded">Không sử dụng</span>;
-    }
-  };
-
-  const entitiesTableHeadsFragment = (
+    const entitiesTableHeadsFragment = (
     <tr>
       <th>Kích hoạt</th>
       <th>Hình thức thanh toán</th>
@@ -110,7 +103,7 @@ function PaymentMethodManage() {
           </div>
         </td>
         <td>{entity.code}</td>
-        <td>{paymentMethodStatusBadgeFragment(entity.status)}</td>
+        <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={PaymentMethodConfigs.resourceUrl} resourceKey={PaymentMethodConfigs.resourceKey} /></td>
       </tr>
     );
   });

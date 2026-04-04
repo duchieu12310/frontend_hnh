@@ -56,6 +56,7 @@ class OrderResourceConfigs extends Configs {
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
     },
+  
     status: {
       label: 'Trạng thái nguồn đơn hàng',
       type: EntityPropertyType.NUMBER,

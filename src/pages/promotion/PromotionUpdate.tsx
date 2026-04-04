@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Divider, Grid, Group, NumberInput, Paper, Select, Stack, Text, TextInput } from '@mantine/core';
+import { Switch,  Button, Divider, Grid, Group, NumberInput, Paper, Select, Stack, Text, TextInput  } from '@mantine/core';
 import { useParams } from 'react-router-dom';
 import { CreateUpdateTitle, DefaultPropertyPanel, EntityFinder } from 'components';
 import PromotionConfigs from 'pages/promotion/PromotionConfigs';
@@ -143,13 +143,12 @@ function PromotionUpdate() {
                     />
                   </Grid.Col>
                   <Grid.Col>
-                    <Select
-                      required
-                      label={PromotionConfigs.properties.status.label}
-                      placeholder="--"
-                      data={statusSelectList}
-                      {...form.getInputProps('status')}
-                    />
+                    <Switch
+                  size="md"
+                  label={PromotionConfigs.properties.status.label}
+                  checked={form.values.status === '1'}
+                  onChange={(event) => form.setFieldValue('status', event.currentTarget.checked ? '1' : '0')}
+                />
                   </Grid.Col>
                 </Grid>
 

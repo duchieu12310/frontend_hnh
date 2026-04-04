@@ -30,7 +30,7 @@ const titles: Record<string, string> = {
 
 const handler = {
   get: function (target: typeof titles, name: string) {
-    return Object.prototype.hasOwnProperty.call(target, name) ? target[name] + ' – ThatAnNhien' : 'ThatAnNhien';
+    return Object.prototype.hasOwnProperty.call(target, name) ? target[name] + ' – Hiếu Bookstore' : 'Hiếu Bookstore';
   },
 };
 

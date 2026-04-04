@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+
   FilterPanel,
   ManageHeader,
   ManageHeaderButtons,
@@ -7,7 +8,8 @@ import {
   ManageMain,
   ManagePagination,
   ManageTable,
-  SearchPanel
+  SearchPanel,
+  StatusToggle,
 } from 'components';
 import DateUtils from 'utils/DateUtils';
 import { SupplierResponse } from 'models/Supplier';
@@ -30,15 +32,7 @@ function SupplierManage() {
 
   const { searchToken } = useAppStore();
 
-  const supplierStatusBadgeFragment = (status: number) => {
-    if (status === 1) {
-      return <span className="px-2 py-1 text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded">Có hiệu lực</span>;
-    }
-
-    return <span className="px-2 py-1 text-xs font-medium border border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 rounded">Vô hiệu lực</span>;
-  };
-
-  const highlightText = (text: string, highlight: string) => {
+    const highlightText = (text: string, highlight: string) => {
     if (!highlight) return text;
     const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
     return parts.map((part, i) =>
@@ -68,8 +62,8 @@ function SupplierManage() {
       <td className="text-sm">
         {highlightText(entity.companyName || '', searchToken)}
       </td>
-      <td>{supplierStatusBadgeFragment(entity.status)}</td>
-    </>
+    
+      <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={SupplierConfigs.resourceUrl} resourceKey={SupplierConfigs.resourceKey} /></td></>
   );
 
   const entityDetailTableRowsFragment = (entity: SupplierResponse) => (
@@ -152,7 +146,7 @@ function SupplierManage() {
       </tr>
       <tr>
         <td>{SupplierConfigs.properties.status.label}</td>
-        <td>{supplierStatusBadgeFragment(entity.status)}</td>
+        <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={SupplierConfigs.resourceUrl} resourceKey={SupplierConfigs.resourceKey} /></td>
       </tr>
     </>
   );

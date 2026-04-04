@@ -52,6 +52,7 @@ import LoadingMiddleware from 'components/LoadingMiddleware/LoadingMiddleware';
 import ScrollToTop from 'components/ScrollToTop/ScrollToTop';
 import EntityFinder from 'components/EntityFinder/EntityFinder';
 import AdminError from 'components/AdminError/AdminError';
+import StatusToggle from 'components/StatusToggle/StatusToggle';
 
 // Client
 import ClientHeader from 'components/ClientHeader/ClientHeader';
@@ -109,6 +110,7 @@ export {
   ScrollToTop,
   EntityFinder,
   AdminError,
+  StatusToggle,
 
   ClientHeader,
   ClientFooter,

@@ -32,6 +32,7 @@ class BrandConfigs extends Configs {
       label: 'Mô tả tác giả',
       type: EntityPropertyType.STRING,
     },
+  
     status: {
       label: 'Trạng thái tác giả',
       type: EntityPropertyType.NUMBER,

@@ -25,6 +25,7 @@ class JobTypeConfigs extends Configs {
       type: EntityPropertyType.STRING,
       isShowInTable: true,
     },
+  
     status: {
       label: 'Trạng thái loại hình công việc',
       type: EntityPropertyType.NUMBER,

@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+
   FilterPanel,
   ManageHeader,
   ManageHeaderButtons,
@@ -7,7 +8,8 @@ import {
   ManageMain,
   ManagePagination,
   ManageTable,
-  SearchPanel
+  SearchPanel,
+  StatusToggle,
 } from 'components';
 import DateUtils from 'utils/DateUtils';
 import { DocketResponse } from 'models/Docket';
@@ -31,29 +33,8 @@ function DocketManage() {
 
   const { searchToken } = useAppStore();
 
-  const docketTypeBadgeFragment = (type: number) => {
-    switch (type) {
-    case 1:
-      return <span className="px-2 py-1 text-xs font-medium bg-blue-500 text-white rounded">Nhập</span>;
-    case 2:
-      return <span className="px-2 py-1 text-xs font-medium bg-orange-500 text-white rounded">Xuất</span>;
-    }
-  };
-
-  const docketStatusBadgeFragment = (status: number) => {
-    switch (status) {
-    case 1:
-      return <span className="px-2 py-1 text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded">Mới</span>;
-    case 2:
-      return <span className="px-2 py-1 text-xs font-medium border border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-400 rounded">Đang xử lý</span>;
-    case 3:
-      return <span className="px-2 py-1 text-xs font-medium border border-green-300 dark:border-green-600 text-green-700 dark:text-green-400 rounded">Hoàn thành</span>;
-    case 4:
-      return <span className="px-2 py-1 text-xs font-medium border border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 rounded">Hủy bỏ</span>;
-    }
-  };
-
   const highlightText = (text: string, highlight: string) => {
+    if (!text) return '';
     if (!highlight) return text;
     const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
     return parts.map((part, i) =>
@@ -65,7 +46,16 @@ function DocketManage() {
     );
   };
 
-  const showedPropertiesFragment = (entity: DocketResponse) => (
+  const docketTypeBadgeFragment = (type: number) => {
+    switch (type) {
+    case 1:
+      return <span className="px-2 py-1 text-xs font-medium bg-blue-500 text-white rounded">Nhập</span>;
+    case 2:
+      return <span className="px-2 py-1 text-xs font-medium bg-orange-500 text-white rounded">Xuất</span>;
+    }
+  };
+
+    const showedPropertiesFragment = (entity: DocketResponse) => (
     <>
       <td>{entity.id}</td>
       <td>{DateUtils.isoDateToString(entity.createdAt)}</td>
@@ -82,8 +72,8 @@ function DocketManage() {
       <td className="text-sm">
         {highlightText(entity.warehouse.name, searchToken)}
       </td>
-      <td>{docketStatusBadgeFragment(entity.status)}</td>
-    </>
+    
+      <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={DocketConfigs.resourceUrl} resourceKey={DocketConfigs.resourceKey} /></td></>
   );
 
   const entityDetailTableRowsFragment = (entity: DocketResponse) => (
@@ -134,7 +124,7 @@ function DocketManage() {
       </tr>
       <tr>
         <td>{DocketConfigs.properties.status.label}</td>
-        <td>{docketStatusBadgeFragment(entity.status)}</td>
+        <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={DocketConfigs.resourceUrl} resourceKey={DocketConfigs.resourceKey} /></td>
       </tr>
     </>
   );

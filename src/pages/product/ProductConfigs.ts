@@ -92,11 +92,6 @@ class ProductConfigs extends Configs {
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
     },
-    status: {
-      label: 'Trạng thái hiển thị',
-      type: EntityPropertyType.NUMBER,
-      isShowInTable: true,
-    },
     'category.name': {
       label: 'Tên thể loại',
       type: EntityPropertyType.STRING,
@@ -177,6 +172,12 @@ class ProductConfigs extends Configs {
       type: EntityPropertyType.NUMBER,
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
+    },
+  
+    status: {
+      label: 'Trạng thái hiển thị',
+      type: EntityPropertyType.NUMBER,
+      isShowInTable: true,
     },
   };
 

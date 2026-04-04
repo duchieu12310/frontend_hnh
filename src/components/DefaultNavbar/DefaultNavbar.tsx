@@ -296,63 +296,72 @@ export function DefaultNavbar() {
     return (
       <div
         key={navbarLink.label}
-        className="rounded-md overflow-hidden"
+        className="flex flex-col gap-1 rounded-xl overflow-hidden group"
       >
         <Link
           to={navbarLink.link}
           onClick={() => setActive(navbarLink.label)}
-          className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'} ${collapsed ? 'px-2' : 'px-4'} py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 no-underline transition-all rounded-lg ${
+          className={`relative flex items-center ${collapsed ? 'justify-center' : 'gap-3'} ${collapsed ? 'px-2' : 'px-4'} py-3 text-[14px] font-medium no-underline transition-all rounded-xl overflow-hidden group ${
             isActive || hasActiveChild
-              ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 shadow-sm'
-              : 'hover:bg-gray-100 dark:hover:bg-gray-700/50'
+              ? 'text-blue-700 dark:text-blue-300'
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50'
           } ${
             isDisabled ? 'opacity-50 pointer-events-none' : ''
           }`}
           title={collapsed ? navbarLink.label : undefined}
         >
-          <navbarLink.icon size={20} strokeWidth={1.5} className={`${
+          {/* Active Gradient Background with Glassmorphism */}
+          {(isActive || hasActiveChild) && (
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent backdrop-blur-sm -z-10" />
+          )}
+          {/* Indicated style */}
+          {(isActive || hasActiveChild) && (
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-3/4 bg-blue-600 dark:bg-blue-400 rounded-r-md" />
+          )}
+
+          <navbarLink.icon size={20} strokeWidth={isActive || hasActiveChild ? 2 : 1.5} className={`${
             isActive || hasActiveChild
-              ? 'text-blue-600 dark:text-blue-400'
-              : 'text-gray-500 dark:text-gray-400'
+              ? 'text-blue-600 dark:text-blue-400 drop-shadow-sm'
+              : 'text-gray-500 dark:text-gray-400 group-hover:text-blue-500 transition-colors'
           }`} />
-          {!collapsed && <span>{navbarLink.label}</span>}
+          {!collapsed && <span className="tracking-wide leading-relaxed">{navbarLink.label}</span>}
         </Link>
-        {!collapsed && (isActive || hasActiveChild) && (navbarLink.childLinks || []).map(childLink => {
-          const isChildActive = location.pathname === childLink.link;
-          return (
-            <Link
-              key={childLink.label}
-              to={childLink.link}
-              className={`flex items-center gap-3 px-4 py-2 text-sm font-medium transition-all rounded-lg ml-4 ${
-                isChildActive
-                  ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50'
-              }`}
-            >
-              <div className="w-6 h-6 flex items-center justify-center">
-                <div className={`w-1.5 h-1.5 rounded-full ${
-                  isChildActive
-                    ? 'bg-blue-600 dark:bg-blue-400'
-                    : 'bg-gray-400 dark:bg-gray-500'
-                }`} />
-              </div>
-              <span>{childLink.label}</span>
-            </Link>
-          );
-        })}
+        {!collapsed && (isActive || hasActiveChild) && navbarLink.childLinks && navbarLink.childLinks.length > 0 && (
+          <div className="flex flex-col ml-6 pl-3 border-l-[1.5px] border-gray-200 dark:border-gray-700/50 relative py-1 gap-1">
+            {navbarLink.childLinks.map(childLink => {
+              const isChildActive = location.pathname === childLink.link;
+              return (
+                <Link
+                  key={childLink.label}
+                  to={childLink.link}
+                  className={`relative flex items-center px-4 py-2 text-[13.5px] font-medium transition-all rounded-lg group ${
+                    isChildActive
+                      ? 'text-blue-700 dark:text-blue-300 bg-blue-50/50 dark:bg-blue-900/20'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/30'
+                  }`}
+                >
+                  <div className={`absolute -left-[13px] top-1/2 w-3 border-t-[1.5px] transition-colors ${
+                    isChildActive ? 'border-blue-500' : 'border-gray-200 dark:border-gray-700/50 group-hover:border-blue-300'
+                  }`} />
+                  <span className="tracking-wide">{childLink.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   });
 
   return (
     <nav
-      className={`fixed left-0 top-14 h-[calc(100vh-3.5rem)] bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto transition-all shadow-sm ${
+      className={`fixed left-4 top-20 h-[calc(100vh-6rem)] bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-2xl overflow-y-auto transition-all shadow-xl ${
         opened ? 'translate-x-0' : '-translate-x-full'
       } md:translate-x-0 z-40 ${
         collapsed ? 'w-16' : 'w-64'
       }`}
     >
-      <div className={`flex flex-col gap-1 ${collapsed ? 'p-2' : 'p-4'}`}>
+      <div className={`flex flex-col gap-1.5 ${collapsed ? 'p-2' : 'p-4'}`}>
         {navbarLinksFragment}
       </div>
     </nav>

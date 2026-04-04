@@ -77,11 +77,6 @@ class UserConfigs extends Configs {
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
     },
-    status: {
-      label: 'Trạng thái người dùng',
-      type: EntityPropertyType.NUMBER,
-      isShowInTable: true,
-    },
     roles: {
       label: 'Quyền người dùng',
       type: EntityPropertyType.ARRAY,
@@ -106,6 +101,12 @@ class UserConfigs extends Configs {
       type: EntityPropertyType.NUMBER,
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
+    },
+  
+    status: {
+      label: 'Trạng thái người dùng',
+      type: EntityPropertyType.NUMBER,
+      isShowInTable: true,
     },
   };
 

@@ -47,11 +47,6 @@ class OfficeConfigs extends Configs {
       label: 'Mã quận huyện',
       type: EntityPropertyType.STRING,
     },
-    status: {
-      label: 'Trạng thái văn phòng',
-      type: EntityPropertyType.NUMBER,
-      isShowInTable: true,
-    },
     'address.provinceId': {
       label: 'Tỉnh thành',
       type: EntityPropertyType.NUMBER,
@@ -63,6 +58,12 @@ class OfficeConfigs extends Configs {
       type: EntityPropertyType.NUMBER,
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
+    },
+  
+    status: {
+      label: 'Trạng thái văn phòng',
+      type: EntityPropertyType.NUMBER,
+      isShowInTable: true,
     },
   };
 

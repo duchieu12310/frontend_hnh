@@ -25,6 +25,7 @@ class DepartmentConfigs extends Configs {
       type: EntityPropertyType.STRING,
       isShowInTable: true,
     },
+  
     status: {
       label: 'Trạng thái phòng ban',
       type: EntityPropertyType.NUMBER,

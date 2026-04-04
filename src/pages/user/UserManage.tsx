@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+
   FilterPanel,
   ManageHeader,
   ManageHeaderButtons,
@@ -7,7 +8,8 @@ import {
   ManageMain,
   ManagePagination,
   ManageTable,
-  SearchPanel
+  SearchPanel,
+  StatusToggle,
 } from 'components';
 import DateUtils from 'utils/DateUtils';
 import { UserResponse } from 'models/User';
@@ -30,15 +32,7 @@ function UserManage() {
 
   const { searchToken } = useAppStore();
 
-  const userStatusBadgeFragment = (status: number) => {
-    if (status === 1) {
-      return <span className="px-2 py-1 text-xs font-medium border border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-400 rounded">Đã kích hoạt</span>;
-    }
-
-    return <span className="px-2 py-1 text-xs font-medium border border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 rounded">Chưa kích hoạt</span>;
-  };
-
-  const highlightText = (text: string, highlight: string) => {
+    const highlightText = (text: string, highlight: string) => {
     if (!highlight) return text;
     const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
     return parts.map((part, i) =>
@@ -66,7 +60,6 @@ function UserManage() {
       <td>
         <img src={entity.avatar || undefined} alt={entity.fullname} className="w-8 h-8 rounded-full object-cover" />
       </td>
-      <td>{userStatusBadgeFragment(entity.status)}</td>
       <td>
         <div className="flex flex-col gap-1 items-start">
           {entity.roles.map((role, index) => (
@@ -77,7 +70,8 @@ function UserManage() {
           ))}
         </div>
       </td>
-    </>
+    
+      <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={UserConfigs.resourceUrl} resourceKey={UserConfigs.resourceKey} /></td></>
   );
 
   const entityDetailTableRowsFragment = (entity: UserResponse) => (
@@ -142,7 +136,7 @@ function UserManage() {
       </tr>
       <tr>
         <td>{UserConfigs.properties.status.label}</td>
-        <td>{userStatusBadgeFragment(entity.status)}</td>
+        <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={UserConfigs.resourceUrl} resourceKey={UserConfigs.resourceKey} /></td>
       </tr>
       <tr>
         <td>{UserConfigs.properties.roles.label}</td>

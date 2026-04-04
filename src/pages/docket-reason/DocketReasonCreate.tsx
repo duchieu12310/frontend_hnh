@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Divider, Grid, Group, Paper, Select, Stack, TextInput } from '@mantine/core';
+import { Switch,  Button, Divider, Grid, Group, Paper, Select, Stack, TextInput  } from '@mantine/core';
 import { CreateUpdateTitle, DefaultPropertyPanel } from 'components';
 import DocketReasonConfigs from 'pages/docket-reason/DocketReasonConfigs';
 import useDocketReasonCreateViewModel from 'pages/docket-reason/DocketReasonCreate.vm';
@@ -32,12 +32,11 @@ function DocketReasonCreate() {
                 />
               </Grid.Col>
               <Grid.Col xs={6}>
-                <Select
-                  required
+                <Switch
+                  size="md"
                   label={DocketReasonConfigs.properties.status.label}
-                  placeholder="--"
-                  data={statusSelectList}
-                  {...form.getInputProps('status')}
+                  checked={form.values.status === '1'}
+                  onChange={(event) => form.setFieldValue('status', event.currentTarget.checked ? '1' : '0')}
                 />
               </Grid.Col>
             </Grid>

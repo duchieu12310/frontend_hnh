@@ -28,6 +28,7 @@ class TagConfigs extends Configs {
       type: EntityPropertyType.STRING,
       isShowInTable: true,
     },
+  
     status: {
       label: 'Trạng thái tag',
       type: EntityPropertyType.NUMBER,

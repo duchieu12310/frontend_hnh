@@ -44,11 +44,6 @@ class DestinationConfigs extends Configs {
       type: EntityPropertyType.STRING,
       isShowInTable: true,
     },
-    status: {
-      label: 'Trạng thái điểm nhập hàng',
-      type: EntityPropertyType.NUMBER,
-      isShowInTable: true,
-    },
     'address.provinceId': {
       label: 'Tỉnh thành',
       type: EntityPropertyType.NUMBER,
@@ -60,6 +55,12 @@ class DestinationConfigs extends Configs {
       type: EntityPropertyType.NUMBER,
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
+    },
+  
+    status: {
+      label: 'Trạng thái điểm nhập hàng',
+      type: EntityPropertyType.NUMBER,
+      isShowInTable: true,
     },
   };
 

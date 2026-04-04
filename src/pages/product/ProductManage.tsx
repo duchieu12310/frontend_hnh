@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+
   FilterPanel,
   ManageHeader,
   ManageHeaderButtons,
@@ -8,7 +9,8 @@ import {
   ManagePagination,
   ManageTable,
   SearchPanel,
-  VariantTablePopover
+  VariantTablePopover,
+  StatusToggle,
 } from 'components';
 import DateUtils from 'utils/DateUtils';
 import { ProductResponse } from 'models/Product';
@@ -51,15 +53,7 @@ function ProductManage() {
     data: listResponse = PageConfigs.initialListResponse as ListResponse<ProductResponse>,
   } = useGetAllApi<ProductResponse>(ProductConfigs.resourceUrl, ProductConfigs.resourceKey, requestParams);
 
-  const productStatusBadgeFragment = (status: number) => {
-    if (status === 1) {
-      return <span className="px-2 py-1 text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded">Có hiệu lực</span>;
-    }
-
-    return <span className="px-2 py-1 text-xs font-medium border border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 rounded">Vô hiệu lực</span>;
-  };
-
-  const highlightText = (text: string, highlight: string) => {
+    const highlightText = (text: string, highlight: string) => {
     if (!highlight) return text;
     const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
     return parts.map((part, i) =>
@@ -84,7 +78,7 @@ function ProductManage() {
           {highlightText(entity.code, searchToken)}
         </td>
         <td>
-          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center border border-gray-200 dark:border-gray-600 shadow-sm">
             {thumbnailImage?.path ? (
               <img src={thumbnailImage.path} alt={entity.name} className="w-full h-full object-cover" />
             ) : (
@@ -92,26 +86,25 @@ function ProductManage() {
             )}
           </div>
         </td>
-        <td>{productStatusBadgeFragment(entity.status)}</td>
         <td className="text-sm">
           {highlightText(entity.category?.name || '', searchToken)}
         </td>
         <td>
-          <div className="flex flex-col gap-1 items-start">
+          <div className="flex flex-wrap gap-1.5 items-center">
             {entity.tags
               .sort((a, b) => a.name.localeCompare(b.name))
               .slice(0, 2)
               .map((tag, index) => (
                 <span
                   key={index}
-                  className="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded relative pl-4 before:content-[''] before:absolute before:left-1 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-blue-600 dark:before:bg-blue-400 before:rounded-full"
+                  className="px-2.5 py-0.5 text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-md border border-slate-200 dark:border-slate-700"
                 >
                   {tag.name}
                 </span>
               ))}
             {entity.tags.length > 2 && (
-              <span className="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded relative pl-4 before:content-[''] before:absolute before:left-1 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-blue-600 dark:before:bg-blue-400 before:rounded-full">
-                ... và {entity.tags.length - 2} tag nữa
+              <span className="px-2.5 py-0.5 text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-md border border-slate-200 dark:border-slate-700">
+                +{entity.tags.length - 2}
               </span>
             )}
           </div>
@@ -119,7 +112,8 @@ function ProductManage() {
         <td>
           <VariantTablePopover variants={entity.variants} productProperties={entity.properties}/>
         </td>
-      </>
+      
+        <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={ProductConfigs.resourceUrl} resourceKey={ProductConfigs.resourceKey} /></td></>
     );
   };
 
@@ -163,7 +157,7 @@ function ProductManage() {
         <tr>
           <td>{ProductConfigs.properties.thumbnail.label}</td>
           <td>
-            <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+            <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center border border-gray-200 dark:border-gray-600 shadow-sm">
               {thumbnailImage?.path ? (
                 <img src={thumbnailImage.path} alt={entity.name} className="w-full h-full object-cover" />
               ) : (
@@ -179,8 +173,8 @@ function ProductManage() {
               {entity.images.filter((image) => !image.isEliminated).map((image) => (
                 <div
                   key={image.name}
-                  className={`relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center ${
-                    image.isThumbnail ? 'ring-2 ring-teal-500 dark:ring-teal-400' : ''
+                  className={`relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center shadow-sm ${
+                    image.isThumbnail ? 'ring-2 ring-teal-500 dark:ring-teal-400' : 'border border-gray-200 dark:border-gray-600'
                   }`}
                 >
                   {image.path ? (
@@ -195,7 +189,7 @@ function ProductManage() {
         </tr>
         <tr>
           <td>{ProductConfigs.properties.status.label}</td>
-          <td>{productStatusBadgeFragment(entity.status)}</td>
+          <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={ProductConfigs.resourceUrl} resourceKey={ProductConfigs.resourceKey} /></td>
         </tr>
         <tr>
           <td>{ProductConfigs.properties['category.name'].label}</td>
@@ -216,13 +210,13 @@ function ProductManage() {
         <tr>
           <td>{ProductConfigs.properties.tags.label}</td>
           <td className="max-w-[300px]">
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 items-center">
               {entity.tags
                 .sort((a, b) => a.name.localeCompare(b.name))
                 .map((tag, index) => (
                   <span
                     key={index}
-                    className="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded relative pl-4 before:content-[''] before:absolute before:left-1 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-blue-600 dark:before:bg-blue-400 before:rounded-full"
+                    className="px-2.5 py-0.5 text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-md border border-slate-200 dark:border-slate-700"
                   >
                     {tag.name}
                   </span>

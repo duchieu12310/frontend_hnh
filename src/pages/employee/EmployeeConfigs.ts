@@ -94,10 +94,7 @@ class EmployeeConfigs extends Configs {
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
     },
-    'user.status': {
-      label: 'Trạng thái người dùng',
-      type: EntityPropertyType.NUMBER,
-    },
+    'user.
     'user.roles': {
       label: 'Quyền người dùng',
       type: EntityPropertyType.ARRAY,
@@ -216,6 +213,10 @@ class EmployeeConfigs extends Configs {
       type: EntityPropertyType.NUMBER,
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
+    },
+  status': {
+      label: 'Trạng thái người dùng',
+      type: EntityPropertyType.NUMBER,
     },
   };
 

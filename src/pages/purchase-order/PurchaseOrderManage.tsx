@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+
   FilterPanel,
   ManageHeader,
   ManageHeaderButtons,
@@ -7,7 +8,8 @@ import {
   ManageMain,
   ManagePagination,
   ManageTable,
-  SearchPanel
+  SearchPanel,
+  StatusToggle,
 } from 'components';
 import DateUtils from 'utils/DateUtils';
 import { PurchaseOrderResponse } from 'models/PurchaseOrder';
@@ -32,26 +34,8 @@ function PurchaseOrderManage() {
 
   const { searchToken } = useAppStore();
 
-  const purchaseOrderStatusBadgeFragment = (status: number) => {
-    switch (status) {
-    case 1:
-      return <span className="px-2 py-1 text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded">Đơn hàng mới</span>;
-    case 2:
-      return <span className="px-2 py-1 text-xs font-medium border border-yellow-300 dark:border-yellow-600 text-yellow-700 dark:text-yellow-400 rounded">Đang chờ duyệt</span>;
-    case 3:
-      return <span className="px-2 py-1 text-xs font-medium border border-violet-300 dark:border-violet-600 text-violet-700 dark:text-violet-400 rounded">Đã duyệt</span>;
-    case 4:
-      return <span className="px-2 py-1 text-xs font-medium border border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-400 rounded">Đang xử lý</span>;
-    case 5:
-      return <span className="px-2 py-1 text-xs font-medium border border-green-300 dark:border-green-600 text-green-700 dark:text-green-400 rounded">Hoàn thành</span>;
-    case 6:
-      return <span className="px-2 py-1 text-xs font-medium border border-orange-300 dark:border-orange-600 text-orange-700 dark:text-orange-400 rounded">Không duyệt</span>;
-    case 7:
-      return <span className="px-2 py-1 text-xs font-medium border border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 rounded">Hủy bỏ</span>;
-    }
-  };
-
   const highlightText = (text: string, highlight: string) => {
+    if (!text) return '';
     if (!highlight) return text;
     const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
     return parts.map((part, i) =>
@@ -63,7 +47,7 @@ function PurchaseOrderManage() {
     );
   };
 
-  const showedPropertiesFragment = (entity: PurchaseOrderResponse) => (
+    const showedPropertiesFragment = (entity: PurchaseOrderResponse) => (
     <>
       <td>{entity.id}</td>
       <td>{DateUtils.isoDateToString(entity.createdAt)}</td>
@@ -94,8 +78,8 @@ function PurchaseOrderManage() {
           <Plus size={20} />
         </button>
       </td>
-      <td>{purchaseOrderStatusBadgeFragment(entity.status)}</td>
-    </>
+    
+      <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={PurchaseOrderConfigs.resourceUrl} resourceKey={PurchaseOrderConfigs.resourceKey} /></td></>
   );
 
   const entityDetailTableRowsFragment = (entity: PurchaseOrderResponse) => (
@@ -153,7 +137,7 @@ function PurchaseOrderManage() {
       </tr>
       <tr>
         <td>{PurchaseOrderConfigs.properties.status.label}</td>
-        <td>{purchaseOrderStatusBadgeFragment(entity.status)}</td>
+        <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={PurchaseOrderConfigs.resourceUrl} resourceKey={PurchaseOrderConfigs.resourceKey} /></td>
       </tr>
     </>
   );

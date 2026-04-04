@@ -46,16 +46,16 @@ class TransferConfigs extends Configs {
       type: EntityPropertyType.STRING,
       isShowInTable: true,
     },
-    'importDocket.status': {
-      label: 'Trạng thái phiếu nhập',
-      type: EntityPropertyType.NUMBER,
-      isShowInTable: true,
-    },
     note: {
       label: 'Ghi chú phiếu chuyển kho',
       type: EntityPropertyType.STRING,
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
+    },
+    'importDocket.status': {
+      label: 'Trạng thái phiếu nhập',
+      type: EntityPropertyType.NUMBER,
+      isShowInTable: true,
     },
   };
 

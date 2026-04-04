@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'tabler-icons-react';
 
 interface CreateUpdateTitleProps {
@@ -11,14 +11,17 @@ function CreateUpdateTitle({
   managerPath,
   title,
 }: CreateUpdateTitleProps) {
+  const navigate = useNavigate();
+
   return (
     <div className="flex items-center gap-2">
-      <Link
-        to={managerPath}
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
         className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
       >
         <ChevronLeft size={20}/>
-      </Link>
+      </button>
       <h3 className="text-xl font-semibold">{title}</h3>
     </div>
   );

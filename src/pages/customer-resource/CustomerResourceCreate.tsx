@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, ColorInput, Divider, Grid, Group, Paper, Select, Stack, TextInput } from '@mantine/core';
+import { Switch,  Button, ColorInput, Divider, Grid, Group, Paper, Select, Stack, TextInput  } from '@mantine/core';
 import { CreateUpdateTitle, DefaultPropertyPanel } from 'components';
 import CustomerResourceConfigs from 'pages/customer-resource/CustomerResourceConfigs';
 import useCustomerResourceCreateViewModel from 'pages/customer-resource/CustomerResourceCreate.vm';
@@ -54,12 +54,11 @@ function CustomerResourceCreate() {
                 />
               </Grid.Col>
               <Grid.Col xs={6}>
-                <Select
-                  required
+                <Switch
+                  size="md"
                   label={CustomerResourceConfigs.properties.status.label}
-                  placeholder="--"
-                  data={statusSelectList}
-                  {...form.getInputProps('status')}
+                  checked={form.values.status === '1'}
+                  onChange={(event) => form.setFieldValue('status', event.currentTarget.checked ? '1' : '0')}
                 />
               </Grid.Col>
             </Grid>

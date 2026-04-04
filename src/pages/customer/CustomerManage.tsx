@@ -31,11 +31,14 @@ function CustomerManage() {
   const { searchToken } = useAppStore();
 
   const userStatusBadgeFragment = (status: number) => {
-    if (status === 1) {
-      return <span className="px-2 py-1 text-xs font-medium border border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-400 rounded">Đã kích hoạt</span>;
-    }
-
-    return <span className="px-2 py-1 text-xs font-medium border border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 rounded">Chưa kích hoạt</span>;
+    const isActive = status === 1;
+    return (
+      <div className="inline-flex cursor-default" title={isActive ? 'Bật (Có hiệu lực)' : 'Tắt (Vô hiệu lực)'}>
+        <div className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${isActive ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
+          <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${isActive ? 'translate-x-[18px]' : 'translate-x-[2px]'}`} />
+        </div>
+      </div>
+    );
   };
 
   const highlightText = (text: string, highlight: string) => {

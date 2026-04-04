@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+
   FilterPanel,
   ManageHeader,
   ManageHeaderButtons,
@@ -7,7 +8,8 @@ import {
   ManageMain,
   ManagePagination,
   ManageTable,
-  SearchPanel
+  SearchPanel,
+  StatusToggle,
 } from 'components';
 import DateUtils from 'utils/DateUtils';
 import { GuaranteeResponse } from 'models/Guarantee';
@@ -30,15 +32,7 @@ function GuaranteeManage() {
 
   const { searchToken } = useAppStore();
 
-  const guaranteeStatusBadgeFragment = (status: number) => {
-    if (status === 1) {
-      return <span className="px-2 py-1 text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded">Có hiệu lực</span>;
-    }
-
-    return <span className="px-2 py-1 text-xs font-medium border border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 rounded">Vô hiệu lực</span>;
-  };
-
-  const highlightText = (text: string, highlight: string) => {
+    const highlightText = (text: string, highlight: string) => {
     if (!highlight) return text;
     const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
     return parts.map((part, i) =>
@@ -58,8 +52,8 @@ function GuaranteeManage() {
       <td className="text-sm">
         {highlightText(entity.name, searchToken)}
       </td>
-      <td>{guaranteeStatusBadgeFragment(entity.status)}</td>
-    </>
+    
+      <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={GuaranteeConfigs.resourceUrl} resourceKey={GuaranteeConfigs.resourceKey} /></td></>
   );
 
   const entityDetailTableRowsFragment = (entity: GuaranteeResponse) => (
@@ -86,7 +80,7 @@ function GuaranteeManage() {
       </tr>
       <tr>
         <td>{GuaranteeConfigs.properties.status.label}</td>
-        <td>{guaranteeStatusBadgeFragment(entity.status)}</td>
+        <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={GuaranteeConfigs.resourceUrl} resourceKey={GuaranteeConfigs.resourceKey} /></td>
       </tr>
     </>
   );

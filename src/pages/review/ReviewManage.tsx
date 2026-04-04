@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import useResetManagePageState from 'hooks/use-reset-manage-page-state';
-import { ManageHeader, ManageHeaderTitle, ManageMain, ManagePagination, ReviewStarGroup } from 'components';
+import {
+ ManageHeader, ManageHeaderTitle, ManageMain, ManagePagination, ReviewStarGroup,   StatusToggle,
+} from 'components';
 import ReviewConfigs from 'pages/review/ReviewConfigs';
 import useGetAllApi from 'hooks/use-get-all-api';
 import { ReviewRequest, ReviewResponse } from 'models/Review';
@@ -29,6 +31,19 @@ function ReviewManage() {
 
   const { searchToken } = useAppStore();
 
+  const highlightText = (text: string, highlight: string) => {
+    if (!text) return '';
+    if (!highlight) return text;
+    const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+    return parts.map((part, i) =>
+      part.toLowerCase() === highlight.toLowerCase() ? (
+        <mark key={i} className="bg-blue-200 dark:bg-blue-800">{part}</mark>
+      ) : (
+        part
+      )
+    );
+  };
+
   const [deleteModalEntityId, setDeleteModalEntityId] = useState<number | null>(null);
   const [checkModalReview, setCheckModalReview] = useState<ReviewResponse | null>(null);
   const [replyModalReview, setReplyModalReview] = useState<ReviewResponse | null>(null);
@@ -45,30 +60,7 @@ function ReviewManage() {
     setReplyModalReview(review);
   };
 
-  const reviewStatusBadgeFragment = (status: number) => {
-    switch (status) {
-    case 1:
-      return <span className="px-2 py-1 text-xs font-medium bg-gray-500 text-white rounded">Chưa duyệt</span>;
-    case 2:
-      return <span className="px-2 py-1 text-xs font-medium bg-teal-500 text-white rounded">Đã duyệt</span>;
-    case 3:
-      return <span className="px-2 py-1 text-xs font-medium bg-pink-500 text-white rounded">Không duyệt</span>;
-    }
-  };
-
-  const highlightText = (text: string, highlight: string) => {
-    if (!highlight) return text;
-    const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
-    return parts.map((part, i) =>
-      part.toLowerCase() === highlight.toLowerCase() ? (
-        <mark key={i} className="bg-blue-200 dark:bg-blue-800">{part}</mark>
-      ) : (
-        part
-      )
-    );
-  };
-
-  const entitiesTableHeadsFragment = (
+    const entitiesTableHeadsFragment = (
     <tr>
       <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">ID</th>
       <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Ngày tạo</th>
@@ -104,7 +96,7 @@ function ReviewManage() {
         {highlightText(entity.content.length > 120 ? entity.content.substring(0, 120).concat('...') : entity.content, searchToken)}
       </td>
       <td className="px-4 py-2">{entity.reply && <Check size={16} className="text-teal-500" />}</td>
-      <td className="px-4 py-2">{reviewStatusBadgeFragment(entity.status)}</td>
+      <td className="px-4 py-2"><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={ReviewConfigs.resourceUrl} resourceKey={ReviewConfigs.resourceKey} /></td>
       <td className="px-4 py-2">
         <div className="flex items-center gap-1">
           <button
