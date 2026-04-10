@@ -13,7 +13,7 @@ function ClientHomeFeaturedCategories() {
           <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 dark:from-emerald-400 dark:via-teal-400 dark:to-cyan-400 bg-clip-text text-transparent">
             Danh mục nổi bật
           </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Khám phá các sản phẩm đặc sắc của chúng tôi</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Khám phá các thể loại sách đa dạng</p>
         </div>
         <Link
           to="/all-categories"

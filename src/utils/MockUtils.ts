@@ -4,33 +4,33 @@ import { MessageResponse } from 'models/Message';
 class MockUtils {
   static featuredCategories: ClientCategoryResponse[] = [
     {
-      categoryName: 'Giày Thể Thao',
-      categorySlug: 'giay-the-thao',
+      categoryName: 'Văn Học Trong Nước',
+      categorySlug: 'van-hoc-trong-nuoc',
       categoryChildren: [],
     },
     {
-      categoryName: 'Giày Tây',
-      categorySlug: 'giay-tay',
+      categoryName: 'Văn Học Nước Ngoài',
+      categorySlug: 'van-hoc-nuoc-ngoai',
       categoryChildren: [],
     },
     {
-      categoryName: 'Giày Sneaker',
-      categorySlug: 'giay-sneaker',
+      categoryName: 'Kinh Tế',
+      categorySlug: 'kinh-te',
       categoryChildren: [],
     },
     {
-      categoryName: 'Giày Chạy Bộ',
-      categorySlug: 'giay-chay-bo',
+      categoryName: 'Kỹ Năng Sống',
+      categorySlug: 'ky-nang-song',
       categoryChildren: [],
     },
     {
-      categoryName: 'Dép & Sandal',
-      categorySlug: 'dep-sandal',
+      categoryName: 'Sách Thiếu Nhi',
+      categorySlug: 'thieu-nhi',
       categoryChildren: [],
     },
     {
-      categoryName: 'Phụ Kiện Giày',
-      categorySlug: 'phu-kien-giay',
+      categoryName: 'Sách Ngoại Ngữ',
+      categorySlug: 'ngoai-ngu',
       categoryChildren: [],
     },
   ];

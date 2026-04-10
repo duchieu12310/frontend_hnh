@@ -11,27 +11,42 @@ function ClientHomeBanner() {
           <ClientCarousel>
             <div className="relative">
               <img
-                src='https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop'
-                alt='Bộ sưu tập Giày Thể Thao'
+                src='https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=1200&auto=format&fit=crop'
+                alt='Thế Giới Văn Học'
                 className="w-full h-[400px] lg:h-[450px] object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-8">
+                <div className="text-white">
+                  <h2 className="text-3xl font-bold mb-2">Thế Giới Văn Học</h2>
+                  <p className="text-lg opacity-90">Khám phá những tác phẩm kinh điển mọi thời đại.</p>
+                </div>
+              </div>
             </div>
             <div className="relative">
               <img
-                src='https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=1200&auto=format&fit=crop'
-                alt='Giày Sneaker Năng Động'
+                src='https://images.unsplash.com/photo-1507733108721-c0157973715d?q=80&w=1200&auto=format&fit=crop'
+                alt='Kinh Tế - Khởi Nghiệp'
                 className="w-full h-[400px] lg:h-[450px] object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-8">
+                <div className="text-white">
+                  <h2 className="text-3xl font-bold mb-2">Kinh Tế & Khởi Nghiệp</h2>
+                  <p className="text-lg opacity-90">Kiến thức nền tảng cho sự thành công của bạn.</p>
+                </div>
+              </div>
             </div>
             <div className="relative">
               <img
-                src='https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=1200&auto=format&fit=crop'
-                alt='Giày Tây Thanh Lịch'
+                src='https://images.unsplash.com/photo-1491843351663-73149e36b473?q=80&w=1200&auto=format&fit=crop'
+                alt='Sách Thiếu Nhi'
                 className="w-full h-[400px] lg:h-[450px] object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-8">
+                <div className="text-white">
+                  <h2 className="text-3xl font-bold mb-2">Nuôi Dưỡng Tâm Hồn</h2>
+                  <p className="text-lg opacity-90">Đánh thức trí tưởng tượng trong từng trang sách.</p>
+                </div>
+              </div>
             </div>
           </ClientCarousel>
         </div>

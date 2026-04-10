@@ -18,17 +18,17 @@ function ClientFooter() {
           {/* Cột 1: Giới thiệu */}
           <div className="col-span-1">
             <div className="flex flex-col gap-4">
-              <h3 className="text-lg font-bold text-white mb-3 relative pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-10 after:h-0.5 after:bg-gradient-to-r after:from-blue-400 after:to-cyan-400 after:rounded-sm">
+              <h3 className="text-lg font-bold text-white mb-3 relative pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-10 after:h-0.5 after:bg-gradient-to-r after:from-amber-400 after:to-orange-400 after:rounded-sm">
                 GIỚI THIỆU
               </h3>
               <div className="flex flex-col gap-3">
                 <p className="text-sm text-gray-300 leading-relaxed">
-                  Fashion Hub chuyên cung cấp quần áo thời trang, phụ kiện cao cấp, 
-                  luôn cập nhật những xu hướng mới nhất để giúp bạn tỏa sáng mỗi ngày.
+                  Hiếu Bookstore là điểm đến lý tưởng cho những người yêu sách, 
+                  nơi hội tụ những tác phẩm văn học, kinh tế và kỹ năng sống tinh hoa nhất.
                 </p>
                 <p className="text-sm text-gray-300 leading-relaxed">
-                  Mua sắm tại <a href="https://fashionhub.com" target="_blank" rel="noopener noreferrer" className="text-pink-400 font-semibold hover:underline">fashionhub.com</a>. Chúng tôi cam kết chất liệu tốt nhất, giao hàng tận nơi, 
-                  cho phép kiểm tra hàng trước và miễn phí đổi trả trong 7 ngày.
+                  Mua sắm tại <a href="/" className="text-amber-400 font-semibold hover:underline">hieubookstore.com</a>. Chúng tôi cam kết sách chính hãng, giao hàng nhanh chóng, 
+                  và dịch vụ hỗ trợ tận tâm nhất cho cộng đồng mọt sách.
                 </p>
               </div>
             </div>
@@ -37,30 +37,27 @@ function ClientFooter() {
           {/* Cột 2: Danh mục sản phẩm */}
           <div className="col-span-1">
             <div className="flex flex-col gap-4">
-              <h3 className="text-lg font-bold text-white mb-3 relative pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-10 after:h-0.5 after:bg-gradient-to-r after:from-blue-400 after:to-cyan-400 after:rounded-sm">
-                DANH MỤC SẢN PHẨM
+              <h3 className="text-lg font-bold text-white mb-3 relative pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-10 after:h-0.5 after:bg-gradient-to-r after:from-amber-400 after:to-orange-400 after:rounded-sm">
+                DANH MỤC SÁCH
               </h3>
               <div className="flex flex-col gap-2">
-                <Link to="/category/thoi-trang-nam" className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-pink-400 hover:translate-x-1 hover:font-medium">
-                  Thời trang Nam
+                <Link to="/category/van-hoc-trong-nuoc" className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-amber-400 hover:translate-x-1 hover:font-medium">
+                  Văn học trong nước
                 </Link>
-                <Link to="/category/thoi-trang-nu" className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-pink-400 hover:translate-x-1 hover:font-medium">
-                  Thời trang Nữ
+                <Link to="/category/van-hoc-nuoc-ngoai" className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-amber-400 hover:translate-x-1 hover:font-medium">
+                  Văn học nước ngoài
                 </Link>
-                <Link to="/category/ao-khoac" className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-pink-400 hover:translate-x-1 hover:font-medium">
-                  Áo khoác
+                <Link to="/category/kinh-te" className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-amber-400 hover:translate-x-1 hover:font-medium">
+                  Kinh tế - Khởi nghiệp
                 </Link>
-                <Link to="/category/quan-jean" className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-pink-400 hover:translate-x-1 hover:font-medium">
-                  Quần Jean
+                <Link to="/category/ky-nang-song" className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-amber-400 hover:translate-x-1 hover:font-medium">
+                  Kỹ năng sống
                 </Link>
-                <Link to="/category/vay-dam" className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-pink-400 hover:translate-x-1 hover:font-medium">
-                  Váy đầm công sở
+                <Link to="/category/thieu-nhi" className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-amber-400 hover:translate-x-1 hover:font-medium">
+                  Sách thiếu nhi
                 </Link>
-                <Link to="/category/phu-kien" className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-pink-400 hover:translate-x-1 hover:font-medium">
-                  Phụ kiện thời trang
-                </Link>
-                <Link to="/category/giay-dep" className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-pink-400 hover:translate-x-1 hover:font-medium">
-                  Giày dép
+                <Link to="/category/ngoai-ngu" className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-amber-400 hover:translate-x-1 hover:font-medium">
+                  Sách ngoại ngữ
                 </Link>
               </div>
             </div>
@@ -99,24 +96,24 @@ function ClientFooter() {
                 VỀ CHÚNG TÔI
               </h3>
               <div className="flex flex-col gap-3">
-                <p className="text-base font-bold text-white mb-2">FASHION HUB</p>
+                <p className="text-base font-bold text-white mb-2">HIẾU BOOKSTORE</p>
                 <div className="flex flex-col gap-2">
                   <p className="text-sm text-gray-300 leading-relaxed">
-                    <strong>Địa chỉ:</strong> số nhà 13 đường nhổn , hà nội
+                    <strong>Địa chỉ:</strong> đường nhổn , hà nội
                   </p>
                   <a 
                     href="https://maps.google.com/?q=số+nhà+13+đường+nhổn,+hà+nội" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-sm text-pink-400 font-medium underline"
+                    className="text-sm text-amber-400 font-medium underline"
                   >
                     (Chỉ đường)
                   </a>
                   <p className="text-sm text-gray-300 leading-relaxed">
-                    <strong>Email:</strong> <a href="mailto:lienhe@fashionhub.com" className="text-pink-400">lienhe@fashionhub.com</a>
+                    <strong>Email:</strong> <a href="mailto:lienhe@hieubookstore.com" className="text-amber-400">lienhe@hieubookstore.com</a>
                   </p>
                   <p className="text-sm text-gray-300 leading-relaxed">
-                    <strong>Điện thoại/Zalo:</strong> <span className="text-pink-400 font-semibold">0909.123.456</span>
+                    <strong>Điện thoại/Zalo:</strong> <span className="text-amber-400 font-semibold">0354188764</span>
                   </p>
                 </div>
                 <div className="flex items-center gap-2 mt-4">

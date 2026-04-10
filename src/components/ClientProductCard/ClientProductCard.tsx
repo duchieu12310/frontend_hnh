@@ -74,7 +74,7 @@ function ClientProductCard({ product, search }: ClientProductCardProps) {
         updateQuantityType: UpdateQuantityType.INCREMENTAL,
       };
       saveCartApi.mutate(cartRequest, {
-        onSuccess: () => NotifyUtils.simpleSuccess(`Đã thêm sản phẩm ${product.productName} vào giỏ hàng thành công`),
+        onSuccess: () => NotifyUtils.simpleSuccess(`Đã thêm cuốn sách ${product.productName} vào giỏ hàng thành công`),
       });
     }
   };

@@ -108,7 +108,7 @@ function ClientHeader() {
               </div>
               <input
                 type="text"
-                placeholder="Tìm sản phẩm..."
+                placeholder="Tìm sách..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={handleSearchInput}

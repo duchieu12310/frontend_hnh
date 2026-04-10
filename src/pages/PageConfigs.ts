@@ -1,11 +1,13 @@
 import { EntityPropertySchema, EntityPropertyType, SelectOption } from "types";
 import { ListResponse } from "utils/FetchUtils";
 import {
+	Book,
+	Notebook,
+	School,
 	Box,
 	BrandPaypal,
 	Cash,
 	Icon,
-	Shoe,
 } from "tabler-icons-react";
 import { PaymentMethodType } from "models/PaymentMethod";
 import VnpayIcon from "components/VnpayIcon";
@@ -80,12 +82,12 @@ class PageConfigs {
 
 	static categorySlugIconMap: Record<string, Icon> = new Proxy(
 		{
-			"giay-the-thao": Shoe,
-			"giay-tay": Shoe,
-			"giay-chay-bo": Shoe,
-			"giay-sneaker": Shoe,
-			"dep-sandal": Shoe,
-			"phu-kien-giay": Box,
+			"van-hoc-trong-nuoc": Book,
+			"van-hoc-nuoc-ngoai": School,
+			"kinh-te": Notebook,
+			"ky-nang-song": Book,
+			"thieu-nhi": School,
+			"ngoai-ngu": Notebook,
 		},
 		{
 			get: function (target: Record<string, Icon>, name: string) {

@@ -51,7 +51,7 @@ function ClientHomeSlowSellingProducts() {
     resultFragment = (
       <div className="flex flex-col items-center gap-4 my-8 text-blue-600 dark:text-blue-400">
         <Marquee size={125} strokeWidth={1} />
-        <p className="text-xl font-medium">Không có sản phẩm</p>
+        <p className="text-xl font-medium">Không có sách</p>
       </div>
     );
   }

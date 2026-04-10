@@ -170,7 +170,7 @@ function ClientCart() {
                     </th>
                     <th className="p-4 text-left min-w-[325px]">
                       <p className="text-sm font-normal text-gray-600 dark:text-gray-400">
-                        Mặt hàng
+                        Cuốn sách
                       </p>
                     </th>
                     <th className="p-4 text-left min-w-[125px]">
@@ -224,7 +224,7 @@ function ClientCart() {
                             strokeWidth={1}
                           />
                           <p className="text-xl font-medium">
-                            Chưa thêm mặt hàng nào
+                            Chưa có cuốn sách nào
                           </p>
                         </div>
                       </td>
@@ -432,7 +432,7 @@ function ClientCart() {
             </Dialog.Title>
             <div className="flex flex-col gap-4">
               <p className="text-gray-700 dark:text-gray-300">
-                Bạn có muốn đặt mua những sản phẩm đã chọn với hình thức thanh toán sau?
+                Bạn có muốn đặt mua những cuốn sách đã chọn?
               </p>
               <div className="flex items-center gap-2">
                 {(() => {
@@ -770,10 +770,10 @@ function CartItemTableRow({
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="w-full max-w-xs rounded-lg bg-white dark:bg-gray-800 p-6 shadow-xl">
             <Dialog.Title className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              Xóa mặt hàng
+              Xóa sách khỏi giỏ
             </Dialog.Title>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              Bạn có muốn xóa mặt hàng này?
+              Bạn có muốn xóa cuốn sách này?
             </p>
             <div className="flex gap-2 justify-end">
               <button

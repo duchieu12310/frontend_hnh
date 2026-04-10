@@ -142,9 +142,9 @@ function ClientCategory() {
               {/* Box chứa các filter bên trái */}
               <div className="flex flex-col gap-0 bg-white dark:bg-gray-800 rounded-md shadow-sm border border-gray-100 dark:border-gray-700">
 
-                {/* ── NHÓM SẢN PHẨM ── */}
+                {/* ── THỂ LOẠI SÁCH ── */}
                 <div className="p-4 border-b border-gray-100 dark:border-gray-700">
-                  <h3 className="font-bold text-[14px] text-gray-800 dark:text-gray-200 uppercase mb-3">Nhóm sản phẩm</h3>
+                  <h3 className="font-bold text-[14px] text-gray-800 dark:text-gray-200 uppercase mb-3">Thể loại sách</h3>
                   <ClientCategorySidebarTree currentSlug={slug as string} />
                 </div>
 
@@ -207,7 +207,7 @@ function ClientCategory() {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <p className="font-medium text-gray-900 dark:text-gray-100">Thương hiệu</p>
+                  <p className="font-medium text-gray-900 dark:text-gray-100">Tác giả / Nhà xuất bản</p>
                   {filter.filterBrands.length > 0
                     ? (
                       <div className="flex flex-wrap gap-2">
@@ -294,7 +294,7 @@ function ClientCategory() {
                     </label>
                   </div>
                 </div>
-                <p className="text-sm text-gray-700 dark:text-gray-300">{totalProducts} sản phẩm</p>
+                <p className="text-sm text-gray-700 dark:text-gray-300">{totalProducts} cuốn sách</p>
               </div>
 
                 <ClientCategoryProducts categorySlug={category.categorySlug} />
