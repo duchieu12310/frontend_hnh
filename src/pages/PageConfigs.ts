@@ -9,6 +9,8 @@ import {
 } from "tabler-icons-react";
 import { PaymentMethodType } from "models/PaymentMethod";
 import VnpayIcon from "components/VnpayIcon";
+import CashIcon from "components/CashIcon";
+import PaypalIcon from "components/PaypalIcon";
 
 class PageConfigs {
 	static properties = {
@@ -95,15 +97,15 @@ class PageConfigs {
 	);
 
 	static paymentMethodIconMap: Record<PaymentMethodType, Icon> = {
-		[PaymentMethodType.CASH]: Cash,
-		[PaymentMethodType.PAYPAL]: BrandPaypal,
+		[PaymentMethodType.CASH]: CashIcon as unknown as Icon,
+		[PaymentMethodType.PAYPAL]: PaypalIcon as unknown as Icon,
 		[PaymentMethodType.VNPAY]: VnpayIcon as Icon,
 	};
 
 	static paymentMethodNameMap: Record<PaymentMethodType, string> = {
-		[PaymentMethodType.CASH]: "Thanh toán tiền mặt",
-		[PaymentMethodType.PAYPAL]: "Thanh toán PayPal",
-		[PaymentMethodType.VNPAY]: "Thanh toán VNPAY",
+		[PaymentMethodType.CASH]: "Thanh toán khi nhận hàng (COD)",
+		[PaymentMethodType.PAYPAL]: "Thanh toán qua PayPal",
+		[PaymentMethodType.VNPAY]: "Thanh toán qua VNPAY",
 	};
 }
 

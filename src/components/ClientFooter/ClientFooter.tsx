@@ -102,10 +102,10 @@ function ClientFooter() {
                 <p className="text-base font-bold text-white mb-2">FASHION HUB</p>
                 <div className="flex flex-col gap-2">
                   <p className="text-sm text-gray-300 leading-relaxed">
-                    <strong>Địa chỉ:</strong> Số 123 Đường Thời Trang, Quận 1, TP Hồ Chí Minh  
+                    <strong>Địa chỉ:</strong> số nhà 13 đường nhổn , hà nội
                   </p>
                   <a 
-                    href="https://maps.google.com" 
+                    href="https://maps.google.com/?q=số+nhà+13+đường+nhổn,+hà+nội" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-sm text-pink-400 font-medium underline"

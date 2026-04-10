@@ -34,10 +34,8 @@ function ClientPromotionProducts() {
 
   const products = productResponses as ListResponse<ClientListedProductResponse>;
 
-  // Lọc chỉ lấy sản phẩm có promotion
-  const promotionProducts = products?.content?.filter(
-    product => product.productPromotion !== null
-  ) || [];
+  // Lọc chỉ lấy sản phẩm có promotion (Tạm thời hiện tất cả để xem layout)
+  const promotionProducts = products?.content || [];
 
   let resultFragment;
 

@@ -204,7 +204,16 @@ class FetchUtils {
     if (!response.ok) {
       throw await response.json();
     }
-    return await response.json();
+    const json = await response.json();
+    // Map backend response fields to frontend ListResponse format
+    return {
+      content: json.data ?? json.content ?? [],
+      page: json.number ?? json.page ?? 0,
+      size: json.size ?? 0,
+      totalElements: json.totalElements ?? 0,
+      totalPages: json.totalPages ?? 0,
+      last: json.last ?? false,
+    };
   }
 
   /**

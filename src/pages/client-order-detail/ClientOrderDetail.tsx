@@ -82,25 +82,25 @@ function ClientOrderDetail() {
 
   const orderStatusBadgeFragment = (status: number) => {
     switch (status) {
-    case 1:
-      return <Badge color="gray" variant="filled" size="sm">Đơn hàng mới</Badge>;
-    case 2:
-      return <Badge color="blue" variant="filled" size="sm">Đang xử lý</Badge>;
-    case 3:
-      return <Badge color="violet" variant="filled" size="sm">Đang giao hàng</Badge>;
-    case 4:
-      return <Badge color="green" variant="filled" size="sm">Đã giao hàng</Badge>;
-    case 5:
-      return <Badge color="red" variant="filled" size="sm">Hủy bỏ</Badge>;
+      case 1:
+        return <Badge color="gray" variant="filled" size="sm">Đơn hàng mới</Badge>;
+      case 2:
+        return <Badge color="blue" variant="filled" size="sm">Đang xử lý</Badge>;
+      case 3:
+        return <Badge color="violet" variant="filled" size="sm">Đang giao hàng</Badge>;
+      case 4:
+        return <Badge color="green" variant="filled" size="sm">Đã giao hàng</Badge>;
+      case 5:
+        return <Badge color="red" variant="filled" size="sm">Hủy bỏ</Badge>;
     }
   };
 
   const orderPaymentStatusBadgeFragment = (paymentStatus: number) => {
     switch (paymentStatus) {
-    case 1:
-      return <Badge color="gray" variant="filled" size="sm">Chưa thanh toán</Badge>;
-    case 2:
-      return <Badge color="green" variant="filled" size="sm">Đã thanh toán</Badge>;
+      case 1:
+        return <Badge color="gray" variant="filled" size="sm">Chưa thanh toán</Badge>;
+      case 2:
+        return <Badge color="green" variant="filled" size="sm">Đã thanh toán</Badge>;
     }
   };
 
@@ -148,7 +148,7 @@ function ClientOrderDetail() {
     orderContentFragment = (
       <Stack>
         {Array(5).fill(0).map((_, index) => (
-          <Skeleton key={index} height={50} radius="md"/>
+          <Skeleton key={index} height={50} radius="md" />
         ))}
       </Stack>
     );
@@ -157,7 +157,7 @@ function ClientOrderDetail() {
   if (isErrorOrderResponse) {
     orderContentFragment = (
       <Stack my={theme.spacing.xl} sx={{ alignItems: 'center', color: theme.colors.pink[6] }}>
-        <AlertTriangle size={125} strokeWidth={1}/>
+        <AlertTriangle size={125} strokeWidth={1} />
         <Text size="xl" weight={500}>Đã có lỗi xảy ra</Text>
       </Stack>
     );
@@ -210,7 +210,7 @@ function ClientOrderDetail() {
             <Card p="md" radius="md" sx={cardStyles}>
               <Stack spacing="xs">
                 <Text weight={500} color="dimmed">Hình thức giao hàng</Text>
-                <Image src={MiscUtils.ghnLogoPath} styles={{ image: { maxWidth: 170 } }}/>
+                <Image src={MiscUtils.ghnLogoPath} styles={{ image: { maxWidth: 170 } }} />
               </Stack>
             </Card>
           </Grid.Col>
@@ -220,7 +220,7 @@ function ClientOrderDetail() {
               <Stack spacing="xs">
                 <Text weight={500} color="dimmed">Hình thức thanh toán</Text>
                 <Group spacing="xs">
-                  <PaymentMethodIcon color={theme.colors.gray[5]}/>
+                  <PaymentMethodIcon size={20} />
                   <Text size="sm">{PageConfigs.paymentMethodNameMap[order.orderPaymentMethodType]}</Text>
                 </Group>
               </Stack>
@@ -264,7 +264,7 @@ function ClientOrderDetail() {
                             return (
                               <Group key={waybillLog.waybillLogId} spacing="sm" sx={{ flexWrap: 'nowrap' }}>
                                 <ThemeIcon color={waybillLogInfo.color} size="sm" variant="filled" radius="xl">
-                                  <waybillLogInfo.icon size={12}/>
+                                  <waybillLogInfo.icon size={12} />
                                 </ThemeIcon>
                                 <Text size="xs" color="dimmed">
                                   {DateUtils.isoDateToString(waybillLog.waybillLogCreatedAt)}
@@ -312,7 +312,7 @@ function ClientOrderDetail() {
         </Card>
 
         <Grid>
-          <Grid.Col sm={7} md={8} lg={9}/>
+          <Grid.Col sm={7} md={8} lg={9} />
           <Grid.Col sm={5} md={4} lg={3}>
             <Stack spacing="xs">
               <Group position="apart">
@@ -338,7 +338,7 @@ function ClientOrderDetail() {
                       sx={{ height: 20 }}
                     >
                       <ThemeIcon variant="light" color="blue" size="sm">
-                        <InfoCircle size={14}/>
+                        <InfoCircle size={14} />
                       </ThemeIcon>
                     </Tooltip>
                   )}
@@ -357,7 +357,7 @@ function ClientOrderDetail() {
           </Grid.Col>
         </Grid>
 
-        <Divider/>
+        <Divider />
 
         <Button
           color="pink"
@@ -377,7 +377,7 @@ function ClientOrderDetail() {
       <Container size="xl">
         <Grid gutter="lg">
           <Grid.Col md={3}>
-            <ClientUserNavbar/>
+            <ClientUserNavbar />
           </Grid.Col>
 
           <Grid.Col md={9}>
@@ -409,7 +409,7 @@ function OrderItemTableRow({ orderItem, canReview }: { orderItem: ClientOrderVar
       overlayBlur: 3,
       closeOnClickOutside: false,
       title: <strong>Đánh giá sản phẩm</strong>,
-      children: <ReviewProductModal orderItem={orderItem}/>,
+      children: <ReviewProductModal orderItem={orderItem} />,
     });
   };
 

@@ -229,7 +229,12 @@ class OrderConfigs extends Configs {
         </tr>
         <tr>
           <td>Hình thức thanh toán</td>
-          <td><PaymentMethodIcon /></td>
+          <td>
+            <div className="flex items-center gap-2">
+              <PaymentMethodIcon size={20} />
+              <span>{PageConfigs.paymentMethodNameMap[entity.paymentMethodType]}</span>
+            </div>
+          </td>
         </tr>
         <tr>
           <td>Trạng thái thanh toán</td>

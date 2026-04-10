@@ -49,10 +49,10 @@ function ClientCart() {
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
 
   const { user, currentPaymentMethod, updateCurrentPaymentMethod } =
-		useAuthStore();
+    useAuthStore();
 
   const { cartResponse, isLoadingCartResponse, isErrorCartResponse } =
-		useGetCartApi();
+    useGetCartApi();
   const {
     paymentMethodResponses,
     isLoadingPaymentMethodResponses,
@@ -80,6 +80,15 @@ function ClientCart() {
     }
   }, [cartResponse]);
 
+  // Initialize payment method
+  useEffect(() => {
+    if (paymentMethodResponses && paymentMethodResponses.content.length > 0 && !currentPaymentMethod) {
+      // Find the first method that isn't PayPal if we want to prioritize others, 
+      // but here we can just pick the first one from the list
+      updateCurrentPaymentMethod(paymentMethodResponses.content[0].paymentMethodCode);
+    }
+  }, [paymentMethodResponses, currentPaymentMethod, updateCurrentPaymentMethod]);
+
   let cartContentFragment;
 
   if (isLoading) {
@@ -99,7 +108,7 @@ function ClientCart() {
       <div className="flex flex-col items-center gap-4 my-8 text-pink-600 dark:text-pink-400">
         <AlertTriangle size={125} strokeWidth={1} />
         <p className="text-xl font-medium">
-					Đã có lỗi xảy ra
+          Đã có lỗi xảy ra
         </p>
       </div>
     );
@@ -119,13 +128,13 @@ function ClientCart() {
       .map(
         (cartItem) =>
           cartItem.cartItemQuantity *
-					MiscUtils.calculateDiscountedPrice(
-					  cartItem.cartItemVariant.variantPrice,
-					  cartItem.cartItemVariant.variantProduct.productPromotion
-					    ? cartItem.cartItemVariant.variantProduct
-					      .productPromotion.promotionPercent
-					    : 0
-					)
+          MiscUtils.calculateDiscountedPrice(
+            cartItem.cartItemVariant.variantPrice,
+            cartItem.cartItemVariant.variantProduct.productPromotion
+              ? cartItem.cartItemVariant.variantProduct
+                .productPromotion.promotionPercent
+              : 0
+          )
       )
       .reduce((partialSum, a) => partialSum + a, 0);
 
@@ -161,27 +170,27 @@ function ClientCart() {
                     </th>
                     <th className="p-4 text-left min-w-[325px]">
                       <p className="text-sm font-normal text-gray-600 dark:text-gray-400">
-												Mặt hàng
+                        Mặt hàng
                       </p>
                     </th>
                     <th className="p-4 text-left min-w-[125px]">
                       <p className="text-sm font-normal text-gray-600 dark:text-gray-400">
-												Đơn giá
+                        Đơn giá
                       </p>
                     </th>
                     <th className="p-4 text-left min-w-[150px]">
                       <p className="text-sm font-normal text-gray-600 dark:text-gray-400">
-												Số lượng
+                        Số lượng
                       </p>
                     </th>
                     <th className="p-4 text-left min-w-[125px]">
                       <p className="text-sm font-normal text-gray-600 dark:text-gray-400">
-												Thành tiền
+                        Thành tiền
                       </p>
                     </th>
                     <th className="p-4 text-center min-w-[80px]">
                       <p className="text-sm font-normal text-gray-600 dark:text-gray-400">
-												Thao tác
+                        Thao tác
                       </p>
                     </th>
                   </tr>
@@ -215,7 +224,7 @@ function ClientCart() {
                             strokeWidth={1}
                           />
                           <p className="text-xl font-medium">
-														Chưa thêm mặt hàng nào
+                            Chưa thêm mặt hàng nào
                           </p>
                         </div>
                       </td>
@@ -233,13 +242,13 @@ function ClientCart() {
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <p className="font-medium text-gray-600 dark:text-gray-400">
-										Giao tới
+                    Giao tới
                   </p>
                   <Link
                     to="/user/setting/personal"
                     className="px-2 py-1 text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
                   >
-										Thay đổi
+                    Thay đổi
                   </Link>
                 </div>
                 <div className="flex flex-col gap-2">
@@ -269,7 +278,7 @@ function ClientCart() {
             <div className="p-6 rounded-md shadow-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
               <div className="flex flex-col gap-2">
                 <p className="font-medium text-gray-600 dark:text-gray-400">
-									Hình thức giao hàng
+                  Hình thức giao hàng
                 </p>
                 <div className="flex flex-col gap-2">
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -293,39 +302,53 @@ function ClientCart() {
             <div className="p-6 rounded-md shadow-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
               <div className="flex flex-col gap-2">
                 <p className="font-medium text-gray-600 dark:text-gray-400">
-									Hình thức thanh toán
+                  Hình thức thanh toán
                 </p>
                 <div className="flex flex-col gap-2">
-                  {paymentMethodResponses.content.map(
-                    (paymentMethod) => {
+                  {paymentMethodResponses.content
+                    .map((paymentMethod) => {
                       const PaymentMethodIcon =
-												PageConfigs
-												  .paymentMethodIconMap[
-												    paymentMethod
-												      .paymentMethodCode
-												  ];
+                        PageConfigs.paymentMethodIconMap[
+                        paymentMethod.paymentMethodCode
+                        ];
 
                       return (
                         <label
                           key={paymentMethod.paymentMethodId}
-                          className="flex items-center gap-2 cursor-pointer w-full"
+                          className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${currentPaymentMethod ===
+                            paymentMethod.paymentMethodCode
+                            ? 'border-blue-600 bg-blue-50/50 dark:bg-blue-900/20 shadow-sm'
+                            : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                            }`}
                         >
                           <input
                             type="radio"
                             name="payment"
                             value={paymentMethod.paymentMethodCode}
-                            checked={currentPaymentMethod === paymentMethod.paymentMethodCode}
-                            onChange={() => updateCurrentPaymentMethod(paymentMethod.paymentMethodCode)}
+                            checked={
+                              currentPaymentMethod ===
+                              paymentMethod.paymentMethodCode
+                            }
+                            onChange={() =>
+                              updateCurrentPaymentMethod(
+                                paymentMethod.paymentMethodCode
+                              )
+                            }
                             className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                           />
-                          <PaymentMethodIcon size={24} />
-                          <p className="text-sm text-gray-900 dark:text-gray-100">
-                            {paymentMethod.paymentMethodName}
+                          <div className="flex items-center justify-center w-10 h-10 bg-white dark:bg-gray-800 rounded-md border border-gray-100 dark:border-gray-700 shrink-0 shadow-xs">
+                            <PaymentMethodIcon size={24} />
+                          </div>
+                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                            {
+                              PageConfigs.paymentMethodNameMap[
+                              paymentMethod.paymentMethodCode
+                              ]
+                            }
                           </p>
                         </label>
                       );
-                    }
-                  )}
+                    })}
                 </div>
               </div>
             </div>
@@ -335,7 +358,7 @@ function ClientCart() {
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-											Tạm tính
+                      Tạm tính
                     </p>
                     <p className="text-sm text-right text-gray-900 dark:text-gray-100">
                       {MiscUtils.formatPrice(totalAmount) + '\u00A0₫'}
@@ -343,7 +366,7 @@ function ClientCart() {
                   </div>
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-											Thuế (10%)
+                      Thuế (10%)
                     </p>
                     <p className="text-sm text-right text-gray-900 dark:text-gray-100">
                       {MiscUtils.formatPrice(taxCost) + '\u00A0₫'}
@@ -352,7 +375,7 @@ function ClientCart() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1 group relative">
                       <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-												Tổng tiền
+                        Tổng tiền
                       </p>
                       <div className="group relative">
                         <InfoCircle size={14} className="text-blue-600 dark:text-blue-400 cursor-help" />
@@ -376,7 +399,7 @@ function ClientCart() {
               className="w-full px-6 py-3 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-md transition-colors"
             >
               <ShoppingCart size={20} />
-							Đặt mua ({selectedItems.size})
+              Đặt mua ({selectedItems.size})
             </button>
           </div>
         </div>
@@ -447,12 +470,12 @@ function ClientCart() {
             <Dialog.Title className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
               Thông báo xác nhận đặt mua
             </Dialog.Title>
-            <ConfirmedOrder 
+            <ConfirmedOrder
               onClose={() => {
                 setConfirmedOrderDialogOpen(false);
                 setSelectedItems(new Set());
-              }} 
-              selectedItems={selectedItems} 
+              }}
+              selectedItems={selectedItems}
             />
           </Dialog.Panel>
         </div>
@@ -466,7 +489,7 @@ function CartItemTableRow({
   isSelected,
   onToggleSelect,
 }: {
-	cartItem: ClientCartVariantResponse;
+  cartItem: ClientCartVariantResponse;
   isSelected: boolean;
   onToggleSelect: (variantId: number) => void;
 }) {
@@ -487,7 +510,7 @@ function CartItemTableRow({
 
   const handleCartItemQuantityInput = (cartItemQuantity: number) => {
     const maxInventory = cartItem.cartItemVariant.quantity;
-    
+
     // Kiểm tra nếu vượt quá tồn kho
     if (cartItemQuantity > maxInventory) {
       setQuantityError(`Số lượng không được vượt quá tồn kho (${maxInventory})`);
@@ -495,7 +518,7 @@ function CartItemTableRow({
       // Tự động điều chỉnh về số lượng tối đa
       const adjustedQuantity = maxInventory;
       setQuantity(adjustedQuantity);
-      
+
       if (
         user &&
         adjustedQuantity !== cartItem.cartItemQuantity &&
@@ -517,14 +540,14 @@ function CartItemTableRow({
       }
       return;
     }
-    
+
     // Xóa thông báo lỗi nếu hợp lệ
     setQuantityError(null);
-    
+
     if (
       user &&
-			cartItemQuantity !== cartItem.cartItemQuantity &&
-			cartItemQuantity <= maxInventory
+      cartItemQuantity !== cartItem.cartItemQuantity &&
+      cartItemQuantity <= maxInventory
     ) {
       const cartRequest: ClientCartRequest = {
         cartId: currentCartId,
@@ -628,23 +651,23 @@ function CartItemTableRow({
             </p>
             {cartItem.cartItemVariant.variantProduct
               .productPromotion && (
-              <div className="flex items-center gap-2">
-                <p className="text-xs text-gray-600 dark:text-gray-400 line-through">
-                  {MiscUtils.formatPrice(
-                    cartItem.cartItemVariant.variantPrice
-                  )}{' '}
-                  ₫
-                </p>
-                <span className="px-2 py-0.5 text-xs font-medium bg-pink-100 dark:bg-pink-900/20 text-pink-700 dark:text-pink-400 rounded">
-                  -
-                  {
-                    cartItem.cartItemVariant.variantProduct
-                      .productPromotion.promotionPercent
-                  }
-                  %
-                </span>
-              </div>
-            )}
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 line-through">
+                    {MiscUtils.formatPrice(
+                      cartItem.cartItemVariant.variantPrice
+                    )}{' '}
+                    ₫
+                  </p>
+                  <span className="px-2 py-0.5 text-xs font-medium bg-pink-100 dark:bg-pink-900/20 text-pink-700 dark:text-pink-400 rounded">
+                    -
+                    {
+                      cartItem.cartItemVariant.variantProduct
+                        .productPromotion.promotionPercent
+                    }
+                    %
+                  </span>
+                </div>
+              )}
           </div>
         </td>
         <td className="p-4">
@@ -683,11 +706,10 @@ function CartItemTableRow({
                 }}
                 min={1}
                 max={cartItem.cartItemVariant.quantity}
-                className={`w-12 h-8 text-center border rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  quantityError 
-                    ? 'border-red-500 dark:border-red-500' 
+                className={`w-12 h-8 text-center border rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${quantityError
+                    ? 'border-red-500 dark:border-red-500'
                     : 'border-gray-300 dark:border-gray-600'
-                }`}
+                  }`}
               />
 
               <button
@@ -720,14 +742,14 @@ function CartItemTableRow({
           <p className="font-medium text-sm text-blue-600 dark:text-blue-400">
             {MiscUtils.formatPrice(
               cartItem.cartItemQuantity *
-                MiscUtils.calculateDiscountedPrice(
-                  cartItem.cartItemVariant.variantPrice,
-                  cartItem.cartItemVariant.variantProduct
-                    .productPromotion
-                    ? cartItem.cartItemVariant.variantProduct
-                      .productPromotion.promotionPercent
-                    : 0
-                )
+              MiscUtils.calculateDiscountedPrice(
+                cartItem.cartItemVariant.variantPrice,
+                cartItem.cartItemVariant.variantProduct
+                  .productPromotion
+                  ? cartItem.cartItemVariant.variantProduct
+                    .productPromotion.promotionPercent
+                  : 0
+              )
             ) + ' ₫'}
           </p>
         </td>
@@ -783,13 +805,13 @@ function ConfirmedOrder({ onClose, selectedItems }: { onClose: () => void; selec
     isLoading,
     isError,
   } = useCreateClientOrderApi();
-  
+
   const deleteCartItemsApi = useDeleteCartItemsApi();
   const hasProcessedRef = useRef(false);
 
   const [checkoutPaypalStatus, setCheckoutPaypalStatus] = useState<
-		'none' | 'success' | 'cancel'
-	>('none');
+    'none' | 'success' | 'cancel'
+  >('none');
 
   const { currentPaymentMethod } = useAuthStore();
 
@@ -798,11 +820,11 @@ function ConfirmedOrder({ onClose, selectedItems }: { onClose: () => void; selec
   useEffect(() => {
     if (checkoutPaypalStatus === 'none' && !hasProcessedRef.current) {
       hasProcessedRef.current = true;
-      
+
       const processOrder = () => {
         // Get current cart
         const cartResponse = queryClient.getQueryData<ClientCartResponse | Empty>(['client-api', 'carts', 'getCart']);
-        
+
         if (cartResponse && Object.hasOwn(cartResponse, 'cartId')) {
           const cart = cartResponse as ClientCartResponse;
           // Find items to remove (not selected)
@@ -857,7 +879,7 @@ function ConfirmedOrder({ onClose, selectedItems }: { onClose: () => void; selec
   useEffect(() => {
     if (newNotifications.length > 0 && clientConfirmedOrderResponse) {
       const lastNotification =
-				newNotifications[newNotifications.length - 1];
+        newNotifications[newNotifications.length - 1];
       if (
         lastNotification.message.includes(
           clientConfirmedOrderResponse.orderCode
@@ -865,13 +887,13 @@ function ConfirmedOrder({ onClose, selectedItems }: { onClose: () => void; selec
       ) {
         if (
           lastNotification.type ===
-					NotificationType.CHECKOUT_PAYPAL_SUCCESS
+          NotificationType.CHECKOUT_PAYPAL_SUCCESS
         ) {
           setCheckoutPaypalStatus('success');
         }
         if (
           lastNotification.type ===
-					NotificationType.CHECKOUT_PAYPAL_CANCEL
+          NotificationType.CHECKOUT_PAYPAL_CANCEL
         ) {
           setCheckoutPaypalStatus('cancel');
         }
@@ -906,8 +928,8 @@ function ConfirmedOrder({ onClose, selectedItems }: { onClose: () => void; selec
 
   if (
     clientConfirmedOrderResponse &&
-		clientConfirmedOrderResponse.orderPaymentMethodType ===
-			PaymentMethodType.CASH
+    clientConfirmedOrderResponse.orderPaymentMethodType ===
+    PaymentMethodType.CASH
   ) {
     contentFragment = (
       <div className="flex flex-col justify-between min-h-[200px]">
@@ -940,8 +962,8 @@ function ConfirmedOrder({ onClose, selectedItems }: { onClose: () => void; selec
 
   if (
     clientConfirmedOrderResponse &&
-		clientConfirmedOrderResponse.orderPaymentMethodType ===
-			PaymentMethodType.PAYPAL
+    clientConfirmedOrderResponse.orderPaymentMethodType ===
+    PaymentMethodType.PAYPAL
   ) {
     contentFragment = (
       <div className="flex flex-col justify-between min-h-[200px]">
@@ -963,7 +985,7 @@ function ConfirmedOrder({ onClose, selectedItems }: { onClose: () => void; selec
             onClick={() =>
               handlePaypalCheckoutButton(
                 clientConfirmedOrderResponse.orderPaypalCheckoutLink ||
-                  ''
+                ''
               )
             }
             className="w-full px-4 py-2 mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
@@ -991,7 +1013,7 @@ function ConfirmedOrder({ onClose, selectedItems }: { onClose: () => void; selec
               onClick={() =>
                 handlePaypalCheckoutButton(
                   clientConfirmedOrderResponse.orderPaypalCheckoutLink ||
-                    ''
+                  ''
                 )
               }
               className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
@@ -1005,8 +1027,8 @@ function ConfirmedOrder({ onClose, selectedItems }: { onClose: () => void; selec
   }
   if (
     clientConfirmedOrderResponse &&
-		clientConfirmedOrderResponse.orderPaymentMethodType ===
-			PaymentMethodType.VNPAY
+    clientConfirmedOrderResponse.orderPaymentMethodType ===
+    PaymentMethodType.VNPAY
   ) {
     contentFragment = (
       <div className="flex flex-col justify-between min-h-[200px]">
@@ -1028,7 +1050,7 @@ function ConfirmedOrder({ onClose, selectedItems }: { onClose: () => void; selec
             onClick={() =>
               handlePaypalCheckoutButton(
                 clientConfirmedOrderResponse.orderPaypalCheckoutLink ||
-                  ''
+                ''
               )
             }
             className="w-full px-4 py-2 mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
@@ -1062,7 +1084,7 @@ function ConfirmedOrder({ onClose, selectedItems }: { onClose: () => void; selec
               onClick={() =>
                 handlePaypalCheckoutButton(
                   clientConfirmedOrderResponse.orderPaypalCheckoutLink ||
-                    ''
+                  ''
                 )
               }
               className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
@@ -1088,7 +1110,7 @@ function ConfirmedOrder({ onClose, selectedItems }: { onClose: () => void; selec
 
 function useGetCartApi() {
   const { user } = useAuthStore();
-  
+
   const {
     data: cartResponse,
     isLoading: isLoadingCartResponse,
@@ -1134,7 +1156,7 @@ function useDeleteCartItemsApi() {
   const queryClient = useQueryClient();
 
   const { currentTotalCartItems, updateCurrentTotalCartItems } =
-		useAuthStore();
+    useAuthStore();
 
   return useMutation<void, ErrorMessage, ClientCartVariantKeyRequest[]>(
     (requestBody) =>
@@ -1164,24 +1186,24 @@ function useCreateClientOrderApi() {
   const { updateCurrentCartId, updateCurrentTotalCartItems } = useAuthStore();
 
   return useMutation<
-		ClientConfirmedOrderResponse,
-		ErrorMessage,
-		ClientSimpleOrderRequest
-	>(
-	  (requestBody) =>
-	    FetchUtils.postWithToken(ResourceURL.CLIENT_ORDER, requestBody),
-	  {
-	    onSuccess: () => {
-	      void queryClient.invalidateQueries([
-	        'client-api',
-	        'carts',
-	        'getCart',
-	      ]);
-	      updateCurrentCartId(null);
-	      updateCurrentTotalCartItems(0);
-	    },
-	  }
-	);
+    ClientConfirmedOrderResponse,
+    ErrorMessage,
+    ClientSimpleOrderRequest
+  >(
+    (requestBody) =>
+      FetchUtils.postWithToken(ResourceURL.CLIENT_ORDER, requestBody),
+    {
+      onSuccess: () => {
+        void queryClient.invalidateQueries([
+          'client-api',
+          'carts',
+          'getCart',
+        ]);
+        updateCurrentCartId(null);
+        updateCurrentTotalCartItems(0);
+      },
+    }
+  );
 }
 
 export default ClientCart;
