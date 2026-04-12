@@ -1,9 +1,9 @@
-import React from 'react';
-import { Switch,  Button, Divider, Grid, Group, Paper, Select, Stack, TextInput  } from '@mantine/core';
+import { Button, Divider, Grid, Group, MultiSelect, Paper, Select, Stack, Switch, TextInput } from '@mantine/core';
 import { useParams } from 'react-router-dom';
 import { CreateUpdateTitle, DefaultPropertyPanel } from 'components';
 import WarehouseConfigs from 'pages/warehouse/WarehouseConfigs';
 import useWarehouseUpdateViewModel from 'pages/warehouse/WarehouseUpdate.vm';
+import WarehouseSelectionTree from './components/WarehouseSelectionTree';
 
 function WarehouseUpdate() {
   const { id } = useParams();
@@ -13,6 +13,8 @@ function WarehouseUpdate() {
     handleFormSubmit,
     provinceSelectList,
     districtSelectList,
+    wardSelectList,
+    treeMetadata,
     statusSelectList,
   } = useWarehouseUpdateViewModel(Number(id));
 
@@ -21,7 +23,7 @@ function WarehouseUpdate() {
   }
 
   return (
-    <Stack sx={{ maxWidth: 800 }}>
+    <Stack>
       <CreateUpdateTitle
         managerPath={WarehouseConfigs.managerPath}
         title={WarehouseConfigs.updateTitle}
@@ -59,7 +61,7 @@ function WarehouseUpdate() {
                   {...form.getInputProps('address.line')}
                 />
               </Grid.Col>
-              <Grid.Col xs={6}>
+              <Grid.Col xs={4}>
                 <Select
                   label={WarehouseConfigs.properties['address.provinceId'].label}
                   placeholder="--"
@@ -69,7 +71,7 @@ function WarehouseUpdate() {
                   {...form.getInputProps('address.provinceId')}
                 />
               </Grid.Col>
-              <Grid.Col xs={6}>
+              <Grid.Col xs={4}>
                 <Select
                   label={WarehouseConfigs.properties['address.districtId'].label}
                   placeholder="--"
@@ -79,7 +81,24 @@ function WarehouseUpdate() {
                   {...form.getInputProps('address.districtId')}
                 />
               </Grid.Col>
-              <Grid.Col xs={6}>
+              <Grid.Col xs={4}>
+                <Select
+                  label={WarehouseConfigs.properties['address.wardId'].label}
+                  placeholder="--"
+                  clearable
+                  searchable
+                  data={wardSelectList}
+                  {...form.getInputProps('address.wardId')}
+                />
+              </Grid.Col>
+              <Grid.Col>
+                <WarehouseSelectionTree 
+                  nodes={form.values.selectionTree}
+                  onNodesChange={(nodes) => form.setFieldValue('selectionTree', nodes)}
+                  metadata={treeMetadata}
+                />
+              </Grid.Col>
+              <Grid.Col>
                 <Switch
                   size="md"
                   label={WarehouseConfigs.properties.status.label}

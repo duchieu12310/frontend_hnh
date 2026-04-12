@@ -38,6 +38,8 @@ class ResourceURL {
   static VARIANT = apiPath + '/variants';
 
   static PRODUCT_INVENTORY = apiPath + '/product-inventories';
+  static PRODUCT_INVENTORY_HIERARCHY = ResourceURL.PRODUCT_INVENTORY + '/hierarchy';
+  static PRODUCT_INVENTORY_AUTO_SAVE = ResourceURL.PRODUCT_INVENTORY + '/auto-save';
   static VARIANT_INVENTORY = apiPath + '/variant-inventories';
   static WAREHOUSE = apiPath + '/warehouses';
   static PURCHASE_ORDER = apiPath + '/purchase-orders';
@@ -50,6 +52,9 @@ class ResourceURL {
   static COUNT_VARIANT = apiPath + '/count-variants';
   static TRANSFER = apiPath + '/transfers';
   static TRANSFER_VARIANT = apiPath + '/transfer-variants';
+  static STORAGE_LOCATION = apiPath + '/storage-locations';
+  static TRANSIT_WAREHOUSE = apiPath + '/transit-warehouses';
+  static TRANSIT_ITEM = apiPath + '/transit-items';
 
   static ORDER = apiPath + '/orders';
   static ORDER_VARIANT = apiPath + '/order-variants';

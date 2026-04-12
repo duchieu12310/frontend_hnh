@@ -47,7 +47,6 @@ import OrderCancellationReasonManage, {
   OrderCancellationReasonUpdate
 } from 'pages/order-cancellation-reason';
 import PurchaseOrderManage, { PurchaseOrderCreate, PurchaseOrderUpdate } from 'pages/purchase-order';
-import DocketManage, { DocketCreate, DocketUpdate } from 'pages/docket';
 // import TransferManage, { TransferCreate, TransferUpdate } from 'pages/transfer';
 // import CountManage, { CountCreate, CountUpdate } from 'pages/count';
 import ClientHome from 'pages/client-home';
@@ -328,9 +327,10 @@ function App() {
                   <Route path={ManagerPath.INVENTORY} element={<InventoryManage/>}/>
                   {/* TODO: TẠM THỜI COMMENT - ĐƠN GIẢN HÓA HỆ THỐNG KHO */}
                   {/* WAREHOUSE */}
-                  {/* <Route path={ManagerPath.WAREHOUSE} element={<WarehouseManage/>}/> */}
-                  {/* <Route path={ManagerPath.WAREHOUSE + '/create'} element={<WarehouseCreate/>}/> */}
-                  {/* <Route path={ManagerPath.WAREHOUSE + '/update/:id'} element={<WarehouseUpdate/>}/> */}
+                  <Route path={ManagerPath.WAREHOUSE} element={<WarehouseManage/>}/>
+                  <Route path={ManagerPath.WAREHOUSE + '/create'} element={<WarehouseCreate/>}/>
+                  <Route path={ManagerPath.WAREHOUSE + '/update/:id'} element={<WarehouseUpdate/>}/>
+
                   {/* TODO: TẠM THỜI COMMENT - ĐƠN GIẢN HÓA HỆ THỐNG KHO */}
                   {/* DESTINATION */}
                   {/* <Route path={ManagerPath.DESTINATION} element={<DestinationManage/>}/> */}
@@ -364,10 +364,8 @@ function App() {
                   {/* <Route path={ManagerPath.PURCHASE_ORDER} element={<PurchaseOrderManage/>}/> */}
                   {/* <Route path={ManagerPath.PURCHASE_ORDER + '/create'} element={<PurchaseOrderCreate/>}/> */}
                   {/* <Route path={ManagerPath.PURCHASE_ORDER + '/update/:id'} element={<PurchaseOrderUpdate/>}/> */}
+                  {/* TODO: TẠM THỜI COMMENT - ĐƠN GIẢN HÓA HỆ THỐNG KHO */}
                   {/* DOCKET */}
-                  <Route path={ManagerPath.DOCKET} element={<DocketManage/>}/>
-                  <Route path={ManagerPath.DOCKET + '/create'} element={<DocketCreate/>}/>
-                  <Route path={ManagerPath.DOCKET + '/update/:id'} element={<DocketUpdate/>}/>
                   {/* TODO: TẠM THỜI COMMENT - ĐƠN GIẢN HÓA HỆ THỐNG KHO */}
                   {/* TRANSFER */}
                   {/* <Route path={ManagerPath.TRANSFER} element={<TransferManage/>}/> */}

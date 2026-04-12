@@ -5,7 +5,7 @@ import { UploadedImageResponse } from 'models/Image';
 /**
  * RequestParams dùng để chứa các query param
  */
-export interface RequestParams {
+export interface RequestParams extends Record<string, any> {
   page?: number;
   size?: number;
   sort?: string;
@@ -40,22 +40,30 @@ type BasicRequestParams = Record<string, string | number | null | boolean>;
 
 class FetchUtils {
   /**
+   * Helper để parse JSON an toàn (tránh lỗi Unexpected end of JSON input khi body trống)
+   */
+  private static async safeJson<O>(response: Response): Promise<O> {
+    const text = await response.text();
+    if (!response.ok) {
+        try {
+            throw JSON.parse(text);
+        } catch (e) {
+            throw { statusCode: response.status, message: text || response.statusText } as ErrorMessage;
+        }
+    }
+    return text ? JSON.parse(text) : {} as O;
+  }
+
+  /**
    * Hàm get cho các trường hợp truy vấn dữ liệu bên client
-   * @param resourceUrl
-   * @param requestParams
    */
   static async get<O>(resourceUrl: string, requestParams?: BasicRequestParams): Promise<O> {
     const response = await fetch(FetchUtils.concatParams(resourceUrl, requestParams));
-    if (!response.ok) {
-      throw await response.json();
-    }
-    return await response.json();
+    return await FetchUtils.safeJson<O>(response);
   }
 
   /**
    * Hàm post cho các trường hợp thực hiện truy vấn POST
-   * @param resourceUrl
-   * @param requestBody
    */
   static async post<I, O>(resourceUrl: string, requestBody: I): Promise<O> {
     const response = await fetch(resourceUrl, {
@@ -66,17 +74,11 @@ class FetchUtils {
       },
       body: JSON.stringify(requestBody),
     });
-    if (!response.ok) {
-      throw await response.json();
-    }
-    return await response.json();
+    return await FetchUtils.safeJson<O>(response);
   }
 
   /**
    * Hàm put cho các trường hợp thực hiện truy vấn PUT
-   * @param resourceUrl
-   * @param requestBody
-   * @param requestParams
    */
   static async put<I, O>(resourceUrl: string, requestBody: I, requestParams?: BasicRequestParams): Promise<O> {
     const response = await fetch(FetchUtils.concatParams(resourceUrl, requestParams), {
@@ -87,23 +89,16 @@ class FetchUtils {
       },
       body: JSON.stringify(requestBody),
     });
-    if (!response.ok) {
-      throw await response.json();
-    }
-    return await response.json();
+    return await FetchUtils.safeJson<O>(response);
   }
 
   /**
    * Hàm getWithToken
-   * @param resourceUrl
-   * @param requestParams
-   * @param isAdmin
    */
   static async getWithToken<O>(resourceUrl: string, requestParams?: BasicRequestParams, isAdmin?: boolean): Promise<O> {
     const token = JSON.parse(localStorage
       .getItem(isAdmin ? 'electro-admin-auth-store' : 'electro-auth-store') || '{}').state?.jwtToken;
 
-    // Source: https://stackoverflow.com/a/70426220
     const response = await fetch(FetchUtils.concatParams(resourceUrl, requestParams), {
       method: 'GET',
       headers: {
@@ -112,17 +107,11 @@ class FetchUtils {
       },
     });
 
-    if (!response.ok) {
-      throw await response.json();
-    }
-    return await response.json();
+    return await FetchUtils.safeJson<O>(response);
   }
 
   /**
    * Hàm postWithToken
-   * @param resourceUrl
-   * @param requestBody
-   * @param isAdmin
    */
   static async postWithToken<I, O>(resourceUrl: string, requestBody: I, isAdmin?: boolean): Promise<O> {
     const token = JSON.parse(localStorage
@@ -138,17 +127,11 @@ class FetchUtils {
       body: JSON.stringify(requestBody),
     });
 
-    if (!response.ok) {
-      throw await response.json();
-    }
-    return await response.json();
+    return await FetchUtils.safeJson<O>(response);
   }
 
   /**
    * Hàm putWithToken
-   * @param resourceUrl
-   * @param requestBody
-   * @param isAdmin
    */
   static async putWithToken<I, O>(resourceUrl: string, requestBody: I, isAdmin?: boolean): Promise<O> {
     const token = JSON.parse(localStorage
@@ -164,17 +147,11 @@ class FetchUtils {
       body: JSON.stringify(requestBody),
     });
 
-    if (!response.ok) {
-      throw await response.json();
-    }
-    return await response.json();
+    return await FetchUtils.safeJson<O>(response);
   }
 
   /**
    * Hàm deleteWithToken
-   * @param resourceUrl
-   * @param entityIds
-   * @param isAdmin
    */
   static async deleteWithToken<T>(resourceUrl: string, entityIds: T[], isAdmin?: boolean) {
     const token = JSON.parse(localStorage
@@ -190,22 +167,17 @@ class FetchUtils {
     });
 
     if (!response.ok) {
-      throw await response.json();
+      throw await FetchUtils.safeJson(response);
     }
   }
 
   /**
-   * Hàm getAll dùng để lấy danh sách tất cả đối tượng (có thể theo một số tiêu chí, cài đặt trong requestParams)
-   * @param resourceUrl
-   * @param requestParams
+   * Hàm getAll
    */
   static async getAll<O>(resourceUrl: string, requestParams?: RequestParams): Promise<ListResponse<O>> {
     const response = await fetch(FetchUtils.concatParams(resourceUrl, { ...requestParams }));
-    if (!response.ok) {
-      throw await response.json();
-    }
-    const json = await response.json();
-    // Map backend response fields to frontend ListResponse format
+    const json = await FetchUtils.safeJson<any>(response);
+    
     return {
       content: json.data ?? json.content ?? [],
       page: json.number ?? json.page ?? 0,
@@ -217,22 +189,15 @@ class FetchUtils {
   }
 
   /**
-   * Hàm getById dùng để lấy entity có id cho trước
-   * @param resourceUrl
-   * @param entityId
+   * Hàm getById
    */
   static async getById<O>(resourceUrl: string, entityId: number): Promise<O> {
     const response = await fetch(resourceUrl + '/' + entityId);
-    if (!response.ok) {
-      throw await response.json();
-    }
-    return await response.json();
+    return await FetchUtils.safeJson<O>(response);
   }
 
   /**
-   * Hàm create dùng để tạo entity từ requestBody
-   * @param resourceUrl
-   * @param requestBody
+   * Hàm create
    */
   static async create<I, O>(resourceUrl: string, requestBody: I): Promise<O> {
     const response = await fetch(resourceUrl, {
@@ -243,17 +208,11 @@ class FetchUtils {
       },
       body: JSON.stringify(requestBody),
     });
-    if (!response.ok) {
-      throw await response.json();
-    }
-    return await response.json();
+    return await FetchUtils.safeJson<O>(response);
   }
 
   /**
-   * Hàm update dùng để cập nhật entity theo id và requestBody nhận được
-   * @param resourceUrl
-   * @param entityId
-   * @param requestBody
+   * Hàm update
    */
   static async update<I, O>(resourceUrl: string, entityId: number, requestBody: I): Promise<O> {
     const response = await fetch(resourceUrl + '/' + entityId, {
@@ -264,28 +223,21 @@ class FetchUtils {
       },
       body: JSON.stringify(requestBody),
     });
-    if (!response.ok) {
-      throw await response.json();
-    }
-    return await response.json();
+    return await FetchUtils.safeJson<O>(response);
   }
 
   /**
-   * Hàm deleteById xóa entity theo id nhận được
-   * @param resourceUrl
-   * @param entityId
+   * Hàm deleteById
    */
   static async deleteById<T>(resourceUrl: string, entityId: T) {
     const response = await fetch(resourceUrl + '/' + entityId, { method: 'DELETE' });
     if (!response.ok) {
-      throw await response.json();
+      throw await FetchUtils.safeJson(response);
     }
   }
 
   /**
-   * Hàm deleteByIds xóa hàng loạt entity theo mảng id nhận được
-   * @param resourceUrl
-   * @param entityIds
+   * Hàm deleteByIds
    */
   static async deleteByIds<T>(resourceUrl: string, entityIds: T[]) {
     const response = await fetch(resourceUrl, {
@@ -294,13 +246,12 @@ class FetchUtils {
       body: JSON.stringify(entityIds),
     });
     if (!response.ok) {
-      throw await response.json();
+      throw await FetchUtils.safeJson(response);
     }
   }
 
   /**
-   * Hàm uploadMultipleImages dùng để tải lên nhiều tệp hình
-   * @param images
+   * Hàm uploadMultipleImages
    */
   static async uploadMultipleImages(images: File[]): Promise<CollectionWrapper<UploadedImageResponse>> {
     const formData = new FormData();
@@ -311,16 +262,11 @@ class FetchUtils {
       body: formData,
     });
 
-    if (!response.ok) {
-      throw await response.json();
-    }
-    return await response.json();
+    return await FetchUtils.safeJson<CollectionWrapper<UploadedImageResponse>>(response);
   }
 
   /**
    * Hàm concatParams dùng để nối url và requestParams
-   * @param url
-   * @param requestParams
    */
   private static concatParams = (url: string, requestParams?: BasicRequestParams) => {
     if (requestParams) {

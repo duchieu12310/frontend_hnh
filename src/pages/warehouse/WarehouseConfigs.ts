@@ -11,16 +11,16 @@ class WarehouseConfigs extends Configs {
   static resourceKey = 'warehouses';
   static createTitle = 'Thêm nhà kho';
   static updateTitle = 'Cập nhật nhà kho';
-  static manageTitle = 'Quản lý nhà kho';
+  static manageTitle = 'Quản lý danh sách kho';
 
   static manageTitleLinks: TitleLink[] = [
     {
       link: ManagerPath.INVENTORY,
-      label: 'Theo dõi tồn kho',
+      label: 'Theo dõi kho hàng',
     },
     {
       link: ManagerPath.WAREHOUSE,
-      label: 'Quản lý nhà kho',
+      label: 'Danh sách kho',
     },
     {
       link: ManagerPath.PURCHASE_ORDER,
@@ -84,6 +84,12 @@ class WarehouseConfigs extends Configs {
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
     },
+    'address.wardId': {
+      label: 'Phường xã',
+      type: EntityPropertyType.NUMBER,
+      isNotAddToSortCriteria: true,
+      isNotAddToFilterCriteria: true,
+    },
   
     status: {
       label: 'Trạng thái nhà kho',
@@ -101,7 +107,9 @@ class WarehouseConfigs extends Configs {
     'address.line': '',
     'address.provinceId': null as string | null,
     'address.districtId': null as string | null,
+    'address.wardId': null as string | null,
     status: '1',
+    selectionTree: [] as any[],
   };
 
   static createUpdateFormSchema = z.object({
@@ -110,7 +118,9 @@ class WarehouseConfigs extends Configs {
     'address.line': z.string(),
     'address.provinceId': z.string().nullable(),
     'address.districtId': z.string().nullable(),
+    'address.wardId': z.string().nullable(),
     status: z.string(),
+    selectionTree: z.array(z.any()),
   });
 }
 

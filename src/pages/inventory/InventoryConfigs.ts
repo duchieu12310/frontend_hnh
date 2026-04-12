@@ -5,7 +5,9 @@ import ResourceURL from 'constants/ResourceURL';
 class InventoryConfigs extends Configs {
   static productInventoryResourceUrl = ResourceURL.PRODUCT_INVENTORY;
   static productInventoryResourceKey = 'product-inventories';
-  static manageTitle = 'Theo dõi tồn kho sản phẩm';
+  static productInventoryHierarchyResourceUrl = ResourceURL.PRODUCT_INVENTORY_HIERARCHY;
+  static productInventoryHierarchyResourceKey = 'product-inventories-hierarchy';
+  static manageTitle = 'Theo dõi kho hàng';
   static manageTitleLinks: TitleLink[] = WarehouseConfigs.manageTitleLinks;
 }
 

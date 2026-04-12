@@ -4,16 +4,9 @@ export interface CategoryResponse extends BaseResponse {
   name: string;
   slug: string;
   level: number;
-  parentCategory: ParentCategoryResponse | null;
+  parentCategory: CategoryResponse | null;
   status: number;
   children: CategoryResponse[];
-}
-
-interface ParentCategoryResponse extends BaseResponse {
-  name: string;
-  slug: string;
-  level: number;
-  status: number;
 }
 
 export interface CategoryRequest {

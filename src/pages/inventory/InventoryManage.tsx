@@ -1,189 +1,473 @@
-import React, { useState } from 'react';
-import { ManageHeader, ManageHeaderTitle, ManageMain, ManagePagination } from 'components';
+import React, { useMemo, useState } from 'react';
+import { 
+  Paper, 
+  Group, 
+  Text, 
+  Stack, 
+  Box, 
+  Grid, 
+  ActionIcon, 
+  Center, 
+  Tooltip,
+  Table,
+  TextInput,
+  Divider,
+  MultiSelect,
+  Pagination,
+  Badge as MantineBadge,
+  Loader
+} from '@mantine/core';
+import { 
+  Refresh, 
+  RotateClockwise, 
+  Package, 
+  LayoutColumns,
+  Search,
+  Database,
+  BoxModel2,
+  BuildingWarehouse,
+  ArrowUpRight,
+  Filter
+} from 'tabler-icons-react';
+import { useQuery } from 'react-query';
+import FetchUtils from 'utils/FetchUtils';
+import ResourceURL from 'constants/ResourceURL';
+import NotifyUtils from 'utils/NotifyUtils';
+import { CategoryLevel1Node, FlattenedInventoryRow } from 'models/InventoryHierarchy';
+import { ListResponse, ErrorMessage } from 'utils/FetchUtils';
 import InventoryConfigs from 'pages/inventory/InventoryConfigs';
-import PageConfigs from 'pages/PageConfigs';
-import { ListResponse } from 'utils/FetchUtils';
-import useGetAllApi from 'hooks/use-get-all-api';
-import { ProductInventoryResponse } from 'models/ProductInventory';
-import useResetManagePageState from 'hooks/use-reset-manage-page-state';
-import { Plus } from 'tabler-icons-react';
-import { DocketVariantExtendedResponse } from 'models/DocketVariantExtended';
-import DateUtils from 'utils/DateUtils';
-import { Dialog } from '@headlessui/react';
-import { useColorScheme } from 'hooks/use-color-scheme';
+import { WarehouseResponse } from 'models/Warehouse';
+import InventoryTableRow from './components/InventoryTableRow';
 
-function InventoryManage() {
-  useResetManagePageState();
+const InventoryManage: React.FC = () => {
+  const [selectedWarehouseId, setSelectedWarehouseId] = useState<number | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Filter States
+  const [selectedL1Ids, setSelectedL1Ids] = useState<string[]>([]);
+  const [selectedL2Ids, setSelectedL2Ids] = useState<string[]>([]);
+  const [selectedL3Ids, setSelectedL3Ids] = useState<string[]>([]);
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+  
+  // Pagination State
+  const [activePage, setActivePage] = useState(1);
+  const pageSize = 20;
 
-  const { colorScheme } = useColorScheme();
-  const [selectedProductName, setSelectedProductName] = useState<string | null>(null);
-  const [selectedTransactions, setSelectedTransactions] = useState<DocketVariantExtendedResponse[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // 1. Fetch Warehouses
+  const { data: warehousesResponse = { content: [] } as ListResponse<WarehouseResponse>, isLoading: isWarehousesLoading } = useQuery(
+    [ResourceURL.WAREHOUSE, 'get-all-warehouses'],
+    () => FetchUtils.getAll<WarehouseResponse>(ResourceURL.WAREHOUSE, { all: 1 })
+  );
 
+  const warehouses = warehousesResponse.content;
+  useMemo(() => {
+    if (!selectedWarehouseId && warehouses.length > 0) {
+      setSelectedWarehouseId(warehouses[0].id);
+    }
+  }, [warehouses, selectedWarehouseId]);
+
+  // 2. Fetch hierarchical inventory
   const {
-    isLoading,
-    data: listResponse = PageConfigs.initialListResponse as ListResponse<ProductInventoryResponse>,
-  } = useGetAllApi<ProductInventoryResponse>(
-    InventoryConfigs.productInventoryResourceUrl,
-    InventoryConfigs.productInventoryResourceKey
+    isLoading: isHierarchyLoading,
+    data: categories = [] as CategoryLevel1Node[],
+    refetch,
+    isFetching: isHierarchyFetching
+  } = useQuery<CategoryLevel1Node[], ErrorMessage>(
+    [
+      InventoryConfigs.productInventoryHierarchyResourceKey, 
+      'getHierarchy', 
+      selectedWarehouseId,
+      selectedL1Ids,
+      selectedL2Ids,
+      selectedL3Ids,
+      selectedProductIds
+    ],
+    () => FetchUtils.get<any>(
+      InventoryConfigs.productInventoryHierarchyResourceUrl,
+      { 
+        warehouseId: selectedWarehouseId,
+        categoryL1Ids: selectedL1Ids.length > 0 ? selectedL1Ids.join(',') : undefined,
+        categoryL2Ids: selectedL2Ids.length > 0 ? selectedL2Ids.join(',') : undefined,
+        categoryL3Ids: selectedL3Ids.length > 0 ? selectedL3Ids.join(',') : undefined,
+        productIds: selectedProductIds.length > 0 ? selectedProductIds.join(',') : undefined,
+      }
+    ).then((res) => {
+      if (Array.isArray(res)) return res;
+      if (res && res.categories) return res.categories;
+      if (res && res.data) return res.data;
+      return [];
+    }),
+    {
+      enabled: !!selectedWarehouseId,
+      onError: (error) => NotifyUtils.simpleFailed(`Lỗi: Không lấy được dữ liệu kho.`),
+      staleTime: 60 * 60 * 1000, // 60 minutes
+      cacheTime: 60 * 60 * 1000, // 60 minutes
+      refetchOnWindowFocus: false,
+    }
   );
 
-  const handleTransactionsAnchor = (productName: string, transactions: DocketVariantExtendedResponse[]) => {
-    setSelectedProductName(productName);
-    setSelectedTransactions(transactions);
-    setIsModalOpen(true);
+  // Flatten logic
+  const flattenedRows = useMemo(() => {
+    const rows: FlattenedInventoryRow[] = [];
+    categories.forEach(l1 => {
+      l1.children?.forEach(l2 => {
+        l2.children?.forEach(l3 => {
+          l3.products?.forEach(product => {
+            product.variants?.forEach(variant => {
+              rows.push({
+                l1Name: l1.name,
+                l2Name: l2.name,
+                l3Name: l3.name,
+                productId: product.productId,
+                productName: product.productName,
+                productCode: product.productCode,
+                storageLocationId: product.storageLocationId,
+                aisle: product.aisle,
+                shelf: product.shelf,
+                bin: product.bin,
+                variantId: variant.variantId,
+                sku: variant.sku,
+                properties: variant.properties,
+                quantityInLocation: variant.quantityInLocation,
+                totalVariantQuantity: variant.totalVariantQuantity
+              });
+            });
+          });
+        });
+      });
+    });
+    return rows;
+  }, [categories]);
+
+  // Extract filter options from the current hierarchy
+  const l1Options = useMemo(() => 
+    categories.map(c => ({ value: String(c.id), label: c.name })), 
+  [categories]);
+
+  const l2Options = useMemo(() => {
+    const list: { value: string, label: string }[] = [];
+    categories.forEach(l1 => {
+        l1.children?.forEach(l2 => {
+            list.push({ value: String(l2.id), label: l2.name });
+        });
+    });
+    return list;
+  }, [categories]);
+
+  const l3Options = useMemo(() => {
+    const list: { value: string, label: string }[] = [];
+    categories.forEach(l1 => {
+        l1.children?.forEach(l2 => {
+            l2.children?.forEach(l3 => {
+                list.push({ value: String(l3.id), label: l3.name });
+            });
+        });
+    });
+    return list;
+  }, [categories]);
+
+  const productOptions = useMemo(() => {
+    const list: { value: string, label: string }[] = [];
+    categories.forEach(l1 => {
+        l1.children?.forEach(l2 => {
+            l2.children?.forEach(l3 => {
+                l3.products?.forEach(p => {
+                    list.push({ value: String(p.productId), label: p.productName });
+                });
+            });
+        });
+    });
+    return list;
+  }, [categories]);
+
+  // Filtered rows for Client-side Search
+  const filteredRows = useMemo(() => {
+    if (!searchTerm) return flattenedRows;
+    const s = searchTerm.toLowerCase();
+    return flattenedRows.filter(r => 
+      r.productName.toLowerCase().includes(s) || 
+      r.sku.toLowerCase().includes(s) ||
+      r.productCode.toLowerCase().includes(s) ||
+      `${r.aisle}-${r.shelf}-${r.bin}`.toLowerCase().includes(s)
+    );
+  }, [flattenedRows, searchTerm]);
+
+  // Stats calculation
+  const stats = useMemo(() => {
+    const uniqueProducts = new Set(flattenedRows.map(r => r.productId));
+    const totalInventory = flattenedRows.reduce((sum, r) => sum + (r.quantityInLocation || 0), 0);
+    return {
+      productCount: uniqueProducts.size,
+      variantCount: flattenedRows.length,
+      totalStock: totalInventory
+    };
+  }, [flattenedRows]);
+
+  const resetFilters = () => {
+    setSelectedL1Ids([]);
+    setSelectedL2Ids([]);
+    setSelectedL3Ids([]);
+    setSelectedProductIds([]);
+    setActivePage(1);
+    setSearchTerm('');
+    refetch();
   };
 
-  const entitiesTableHeadsFragment = (
-    <tr>
-      <th>Mã sản phẩm</th>
-      <th>Tên sản phẩm</th>
-      <th>Nhãn hiệu</th>
-      <th>Nhà cung cấp</th>
-      <th>Tồn thực tế</th>
-      <th>Chờ xuất</th>
-      <th>Có thể bán</th>
-      <th>Sắp về</th>
-      <th>Theo dõi</th>
-      <th>Lịch sử</th>
-    </tr>
-  );
+  // Reset page when filters or search change
+  React.useEffect(() => {
+      setActivePage(1);
+  }, [searchTerm, selectedL1Ids, selectedL2Ids, selectedL3Ids, selectedProductIds, selectedWarehouseId]);
 
-  const entitiesTableRowsFragment = listResponse.content.map((entity) => (
-    <tr key={entity.product.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-      <td>{entity.product.code}</td>
-      <td>{entity.product.name}</td>
-      <td>{entity.product.brand?.name}</td>
-      <td>{entity.product.supplier?.displayName}</td>
-      <td>{entity.inventory}</td>
-      <td>{entity.waitingForDelivery}</td>
-      <td>{entity.canBeSold}</td>
-      <td>{entity.areComing}</td>
-      <td>
-        <button
-          className="p-1 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 rounded transition-colors"
-          title="Thiết lập định mức tồn kho cho sản phẩm"
-        >
-          <Plus size={20}/>
-        </button>
-      </td>
-      <td>
-        <button
-          className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline"
-          onClick={() => handleTransactionsAnchor(entity.product.name, entity.transactions)}
-        >
-          Giao dịch
-        </button>
-      </td>
-    </tr>
-  ));
+  const totalPages = Math.ceil(filteredRows.length / pageSize);
+  const paginatedRows = filteredRows.slice((activePage - 1) * pageSize, activePage * pageSize);
 
   return (
-    <>
-      <div className="flex flex-col gap-4">
-        <ManageHeader>
-          <ManageHeaderTitle
-            titleLinks={InventoryConfigs.manageTitleLinks}
-            title={InventoryConfigs.manageTitle}
-          />
-        </ManageHeader>
+    <Stack spacing="xl" p="md" className="bg-gray-50/50 min-h-screen">
+      {/* Dashboard Top Header */}
+      <Paper radius="xl" p="xl" withBorder className="shadow-sm border-gray-200/50 bg-white/80 backdrop-blur-xl">
+        <Grid gutter={40} align="center">
+          <Grid.Col md={4}>
+            <Group spacing="lg">
+              <Box className="p-4 bg-blue-600 text-white rounded-[2rem] shadow-xl shadow-blue-200 rotate-3">
+                <BuildingWarehouse size={28} strokeWidth={2.5} />
+              </Box>
+              <Stack spacing={0}>
+                <Text weight={900} size="xl" className="tracking-tight text-gray-900 font-bold">Quản lý Kho hàng</Text>
+                <Text size="xs" color="dimmed" weight={600} transform="uppercase" sx={{ letterSpacing: 1.5 }}>
+                  Hệ thống phân cấp đa tầng (5 Levels)
+                </Text>
+              </Stack>
+            </Group>
+          </Grid.Col>
 
-        <ManageMain
-          listResponse={listResponse}
-          isLoading={isLoading}
-        >
-          <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
-            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                {entitiesTableHeadsFragment}
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {entitiesTableRowsFragment}
-              </tbody>
-            </table>
-          </div>
-        </ManageMain>
+          <Grid.Col md={8}>
+            <Group position="right" spacing="xl">
+              <Box className="flex gap-12 bg-gray-50/50 px-10 py-4 rounded-[2rem] border border-gray-100">
+                <Stack spacing={0}>
+                  <Text size="xs" color="dimmed" weight={700} transform="uppercase">Sản phẩm</Text>
+                  <Group spacing={6}>
+                    <Text size="xl" weight={900} color="blue">{stats.productCount}</Text>
+                    <ArrowUpRight size={14} className="text-blue-500 mb-1" />
+                  </Group>
+                </Stack>
+                <Divider orientation="vertical" />
+                <Stack spacing={0}>
+                  <Text size="xs" color="dimmed" weight={700} transform="uppercase">Phân loại</Text>
+                  <Text size="xl" weight={900} color="blue">{stats.variantCount}</Text>
+                </Stack>
+                <Divider orientation="vertical" />
+                <Stack spacing={0}>
+                  <Text size="xs" color="dimmed" weight={700} transform="uppercase">Tổng tồn</Text>
+                  <Group spacing={6}>
+                    <Text size="xl" weight={900} color="indigo">{stats.totalStock}</Text>
+                    <Box className="px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded text-[9px] font-black uppercase">Qty</Box>
+                  </Group>
+                </Stack>
+              </Box>
+              
+              <Group spacing="sm">
+                <ActionIcon 
+                  variant="transparent" 
+                  color="gray" 
+                  onClick={resetFilters}
+                  title="Đặt lại bộ lọc"
+                  size="xl"
+                  radius="lg"
+                >
+                  <RotateClockwise size={20} />
+                </ActionIcon>
+                <ActionIcon 
+                   variant="filled" 
+                   color="blue" 
+                   size={56} 
+                   radius="xl" 
+                   loading={isHierarchyFetching}
+                   onClick={() => refetch()}
+                   className="shadow-lg shadow-blue-100"
+                >
+                  <Refresh size={24} />
+                </ActionIcon>
+              </Group>
+            </Group>
+          </Grid.Col>
+        </Grid>
+      </Paper>
 
-        <ManagePagination listResponse={listResponse}/>
-      </div>
-
-      <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} className="relative z-50">
-        <div className="fixed inset-0 bg-black/30 dark:bg-black/50" aria-hidden="true" />
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="w-full max-w-6xl bg-white dark:bg-gray-800 rounded-lg shadow-xl max-h-[90vh] overflow-hidden flex flex-col">
-            <Dialog.Title className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 font-semibold text-lg">
-              Lịch sử nhập xuất của sản phẩm &quot;{selectedProductName}&quot;
-            </Dialog.Title>
-            <div className="flex-1 overflow-auto p-6">
-              <ProductInventoryTransactionsModal transactions={selectedTransactions}/>
-            </div>
-            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+      {/* Control Bar: Warehouse Pills + Filters */}
+      <Stack spacing="lg">
+        <Group position="apart" px="md">
+          <div className="flex gap-2 p-1.5 bg-white border border-gray-100 rounded-full shadow-sm">
+            {warehouses.map((w) => (
               <button
-                onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                key={w.id}
+                onClick={() => setSelectedWarehouseId(w.id)}
+                className={`px-8 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition-all ${
+                  selectedWarehouseId === w.id 
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 translate-y-[-1px]' 
+                  : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                }`}
               >
-                Đóng
+                {w.name}
               </button>
+            ))}
+          </div>
+
+          <TextInput 
+            placeholder="Tìm sản phẩm, SKU hoặc vị trí..."
+            size="md"
+            radius="xl"
+            icon={<Search size={18} />}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{ width: 400 }}
+            styles={{ input: { border: '1px solid #eee', fontWeight: 600, paddingLeft: 45 } }}
+          />
+        </Group>
+
+        {/* Multi-Level Filters Card */}
+        <Paper radius="xl" p="xl" withBorder className="bg-white/50 border-gray-100 shadow-sm">
+            <Grid gutter="xl">
+                <Grid.Col md={3} sm={6}>
+                    <MultiSelect
+                        label={<Text size="xs" weight={900} color="blue" transform="uppercase" mb={4} ml={4}>Danh mục Cấp 1</Text>}
+                        placeholder="Chọn danh mục chính..."
+                        data={l1Options}
+                        value={selectedL1Ids}
+                        onChange={setSelectedL1Ids}
+                        searchable
+                        radius="lg"
+                        size="sm"
+                        clearable
+                        styles={{ label: { marginBottom: 8 } }}
+                    />
+                </Grid.Col>
+                <Grid.Col md={3} sm={6}>
+                    <MultiSelect
+                        label={<Text size="xs" weight={900} color="indigo" transform="uppercase" mb={4} ml={4}>Danh mục Cấp 2</Text>}
+                        placeholder="Chọn danh mục phụ..."
+                        data={l2Options}
+                        value={selectedL2Ids}
+                        onChange={setSelectedL2Ids}
+                        searchable
+                        radius="lg"
+                        size="sm"
+                        clearable
+                    />
+                </Grid.Col>
+                <Grid.Col md={3} sm={6}>
+                    <MultiSelect
+                        label={<Text size="xs" weight={900} color="teal" transform="uppercase" mb={4} ml={4}>Danh mục Cấp 3</Text>}
+                        placeholder="Chọn phân loại..."
+                        data={l3Options}
+                        value={selectedL3Ids}
+                        onChange={setSelectedL3Ids}
+                        searchable
+                        radius="lg"
+                        size="sm"
+                        clearable
+                    />
+                </Grid.Col>
+                <Grid.Col md={3} sm={6}>
+                    <MultiSelect
+                        label={<Text size="xs" weight={900} color="orange" transform="uppercase" mb={4} ml={4}>Sản phẩm cụ thể</Text>}
+                        placeholder="Chọn sản phẩm..."
+                        data={productOptions}
+                        value={selectedProductIds}
+                        onChange={setSelectedProductIds}
+                        searchable
+                        radius="lg"
+                        size="sm"
+                        clearable
+                    />
+                </Grid.Col>
+            </Grid>
+        </Paper>
+      </Stack>
+
+      {/* Main Data Table */}
+      <Paper radius="xl" withBorder className="overflow-hidden shadow-sm border-gray-200 bg-white flex flex-col">
+        <div className="relative overflow-x-auto" style={{ maxHeight: 'calc(100vh - 400px)' }}>
+          {isHierarchyLoading && (
+            <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+              <Stack align="center" spacing="xs">
+                <Loader size="lg" variant="dots" />
+                <Text size="sm" weight={700} color="dimmed">Đang tải dữ liệu...</Text>
+              </Stack>
             </div>
-          </Dialog.Panel>
+          )}
+
+          <Table 
+            horizontalSpacing="md" 
+            verticalSpacing="xs" 
+            className="w-full border-collapse"
+            sx={{ 
+                minWidth: 1200,
+                'thead': {
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 20,
+                    backgroundColor: '#1e293b',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                }
+            }}
+          >
+            <thead>
+              <tr>
+                <th className="text-[11px] font-bold text-white uppercase tracking-wider py-4 border-r border-slate-700 w-32">Danh mục 1</th>
+                <th className="text-[11px] font-bold text-white uppercase tracking-wider py-4 border-r border-slate-700 w-32">Danh mục 2</th>
+                <th className="text-[11px] font-bold text-white uppercase tracking-wider py-4 border-r border-slate-700 w-32">Danh mục 3</th>
+                <th className="text-[11px] font-bold text-white uppercase tracking-wider py-4 border-r border-slate-700">Sản phẩm</th>
+                <th className="text-[11px] font-bold text-white uppercase tracking-wider py-4 border-r border-slate-700">Biến thể</th>
+                <th className="text-[11px] font-bold text-white uppercase tracking-wider py-4 border-r border-slate-700 text-center w-28">Tồn gốc</th>
+                <th className="text-[11px] font-bold text-white uppercase tracking-wider py-4 border-r border-slate-700 text-center w-40">Điều chỉnh (+/-)</th>
+                <th className="text-[11px] font-bold text-white uppercase tracking-wider py-4 border-r border-slate-700 text-center w-32">Tổng hiện tại</th>
+                <th className="text-[11px] font-bold text-white uppercase tracking-wider py-4 text-center w-32">Toàn hệ thống</th>
+                <th className="w-12 border-l border-slate-700"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedRows.length > 0 ? (
+                paginatedRows.map((row, index) => {
+                  const prevRow = index > 0 ? paginatedRows[index - 1] : null;
+                  const isFirstL1 = !prevRow || row.l1Name !== prevRow.l1Name;
+                  const isFirstL2 = isFirstL1 || row.l2Name !== prevRow.l2Name;
+                  const isFirstL3 = isFirstL2 || row.l3Name !== prevRow.l3Name;
+                  const isFirstProduct = isFirstL3 || row.productId !== prevRow.productId;
+
+                  return (
+                    <InventoryTableRow 
+                      key={`${row.storageLocationId}-${row.variantId}`}
+                      row={row} 
+                      warehouseId={selectedWarehouseId!}
+                      isFirstL1={isFirstL1}
+                      isFirstL2={isFirstL2}
+                      isFirstL3={isFirstL3}
+                      isFirstProduct={isFirstProduct}
+                    />
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={10} className="py-20 text-center">
+                    <Center>
+                      <Stack align="center" spacing="lg">
+                        <Box className="p-8 bg-gray-50 rounded-[2.5rem] text-gray-200 border border-gray-100">
+                          <BoxModel2 size={64} strokeWidth={1} />
+                        </Box>
+                        <Stack align="center" spacing={4}>
+                          <Text weight={900} color="gray" size="xl">Kho hàng trống</Text>
+                          <Text size="sm" color="dimmed" weight={500}>Không có sản phẩm nào khớp với bộ lọc của bạn.</Text>
+                        </Stack>
+                      </Stack>
+                    </Center>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </Table>
         </div>
-      </Dialog>
-    </>
-  );
-}
-
-function ProductInventoryTransactionsModal({ transactions }: { transactions: DocketVariantExtendedResponse[] }) {
-  const docketTypeBadgeFragment = (type: number) => {
-    switch (type) {
-    case 1:
-      return <span className="px-2 py-1 text-xs font-medium bg-blue-500 text-white rounded">Nhập</span>;
-    case 2:
-      return <span className="px-2 py-1 text-xs font-medium bg-orange-500 text-white rounded">Xuất</span>;
-    }
-  };
-
-  const docketStatusBadgeFragment = (status: number) => {
-    switch (status) {
-    case 1:
-      return <span className="px-2 py-1 text-xs font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded">Mới</span>;
-    case 2:
-      return <span className="px-2 py-1 text-xs font-medium border border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-400 rounded">Đang xử lý</span>;
-    case 3:
-      return <span className="px-2 py-1 text-xs font-medium border border-green-300 dark:border-green-600 text-green-700 dark:text-green-400 rounded">Hoàn thành</span>;
-    case 4:
-      return <span className="px-2 py-1 text-xs font-medium border border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 rounded">Hủy bỏ</span>;
-    }
-  };
-
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-          <tr>
-            <th className="px-2 py-2">Phiếu</th>
-            <th className="px-2 py-2">Ngày tạo</th>
-            <th className="px-2 py-2">Lý do</th>
-            <th className="px-2 py-2">Số lượng</th>
-            <th className="px-2 py-2">SKU</th>
-            <th className="px-2 py-2">Kho</th>
-            <th className="px-2 py-2">Trạng thái</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-          {transactions.map(transaction => (
-            <tr key={transaction.docket.code} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-              <td className="px-2 py-2">{docketTypeBadgeFragment(transaction.docket.type)}</td>
-              <td className="px-2 py-2">{DateUtils.isoDateToString(transaction.docket.createdAt)}</td>
-              <td className="px-2 py-2">{transaction.docket.reason.name}</td>
-              <td className="px-2 py-2">{transaction.quantity}</td>
-              <td className="px-2 py-2">{transaction.variant.sku}</td>
-              <td className="px-2 py-2">{transaction.docket.warehouse.name}</td>
-              <td className="px-2 py-2">{docketStatusBadgeFragment(transaction.docket.status)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+      </Paper>
+    </Stack>
   );
 }
 

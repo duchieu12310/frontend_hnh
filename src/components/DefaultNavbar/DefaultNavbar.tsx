@@ -172,39 +172,14 @@ const navbarLinks: NavbarLink[] = [
     icon: Box,
   },
   {
-    link: '/admin/inventory',
-    label: 'Tồn kho',
+    link: '/admin/warehouses',
+    label: 'Nhà kho',
     icon: BuildingWarehouse,
     childLinks: [
-      // TODO: TẠM THỜI COMMENT - ĐƠN GIẢN HÓA HỆ THỐNG KHO (CHỈ GIỮ TỒN KHO VÀ PHIẾU NHẬP XUẤT KHO)
-      // {
-      //   link: '/admin/inventory/warehouse',
-      //   label: 'Nhà kho',
-      // },
-      // {
-      //   link: '/admin/inventory/purchase-order',
-      //   label: 'Đơn mua hàng',
-      // },
-      // {
-      //   link: '/admin/inventory/destination',
-      //   label: 'Điểm nhập hàng',
-      // },
       {
-        link: '/admin/inventory/docket',
-        label: 'Phiếu nhập xuất kho',
+        link: '/admin/warehouses/list',
+        label: 'Danh sách kho',
       },
-      // {
-      //   link: '/admin/inventory/docket-reason',
-      //   label: 'Lý do phiếu NXK',
-      // },
-      // {
-      //   link: '/admin/inventory/count',
-      //   label: 'Phiếu kiểm kho',
-      // },
-      // {
-      //   link: '/admin/inventory/transfer',
-      //   label: 'Phiếu chuyển kho',
-      // },
     ],
     disableForEmployee: true,
   },
