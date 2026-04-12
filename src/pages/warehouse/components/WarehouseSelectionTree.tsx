@@ -49,6 +49,7 @@ const SelectionRow: React.FC<{
           searchable
           clearable
           size="sm"
+          nothingFound="Không tìm thấy mục nào"
         />
         
         <Group spacing={4} sx={{ opacity: hovered ? 1 : 0, transition: 'opacity 0.2s ease', visibility: hovered ? 'visible' : 'hidden' }}>
@@ -164,7 +165,8 @@ const WarehouseSelectionTree: React.FC<WarehouseSelectionTreeProps> = ({ nodes, 
         <Stack spacing={8} mt="xs" sx={(theme) => ({
           backgroundColor: node.type === 'L1' ? (theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0]) : 'transparent',
           borderRadius: theme.radius.md,
-          padding: node.children.length > 0 && node.type === 'L1' ? '8px 0 8px 0' : 0,
+          padding: node.children.length > 0 && node.type === 'L1' ? '8px 12px 12px 12px' : 0,
+          border: node.children.length > 0 && node.type === 'L1' ? `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[2]}` : 'none',
         })}>
           {node.children.map((child, index) => {
             const childOptions = child.type === 'L2' ? metadata.l2Options(node.value) : 

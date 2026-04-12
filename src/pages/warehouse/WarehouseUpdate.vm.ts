@@ -18,6 +18,8 @@ import { useQuery } from 'react-query';
 import FetchUtils from 'utils/FetchUtils';
 import InventoryConfigs from 'pages/inventory/InventoryConfigs';
 import { CategoryLevel1Node } from 'models/InventoryHierarchy';
+import { CategoryResponse } from 'models/Category';
+import { ProductResponse } from 'models/Product';
 
 function useWarehouseUpdateViewModel(id: number) {
   const form = useForm({
@@ -32,13 +34,15 @@ function useWarehouseUpdateViewModel(id: number) {
   const [wardSelectList, setWardSelectList] = useState<SelectOption[]>([]);
 
   // 1. Fetch the Global Hierarchy for selection options
-  // We pass a dummy warehouseId or 0 to get the full tree for whitelisting
+  // We omit the warehouseId parameter to request the full system catalog from the backend
   const { data: globalHierarchy = [] as CategoryLevel1Node[] } = useQuery(
     [InventoryConfigs.productInventoryHierarchyResourceKey, 'global-hierarchy'],
-    () => FetchUtils.get<any>(InventoryConfigs.productInventoryHierarchyResourceUrl, { warehouseId: 0 })
+    () => FetchUtils.get<any>(InventoryConfigs.productInventoryHierarchyResourceUrl)
       .then(res => {
         if (Array.isArray(res)) return res;
-        return res.categories || res.data || res.content || [];
+        // Search deeply for categories if the response is an object
+        const categories = res?.categories || res?.data?.categories || res?.data || res?.content || [];
+        return Array.isArray(categories) ? categories : [];
       })
   );
 
@@ -49,53 +53,63 @@ function useWarehouseUpdateViewModel(id: number) {
       const categories = warehouseResponse.categories || [];
       const products = warehouseResponse.products || [];
       
-      const selectionTree: SelectionNode[] = [];
-      const l1s = categories.filter(c => c.level === 1);
-      
-      l1s.forEach(l1 => {
-        const l1Node: SelectionNode = {
-          id: Math.random().toString(36).substr(2, 9),
-          type: 'L1',
-          value: String(l1.id),
-          children: []
-        };
+      // RECURSIVE MAPPING: Handles both nested and flat category structures
+      const buildTree = (allCats: CategoryResponse[], allProducts: ProductResponse[], parentId: number | null = null, level: number = 1): SelectionNode[] => {
+        const nodes: SelectionNode[] = [];
         
-        const l2s = categories.filter(c => c.level === 2 && c.parentCategory?.id === l1.id);
-        l2s.forEach(l2 => {
-          const l2Node: SelectionNode = {
+        // Find categories at this level under this parent
+        const matches = allCats.filter(c => c.level === level && (parentId === null || c.parentCategory?.id === parentId));
+        
+        matches.forEach(cat => {
+          const node: SelectionNode = {
             id: Math.random().toString(36).substr(2, 9),
-            type: 'L2',
-            value: String(l2.id),
-            children: []
+            type: ('L' + level) as any,
+            value: String(cat.id),
+            children: buildTree(allCats, allProducts, cat.id, level + 1)
           };
-          
-          const l3s = categories.filter(c => c.level === 3 && c.parentCategory?.id === l2.id);
-          l3s.forEach(l3 => {
-            const l3Node: SelectionNode = {
-              id: Math.random().toString(36).substr(2, 9),
-              type: 'L3',
-              value: String(l3.id),
-              children: []
-            };
-            
-            const filteredProducts = products.filter(p => p.category?.id === l3.id);
-            filteredProducts.forEach(p => {
-              l3Node.children.push({
+
+          // If this is Level 3, append products
+          if (level === 3) {
+            const catProducts = allProducts.filter(p => p.category?.id === cat.id);
+            catProducts.forEach(p => {
+              node.children.push({
                 id: Math.random().toString(36).substr(2, 9),
                 type: 'Product',
                 value: String(p.id),
                 children: []
               });
             });
-            
-            l2Node.children.push(l3Node);
-          });
+          }
           
-          l1Node.children.push(l2Node);
+          nodes.push(node);
         });
-        
-        selectionTree.push(l1Node);
-      });
+
+        // FALLBACK: If level 1 finds nothing but the array isn't empty, check if it's already nested
+        if (level === 1 && nodes.length === 0 && allCats.length > 0) {
+           allCats.forEach(cat => {
+              const node: SelectionNode = { id: Math.random().toString(36).substr(2, 9), type: 'L1', value: String(cat.id), children: [] };
+              if (cat.children) {
+                 cat.children.forEach(l2 => {
+                    const l2Node: SelectionNode = { id: Math.random().toString(36).substr(2, 9), type: 'L2', value: String(l2.id), children: [] };
+                    if (l2.children) {
+                       l2.children.forEach(l3 => {
+                          const l3Node: SelectionNode = { id: Math.random().toString(36).substr(2, 9), type: 'L3', value: String(l3.id), children: [] };
+                          allProducts.filter(p => p.category?.id === l3.id).forEach(p => {
+                             l3Node.children.push({ id: Math.random().toString(36).substr(2, 9), type: 'Product', value: String(p.id), children: [] });
+                          });
+                          l2Node.children.push(l3Node);
+                       });
+                    }
+                    node.children.push(l2Node);
+                 });
+              }
+              nodes.push(node);
+           });
+        }
+        return nodes;
+      };
+
+      const reconstructedTree = buildTree(categories, products);
 
       const formValues: typeof form.values = {
         code: warehouseResponse.code,
@@ -105,7 +119,7 @@ function useWarehouseUpdateViewModel(id: number) {
         'address.districtId': warehouseResponse.address?.district ? String(warehouseResponse.address.district.id) : null,
         'address.wardId': warehouseResponse.address?.ward ? String(warehouseResponse.address.ward.id) : null,
         status: String(warehouseResponse.status),
-        selectionTree: selectionTree
+        selectionTree: reconstructedTree
       };
       form.setValues(formValues);
       setPrevFormValues(formValues);

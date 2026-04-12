@@ -28,12 +28,15 @@ function useWarehouseCreateViewModel() {
   const [wardSelectList, setWardSelectList] = useState<SelectOption[]>([]);
   
   // 1. Fetch Global Hierarchy for dropdown options
+  // We omit the warehouseId parameter to request the full system catalog from the backend
   const { data: globalHierarchy = [] as CategoryLevel1Node[] } = useQuery(
     [InventoryConfigs.productInventoryHierarchyResourceKey, 'global-hierarchy'],
-    () => FetchUtils.get<any>(InventoryConfigs.productInventoryHierarchyResourceUrl, { warehouseId: 0 })
+    () => FetchUtils.get<any>(InventoryConfigs.productInventoryHierarchyResourceUrl)
       .then(res => {
         if (Array.isArray(res)) return res;
-        return res.categories || res.data || res.content || [];
+        // Search deeply for categories if the response is an object
+        const categories = res?.categories || res?.data?.categories || res?.data || res?.content || [];
+        return Array.isArray(categories) ? categories : [];
       })
   );
 
