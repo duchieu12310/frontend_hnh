@@ -17,7 +17,7 @@ import DateUtils from 'utils/DateUtils';
 import { WaybillResponse } from 'models/Waybill';
 import { ListResponse } from 'utils/FetchUtils';
 import PageConfigs from 'pages/PageConfigs';
-import WaybillConfigs from 'pages/waybill/WaybillConfigs';
+import WaybillConfigs from './WaybillConfigs_v2';
 import useResetManagePageState from 'hooks/use-reset-manage-page-state';
 import useInitFilterPanelState from 'hooks/use-init-filter-panel-state';
 import useGetAllApi from 'hooks/use-get-all-api';
@@ -26,7 +26,7 @@ import MiscUtils from 'utils/MiscUtils';
 import OrderConfigs from 'pages/order/OrderConfigs';
 
 function WaybillManage() {
-  useResetManagePageState();
+  useResetManagePageState(WaybillConfigs.resourceKey);
   useInitFilterPanelState(WaybillConfigs.properties);
 
   const {

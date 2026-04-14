@@ -10,7 +10,7 @@ function useTagCreateViewModel() {
     schema: zodResolver(TagConfigs.createUpdateFormSchema),
   });
 
-  const createApi = useCreateApi<TagRequest, TagResponse>(TagConfigs.resourceUrl);
+  const createApi = useCreateApi<TagRequest, TagResponse>(TagConfigs.resourceUrl, TagConfigs.resourceKey);
 
   const handleFormSubmit = form.onSubmit((formValues) => {
     const requestBody: TagRequest = {

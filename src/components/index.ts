@@ -53,6 +53,7 @@ import ScrollToTop from 'components/ScrollToTop/ScrollToTop';
 import EntityFinder from 'components/EntityFinder/EntityFinder';
 import AdminError from 'components/AdminError/AdminError';
 import StatusToggle from 'components/StatusToggle/StatusToggle';
+import AdminGuard from 'components/AdminGuard/AdminGuard';
 
 // Client
 import ClientHeader from 'components/ClientHeader/ClientHeader';
@@ -111,6 +112,7 @@ export {
   EntityFinder,
   AdminError,
   StatusToggle,
+  AdminGuard,
 
   ClientHeader,
   ClientFooter,

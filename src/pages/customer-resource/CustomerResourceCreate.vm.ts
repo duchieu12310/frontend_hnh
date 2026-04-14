@@ -10,7 +10,7 @@ function useCustomerResourceCreateViewModel() {
     schema: zodResolver(CustomerResourceConfigs.createUpdateFormSchema),
   });
 
-  const createApi = useCreateApi<CustomerResourceRequest, CustomerResourceResponse>(CustomerResourceConfigs.resourceUrl);
+  const createApi = useCreateApi<CustomerResourceRequest, CustomerResourceResponse>(CustomerResourceConfigs.resourceUrl, CustomerResourceConfigs.resourceKey);
 
   const handleFormSubmit = form.onSubmit((formValues) => {
     const requestBody: CustomerResourceRequest = {

@@ -38,7 +38,7 @@ const InventoryTableRow: React.FC<Props> = ({
   const statusColor = adjustment > 0 ? 'teal' : adjustment < 0 ? 'red' : 'blue';
 
   const mutation = useMutation(
-    (data: InventoryUpdateDto) => FetchUtils.post<InventoryUpdateDto, any>(ResourceURL.PRODUCT_INVENTORY_AUTO_SAVE, data),
+    (data: InventoryUpdateDto) => FetchUtils.postWithToken<InventoryUpdateDto, any>(ResourceURL.PRODUCT_INVENTORY_AUTO_SAVE, data),
     {
       onSuccess: () => {
         setIsSaving(false);

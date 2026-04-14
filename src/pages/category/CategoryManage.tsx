@@ -25,7 +25,7 @@ import useAppStore from 'stores/use-app-store';
 import { FilePlus } from 'tabler-icons-react';
 
 function CategoryManage() {
-  useResetManagePageState();
+  useResetManagePageState(CategoryConfigs.resourceKey);
   useInitFilterPanelState(CategoryConfigs.properties);
 
   const {

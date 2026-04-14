@@ -22,7 +22,7 @@ import MiscUtils from 'utils/MiscUtils';
 import { ArrowNarrowRight } from 'tabler-icons-react';
 
 function TransferManage() {
-  useResetManagePageState();
+  useResetManagePageState(TransferConfigs.resourceKey);
   useInitFilterPanelState(TransferConfigs.properties);
 
   const {

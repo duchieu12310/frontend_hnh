@@ -8,12 +8,11 @@ function useDeleteByIdApi<T = number>(resourceUrl: string, resourceKey: string) 
   const navigate = useNavigate();
 
   return useMutation<void, ErrorMessage, T>(
-    (entityId) => FetchUtils.deleteById(resourceUrl, entityId),
+    (entityId) => FetchUtils.deleteWithToken(resourceUrl, [entityId]),
     {
       onSuccess: () => {
         NotifyUtils.simpleSuccess('Xóa thành công');
         void queryClient.invalidateQueries([resourceKey, 'getAll']);
-        navigate(-1);
       },
       onError: () => NotifyUtils.simpleFailed('Xóa không thành công'),
     }

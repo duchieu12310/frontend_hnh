@@ -19,7 +19,7 @@ function useOfficeCreateViewModel() {
   const [provinceSelectList, setProvinceSelectList] = useState<SelectOption[]>([]);
   const [districtSelectList, setDistrictSelectList] = useState<SelectOption[]>([]);
 
-  const createApi = useCreateApi<OfficeRequest, OfficeResponse>(OfficeConfigs.resourceUrl);
+  const createApi = useCreateApi<OfficeRequest, OfficeResponse>(OfficeConfigs.resourceUrl, OfficeConfigs.resourceKey);
   useGetAllApi<ProvinceResponse>(ProvinceConfigs.resourceUrl, ProvinceConfigs.resourceKey,
     { all: 1 },
     (provinceListResponse) => {

@@ -19,7 +19,8 @@ function useTransitItemCreateViewModel() {
   });
 
   const createApi = useCreateApi<TransitItemRequest, TransitItemResponse>(
-    TransitItemConfigs.resourceUrl
+    TransitItemConfigs.resourceUrl,
+    TransitItemConfigs.resourceKey
   );
 
   const [transitWarehouseSelectList, setTransitWarehouseSelectList] = useState<SelectOption[]>([]);

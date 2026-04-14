@@ -26,7 +26,7 @@ function useCountCreateViewModel() {
 
   const [variantIdForFetchInventory, setVariantIdForFetchInventory] = useState(0);
 
-  const createApi = useCreateApi<CountRequest, CountResponse>(CountConfigs.resourceUrl);
+  const createApi = useCreateApi<CountRequest, CountResponse>(CountConfigs.resourceUrl, CountConfigs.resourceKey);
   useGetAllApi<WarehouseResponse>(WarehouseConfigs.resourceUrl, WarehouseConfigs.resourceKey,
     { sort: 'id,asc', all: 1 },
     (warehouseListResponse) => {

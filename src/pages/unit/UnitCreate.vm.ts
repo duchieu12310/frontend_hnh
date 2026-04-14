@@ -10,7 +10,7 @@ function useUnitCreateViewModel() {
     schema: zodResolver(UnitConfigs.createUpdateFormSchema),
   });
 
-  const createApi = useCreateApi<UnitRequest, UnitResponse>(UnitConfigs.resourceUrl);
+  const createApi = useCreateApi<UnitRequest, UnitResponse>(UnitConfigs.resourceUrl, UnitConfigs.resourceKey);
 
   const handleFormSubmit = form.onSubmit((formValues) => {
     const requestBody: UnitRequest = {

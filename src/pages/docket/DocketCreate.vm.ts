@@ -24,7 +24,7 @@ function useDocketCreateViewModel() {
 
   const [variants, setVariants] = useState<VariantResponse[]>([]);
 
-  const createApi = useCreateApi<DocketRequest, DocketResponse>(DocketConfigs.resourceUrl);
+  const createApi = useCreateApi<DocketRequest, DocketResponse>(DocketConfigs.resourceUrl, DocketConfigs.resourceKey);
   useGetAllApi<DocketReasonResponse>(DocketReasonConfigs.resourceUrl, DocketReasonConfigs.resourceKey,
     { sort: 'id,asc', all: 1 },
     (docketReasonListResponse) => {

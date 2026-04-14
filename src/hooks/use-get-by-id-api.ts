@@ -12,7 +12,7 @@ function useGetByIdApi<O>(
 ) {
   return useQuery<O, ErrorMessage>(
     [resourceKey, 'getById', entityId],
-    () => FetchUtils.getById<O>(resourceUrl, entityId),
+    () => FetchUtils.getByIdWithToken<O>(resourceUrl, entityId),
     {
       onSuccess: successCallback,
       onError: () => NotifyUtils.simpleFailed('Lấy dữ liệu không thành công'),

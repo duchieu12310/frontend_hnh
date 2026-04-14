@@ -54,7 +54,7 @@ export function DefaultHeader() {
 
   const { data: roomResponses } = useQuery<ListResponse<RoomResponse>, ErrorMessage>(
     ['rooms', 'unread-count'],
-    () => FetchUtils.getAll<RoomResponse>(ResourceURL.ROOM, { all: 1, sort: 'updatedAt,desc' }),
+    () => FetchUtils.getAllWithToken<RoomResponse>(ResourceURL.ROOM, { all: 1, sort: 'updatedAt,desc' }),
     {
       refetchInterval: 5000, // Refresh mỗi 5 giây
       onSuccess: (data) => {

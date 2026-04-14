@@ -10,7 +10,7 @@ function useJobTitleCreateViewModel() {
     schema: zodResolver(JobTitleConfigs.createUpdateFormSchema),
   });
 
-  const createApi = useCreateApi<JobTitleRequest, JobTitleResponse>(JobTitleConfigs.resourceUrl);
+  const createApi = useCreateApi<JobTitleRequest, JobTitleResponse>(JobTitleConfigs.resourceUrl, JobTitleConfigs.resourceKey);
 
   const handleFormSubmit = form.onSubmit((formValues) => {
     const requestBody: JobTitleRequest = {

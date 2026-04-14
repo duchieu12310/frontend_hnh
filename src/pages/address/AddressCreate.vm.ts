@@ -19,7 +19,7 @@ function useAddressCreateViewModel() {
   const [provinceSelectList, setProvinceSelectList] = useState<SelectOption[]>([]);
   const [districtSelectList, setDistrictSelectList] = useState<SelectOption[]>([]);
 
-  const createApi = useCreateApi<AddressRequest, AddressResponse>(AddressConfigs.resourceUrl);
+  const createApi = useCreateApi<AddressRequest, AddressResponse>(AddressConfigs.resourceUrl, AddressConfigs.resourceKey);
   useGetAllApi<ProvinceResponse>(ProvinceConfigs.resourceUrl, ProvinceConfigs.resourceKey,
     { all: 1 },
     (provinceListResponse) => {

@@ -25,7 +25,7 @@ import NotifyUtils from 'utils/NotifyUtils';
 import DocketConfigs from 'pages/docket/DocketConfigs';
 
 function OrderManage() {
-  useResetManagePageState();
+  useResetManagePageState(OrderConfigs.resourceKey);
   useInitFilterPanelState(OrderConfigs.properties);
 
   const {

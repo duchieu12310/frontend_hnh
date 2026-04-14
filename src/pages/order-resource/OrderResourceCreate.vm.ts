@@ -18,7 +18,7 @@ function useOrderResourceCreateViewModel() {
   // TODO: TẠM THỜI COMMENT - ĐƠN GIẢN HÓA HỆ THỐNG (XÓA CUSTOMER VÀ EMPLOYEE)
   // const [customerResourceSelectList, setCustomerResourceSelectList] = useState<SelectOption[]>([]);
 
-  const createApi = useCreateApi<OrderResourceRequest, OrderResourceResponse>(OrderResourceConfigs.resourceUrl);
+  const createApi = useCreateApi<OrderResourceRequest, OrderResourceResponse>(OrderResourceConfigs.resourceUrl, OrderResourceConfigs.resourceKey);
   // useGetAllApi<CustomerResourceResponse>(CustomerResourceConfigs.resourceUrl, CustomerResourceConfigs.resourceKey,
   //   { all: 1 },
   //   (customerResourceListResponse) => {

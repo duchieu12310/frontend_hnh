@@ -10,7 +10,7 @@ function useDocketReasonCreateViewModel() {
     schema: zodResolver(DocketReasonConfigs.createUpdateFormSchema),
   });
 
-  const createApi = useCreateApi<DocketReasonRequest, DocketReasonResponse>(DocketReasonConfigs.resourceUrl);
+  const createApi = useCreateApi<DocketReasonRequest, DocketReasonResponse>(DocketReasonConfigs.resourceUrl, DocketReasonConfigs.resourceKey);
 
   const handleFormSubmit = form.onSubmit((formValues) => {
     const requestBody: DocketReasonRequest = {

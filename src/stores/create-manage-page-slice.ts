@@ -9,6 +9,8 @@ export interface ManagePageState {
   setActivePage: Dispatch<SetStateAction<number>>;
   activePageSize: number;
   setActivePageSize: Dispatch<SetStateAction<number>>;
+  activeResourceKey: string | null;
+  setActiveResourceKey: Dispatch<SetStateAction<string | null>>;
   activeFilter: Filter | null;
   setActiveFilter: Dispatch<SetStateAction<Filter | null>>;
   searchToken: string;
@@ -20,12 +22,13 @@ export interface ManagePageState {
   activeFilterPanel: boolean;
   setActiveFilterPanel: Dispatch<SetStateAction<boolean>>;
   getRequestParams: () => RequestParams;
-  resetManagePageState: () => void;
+  resetManagePageState: (resourceKey?: string) => void;
 }
 
 const initialManagePageState = {
   activePage: PageConfigs.initialListResponse.page,
   activePageSize: PageConfigs.initialListResponse.size,
+  activeResourceKey: null as string | null,
   activeFilter: null,
   searchToken: '',
   selection: [],
@@ -37,6 +40,7 @@ const createManagePageSlice: SliceCreator<ManagePageState> = (set, get) => ({
   ...initialManagePageState,
   setActivePage: (value) => set((state) => extractValue(state, value, 'activePage'), false, 'AppStore/activePage'),
   setActivePageSize: (value) => set((state) => extractValue(state, value, 'activePageSize'), false, 'AppStore/activePageSize'),
+  setActiveResourceKey: (value) => set((state) => extractValue(state, value, 'activeResourceKey'), false, 'AppStore/activeResourceKey'),
   setActiveFilter: (value) => set((state) => extractValue(state, value, 'activeFilter'), false, 'AppStore/activeFilter'),
   setSearchToken: (value) => set((state) => extractValue(state, value, 'searchToken'), false, 'AppStore/searchToken'),
   setSelection: (value) => set((state) => extractValue(state, value, 'selection'), false, 'AppStore/selection'),
@@ -49,7 +53,15 @@ const createManagePageSlice: SliceCreator<ManagePageState> = (set, get) => ({
     filter: FilterUtils.convertToFilterRSQL(get().activeFilter),
     search: get().searchToken,
   }),
-  resetManagePageState: () => set(initialManagePageState),
+  resetManagePageState: (resourceKey) => {
+    if (resourceKey && get().activeResourceKey === resourceKey) {
+      // Nếu cùng resource, chỉ reset selection
+      set({ selection: [] });
+    } else {
+      // Nếu khác resource hoặc không truyền, reset hoàn toàn
+      set({ ...initialManagePageState, activeResourceKey: resourceKey || null });
+    }
+  },
 });
 
 export default createManagePageSlice;

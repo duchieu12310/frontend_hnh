@@ -21,7 +21,7 @@ function useTransferCreateViewModel() {
 
   const [variants, setVariants] = useState<VariantResponse[]>([]);
 
-  const createApi = useCreateApi<TransferRequest, TransferResponse>(TransferConfigs.resourceUrl);
+  const createApi = useCreateApi<TransferRequest, TransferResponse>(TransferConfigs.resourceUrl, TransferConfigs.resourceKey);
   useGetAllApi<WarehouseResponse>(WarehouseConfigs.resourceUrl, WarehouseConfigs.resourceKey,
     { sort: 'id,asc', all: 1 },
     (warehouseListResponse) => {

@@ -24,7 +24,7 @@ import MiscUtils from 'utils/MiscUtils';
 import { Plus } from 'tabler-icons-react';
 
 function PurchaseOrderManage() {
-  useResetManagePageState();
+  useResetManagePageState(PurchaseOrderConfigs.resourceKey);
   useInitFilterPanelState(PurchaseOrderConfigs.properties);
 
   const {

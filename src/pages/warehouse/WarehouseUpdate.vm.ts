@@ -37,7 +37,7 @@ function useWarehouseUpdateViewModel(id: number) {
   // We omit the warehouseId parameter to request the full system catalog from the backend
   const { data: globalHierarchy = [] as CategoryLevel1Node[] } = useQuery(
     [InventoryConfigs.productInventoryHierarchyResourceKey, 'global-hierarchy'],
-    () => FetchUtils.get<any>(InventoryConfigs.productInventoryHierarchyResourceUrl)
+    () => FetchUtils.getWithToken<any>(InventoryConfigs.productInventoryHierarchyResourceUrl)
       .then(res => {
         if (Array.isArray(res)) return res;
         // Search deeply for categories if the response is an object
@@ -46,7 +46,7 @@ function useWarehouseUpdateViewModel(id: number) {
       })
   );
 
-  useGetByIdApi<WarehouseResponse>(WarehouseConfigs.resourceUrl, WarehouseConfigs.resourceKey, id,
+  const { refetch } = useGetByIdApi<WarehouseResponse>(WarehouseConfigs.resourceUrl, WarehouseConfigs.resourceKey, id,
     (warehouseResponse) => {
       setWarehouse(warehouseResponse);
       
@@ -205,8 +205,7 @@ function useWarehouseUpdateViewModel(id: number) {
   };
 
   /**
-   * RECURSIVE EXPANSION:
-   * If a user selects "All" (null value), this function finds all products under that branch.
+   * RECURSIVE EXPANSION Logic
    */
   const expandAllProducts = (nodeId: string | null, type: SelectionNode['type'], map: Map<number, Set<number>>) => {
     const collectFromL3 = (l3: any) => {
@@ -215,13 +214,8 @@ function useWarehouseUpdateViewModel(id: number) {
       l3.products.forEach((p: any) => map.get(l3.id)!.add(p.productId));
     };
 
-    const collectFromL2 = (l2: any) => {
-      l2.children?.forEach(collectFromL3);
-    };
-
-    const collectFromL1 = (l1: any) => {
-      l1.children?.forEach(collectFromL2);
-    };
+    const collectFromL2 = (l2: any) => l2.children?.forEach(collectFromL3);
+    const collectFromL1 = (l1: any) => l1.children?.forEach(collectFromL2);
 
     if (type === 'L1') {
       const roots = nodeId ? globalHierarchy.filter(c => String(c.id) === nodeId) : globalHierarchy;

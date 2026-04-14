@@ -22,7 +22,7 @@ import useGetAllApi from 'hooks/use-get-all-api';
 import useAppStore from 'stores/use-app-store';
 
 function JobTitleManage() {
-  useResetManagePageState();
+  useResetManagePageState(JobTitleConfigs.resourceKey);
   useInitFilterPanelState(JobTitleConfigs.properties);
 
   const {

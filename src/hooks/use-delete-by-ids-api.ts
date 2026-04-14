@@ -6,7 +6,7 @@ function useDeleteByIdsApi<T = number>(resourceUrl: string, resourceKey: string)
   const queryClient = useQueryClient();
 
   return useMutation<void, ErrorMessage, T[]>(
-    (entityIds) => FetchUtils.deleteByIds(resourceUrl, entityIds),
+    (entityIds) => FetchUtils.deleteWithToken(resourceUrl, entityIds),
     {
       onSuccess: () => {
         NotifyUtils.simpleSuccess('Xóa thành công');

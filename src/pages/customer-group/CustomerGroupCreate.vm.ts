@@ -10,7 +10,7 @@ function useCustomerGroupCreateViewModel() {
     schema: zodResolver(CustomerGroupConfigs.createUpdateFormSchema),
   });
 
-  const createApi = useCreateApi<CustomerGroupRequest, CustomerGroupResponse>(CustomerGroupConfigs.resourceUrl);
+  const createApi = useCreateApi<CustomerGroupRequest, CustomerGroupResponse>(CustomerGroupConfigs.resourceUrl, CustomerGroupConfigs.resourceKey);
 
   const handleFormSubmit = form.onSubmit((formValues) => {
     const requestBody: CustomerGroupRequest = {

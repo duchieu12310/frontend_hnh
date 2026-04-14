@@ -56,7 +56,7 @@ const InventoryManage: React.FC = () => {
   // 1. Fetch Warehouses
   const { data: warehousesResponse = { content: [] } as ListResponse<WarehouseResponse>, isLoading: isWarehousesLoading } = useQuery(
     [ResourceURL.WAREHOUSE, 'get-all-warehouses'],
-    () => FetchUtils.getAll<WarehouseResponse>(ResourceURL.WAREHOUSE, { all: 1 })
+    () => FetchUtils.getAllWithToken<WarehouseResponse>(ResourceURL.WAREHOUSE, { all: 1 })
   );
 
   const warehouses = warehousesResponse.content;
@@ -82,7 +82,7 @@ const InventoryManage: React.FC = () => {
       selectedL3Ids,
       selectedProductIds
     ],
-    () => FetchUtils.get<any>(
+    () => FetchUtils.getWithToken<any>(
       InventoryConfigs.productInventoryHierarchyResourceUrl,
       { 
         warehouseId: selectedWarehouseId,

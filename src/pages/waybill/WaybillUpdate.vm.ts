@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useForm, zodResolver } from '@mantine/form';
-import WaybillConfigs from 'pages/waybill/WaybillConfigs';
+import WaybillConfigs from './WaybillConfigs_v2';
 import { RequiredNote, WaybillRequest, WaybillResponse } from 'models/Waybill';
 import useUpdateApi from 'hooks/use-update-api';
 import useGetByIdApi from 'hooks/use-get-by-id-api';

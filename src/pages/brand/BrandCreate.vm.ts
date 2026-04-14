@@ -10,7 +10,7 @@ function useBrandCreateViewModel() {
     schema: zodResolver(BrandConfigs.createUpdateFormSchema),
   });
 
-  const createApi = useCreateApi<BrandRequest, BrandResponse>(BrandConfigs.resourceUrl);
+  const createApi = useCreateApi<BrandRequest, BrandResponse>(BrandConfigs.resourceUrl, BrandConfigs.resourceKey);
 
   const handleFormSubmit = form.onSubmit((formValues) => {
     const requestBody: BrandRequest = {

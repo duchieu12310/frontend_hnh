@@ -33,7 +33,7 @@ function useGetAllApi<O>(
 
   return useQuery<ListResponse<O>, ErrorMessage>(
     queryKey,
-    () => FetchUtils.getAll<O>(resourceUrl, requestParams),
+    () => FetchUtils.getAllWithToken<O>(resourceUrl, requestParams),
     {
       keepPreviousData: true,
       onSuccess: successCallback,

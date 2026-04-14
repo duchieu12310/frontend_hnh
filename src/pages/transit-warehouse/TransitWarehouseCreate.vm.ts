@@ -26,7 +26,8 @@ function useTransitWarehouseCreateViewModel() {
   });
 
   const createApi = useCreateApi<TransitWarehouseRequest, TransitWarehouseResponse>(
-    TransitWarehouseConfigs.resourceUrl
+    TransitWarehouseConfigs.resourceUrl,
+    TransitWarehouseConfigs.resourceKey
   );
 
   const [provinceSelectList, setProvinceSelectList] = useState<SelectOption[]>([]);

@@ -16,16 +16,6 @@ import ProvinceManage, { ProvinceCreate, ProvinceUpdate } from 'pages/province';
 import DistrictManage, { DistrictCreate, DistrictUpdate } from 'pages/district';
 import UserManage, { UserCreate, UserUpdate } from 'pages/user';
 import RoleManage, { RoleCreate, RoleUpdate } from 'pages/role';
-import OfficeManage, { OfficeCreate, OfficeUpdate } from 'pages/office';
-import DepartmentManage, { DepartmentCreate, DepartmentUpdate } from 'pages/department';
-import JobTypeManage, { JobTypeCreate, JobTypeUpdate } from 'pages/job-type';
-import JobLevelManage, { JobLevelCreate, JobLevelUpdate } from 'pages/job-level';
-import JobTitleManage, { JobTitleCreate, JobTitleUpdate } from 'pages/job-title';
-import EmployeeManage, { EmployeeCreate, EmployeeUpdate } from 'pages/employee';
-import CustomerGroupManage, { CustomerGroupCreate, CustomerGroupUpdate } from 'pages/customer-group';
-import CustomerStatusManage, { CustomerStatusCreate, CustomerStatusUpdate } from 'pages/customer-status';
-import CustomerResourceManage, { CustomerResourceCreate, CustomerResourceUpdate } from 'pages/customer-resource';
-import CustomerManage, { CustomerCreate, CustomerUpdate } from 'pages/customer';
 import ProductManage, { ProductCreate, ProductUpdate } from 'pages/product';
 import CategoryManage, { CategoryCreate, CategoryUpdate, CategoryDetail } from 'pages/category';
 import BrandManage, { BrandCreate, BrandUpdate } from 'pages/brand';
@@ -37,18 +27,12 @@ import GuaranteeManage, { GuaranteeCreate, GuaranteeUpdate } from 'pages/guarant
 import SupplierManage, { SupplierCreate, SupplierUpdate } from 'pages/supplier';
 import InventoryManage from 'pages/inventory';
 import WarehouseManage, { WarehouseCreate, WarehouseUpdate } from 'pages/warehouse';
-// TODO: TẠM THỜI COMMENT - ĐƠN GIẢN HÓA HỆ THỐNG KHO
-// import DestinationManage, { DestinationCreate, DestinationUpdate } from 'pages/destination';
-import DocketReasonManage, { DocketReasonCreate, DocketReasonUpdate } from 'pages/docket-reason';
 import OrderManage, { OrderCreate, OrderUpdate } from 'pages/order';
 import OrderResourceManage, { OrderResourceCreate, OrderResourceUpdate } from 'pages/order-resource';
 import OrderCancellationReasonManage, {
   OrderCancellationReasonCreate,
   OrderCancellationReasonUpdate
 } from 'pages/order-cancellation-reason';
-import PurchaseOrderManage, { PurchaseOrderCreate, PurchaseOrderUpdate } from 'pages/purchase-order';
-// import TransferManage, { TransferCreate, TransferUpdate } from 'pages/transfer';
-// import CountManage, { CountCreate, CountUpdate } from 'pages/count';
 import ClientHome from 'pages/client-home';
 import ClientAllCategories from 'pages/client-all-categories';
 import ClientCategory from 'pages/client-category';
@@ -56,7 +40,7 @@ import ClientPromotionProducts from 'pages/client-promotion-products';
 import ClientSearch from 'pages/client-search';
 import ClientSignin from 'pages/client-signin';
 import ClientUser from 'pages/client-user';
-import { AdminError, ClientError, ProtectedRoute, ScrollToTop } from 'components';
+import { AdminError, AdminGuard, ClientError, ProtectedRoute, ScrollToTop } from 'components';
 import ClientSetting from 'pages/client-setting';
 import ClientSettingPersonal from 'pages/client-setting-personal';
 import ClientSettingPhone from 'pages/client-setting-phone';
@@ -83,9 +67,6 @@ import ClientPaymentSuccess from 'pages/client-payment-success';
 import ClientPaymentCancel from 'pages/client-payment-cancel';
 import AdminNotification from 'pages/admin-notification';
 import AdminAccount from 'pages/admin-account';
-// TODO: TẠM THỜI COMMENT - FLOW ĐIỂM THƯỞNG
-// import RewardManage from 'pages/reward-strategy';
-// import ClientReward from 'pages/client-reward';
 import ClientSignup from 'pages/client-signup';
 import ClientForgotPassword, { ClientChangePassword } from 'pages/client-forgot-password';
 import ClientContact from 'pages/client-contact';
@@ -213,195 +194,92 @@ function App() {
                       </StompSessionProvider>
                     </ProtectedRoute>
                   )}/>
-                  {/* TODO: TẠM THỜI COMMENT - FLOW ĐIỂM THƯỞNG */}
-                  {/* <Route path="/user/reward" element={(
-                    <ProtectedRoute>
-                      <ClientReward/>
-                    </ProtectedRoute>
-                  )}/> */}
                   <Route path="/contact" element={<ClientContact/>}/>
                   <Route path="/lien-he" element={<ClientContact/>}/>
                 </Route>
                 <Route path="/admin" element={<Admin/>}>
                   <Route path="/admin/*" element={<AdminError/>}/>
                   <Route index element={<AdminDashboard/>}/>
-                  {/* ADDRESS */}
-                  <Route path={ManagerPath.ADDRESS} element={<AddressManage/>}/>
-                  <Route path={ManagerPath.ADDRESS + '/create'} element={<AddressCreate/>}/>
-                  <Route path={ManagerPath.ADDRESS + '/update/:id'} element={<AddressUpdate/>}/>
-                  {/* PROVINCE */}
-                  <Route path={ManagerPath.PROVINCE} element={<ProvinceManage/>}/>
-                  <Route path={ManagerPath.PROVINCE + '/create'} element={<ProvinceCreate/>}/>
-                  <Route path={ManagerPath.PROVINCE + '/update/:id'} element={<ProvinceUpdate/>}/>
-                  {/* DISTRICT */}
-                  <Route path={ManagerPath.DISTRICT} element={<DistrictManage/>}/>
-                  <Route path={ManagerPath.DISTRICT + '/create'} element={<DistrictCreate/>}/>
-                  <Route path={ManagerPath.DISTRICT + '/update/:id'} element={<DistrictUpdate/>}/>
-                  {/* USER */}
-                  <Route path={ManagerPath.USER} element={<UserManage/>}/>
-                  <Route path={ManagerPath.USER + '/create'} element={<UserCreate/>}/>
-                  <Route path={ManagerPath.USER + '/update/:id'} element={<UserUpdate/>}/>
-                  {/* ROLE */}
-                  <Route path={ManagerPath.ROLE} element={<RoleManage/>}/>
-                  <Route path={ManagerPath.ROLE + '/create'} element={<RoleCreate/>}/>
-                  <Route path={ManagerPath.ROLE + '/update/:id'} element={<RoleUpdate/>}/>
-                  {/* TODO: TẠM THỜI COMMENT - ĐƠN GIẢN HÓA HỆ THỐNG (XÓA CUSTOMER VÀ EMPLOYEE) */}
-                  {/* OFFICE */}
-                  {/* <Route path={ManagerPath.OFFICE} element={<OfficeManage/>}/> */}
-                  {/* <Route path={ManagerPath.OFFICE + '/create'} element={<OfficeCreate/>}/> */}
-                  {/* <Route path={ManagerPath.OFFICE + '/update/:id'} element={<OfficeUpdate/>}/> */}
-                  {/* DEPARTMENT */}
-                  {/* <Route path={ManagerPath.DEPARTMENT} element={<DepartmentManage/>}/> */}
-                  {/* <Route path={ManagerPath.DEPARTMENT + '/create'} element={<DepartmentCreate/>}/> */}
-                  {/* <Route path={ManagerPath.DEPARTMENT + '/update/:id'} element={<DepartmentUpdate/>}/> */}
-                  {/* JOB_TYPE */}
-                  {/* <Route path={ManagerPath.JOB_TYPE} element={<JobTypeManage/>}/> */}
-                  {/* <Route path={ManagerPath.JOB_TYPE + '/create'} element={<JobTypeCreate/>}/> */}
-                  {/* <Route path={ManagerPath.JOB_TYPE + '/update/:id'} element={<JobTypeUpdate/>}/> */}
-                  {/* JOB_LEVEL */}
-                  {/* <Route path={ManagerPath.JOB_LEVEL} element={<JobLevelManage/>}/> */}
-                  {/* <Route path={ManagerPath.JOB_LEVEL + '/create'} element={<JobLevelCreate/>}/> */}
-                  {/* <Route path={ManagerPath.JOB_LEVEL + '/update/:id'} element={<JobLevelUpdate/>}/> */}
-                  {/* JOB_TITLE */}
-                  {/* <Route path={ManagerPath.JOB_TITLE} element={<JobTitleManage/>}/> */}
-                  {/* <Route path={ManagerPath.JOB_TITLE + '/create'} element={<JobTitleCreate/>}/> */}
-                  {/* <Route path={ManagerPath.JOB_TITLE + '/update/:id'} element={<JobTitleUpdate/>}/> */}
-                  {/* EMPLOYEE */}
-                  {/* <Route path={ManagerPath.EMPLOYEE} element={<EmployeeManage/>}/> */}
-                  {/* <Route path={ManagerPath.EMPLOYEE + '/create'} element={<EmployeeCreate/>}/> */}
-                  {/* <Route path={ManagerPath.EMPLOYEE + '/update/:id'} element={<EmployeeUpdate/>}/> */}
-                  {/* CUSTOMER */}
-                  {/* <Route path={ManagerPath.CUSTOMER} element={<CustomerManage/>}/> */}
-                  {/* <Route path={ManagerPath.CUSTOMER + '/create'} element={<CustomerCreate/>}/> */}
-                  {/* <Route path={ManagerPath.CUSTOMER + '/update/:id'} element={<CustomerUpdate/>}/> */}
-                  {/* CUSTOMER_GROUP */}
-                  {/* <Route path={ManagerPath.CUSTOMER_GROUP} element={<CustomerGroupManage/>}/> */}
-                  {/* <Route path={ManagerPath.CUSTOMER_GROUP + '/create'} element={<CustomerGroupCreate/>}/> */}
-                  {/* <Route path={ManagerPath.CUSTOMER_GROUP + '/update/:id'} element={<CustomerGroupUpdate/>}/> */}
-                  {/* CUSTOMER_STATUS */}
-                  {/* <Route path={ManagerPath.CUSTOMER_STATUS} element={<CustomerStatusManage/>}/> */}
-                  {/* <Route path={ManagerPath.CUSTOMER_STATUS + '/create'} element={<CustomerStatusCreate/>}/> */}
-                  {/* <Route path={ManagerPath.CUSTOMER_STATUS + '/update/:id'} element={<CustomerStatusUpdate/>}/> */}
-                  {/* CUSTOMER_RESOURCE */}
-                  {/* <Route path={ManagerPath.CUSTOMER_RESOURCE} element={<CustomerResourceManage/>}/> */}
-                  {/* <Route path={ManagerPath.CUSTOMER_RESOURCE + '/create'} element={<CustomerResourceCreate/>}/> */}
-                  {/* <Route path={ManagerPath.CUSTOMER_RESOURCE + '/update/:id'} element={<CustomerResourceUpdate/>}/> */}
-                  {/* PRODUCT */}
-                  <Route path={ManagerPath.PRODUCT} element={<ProductManage/>}/>
-                  <Route path={ManagerPath.PRODUCT + '/create'} element={<ProductCreate/>}/>
-                  <Route path={ManagerPath.PRODUCT + '/update/:id'} element={<ProductUpdate/>}/>
-                  {/* CATEGORY */}
-                  <Route path={ManagerPath.CATEGORY} element={<CategoryManage/>}/>
-                  <Route path={ManagerPath.CATEGORY + '/create'} element={<CategoryCreate/>}/>
-                  <Route path={ManagerPath.CATEGORY + '/update/:id'} element={<CategoryUpdate/>}/>
-                  <Route path={ManagerPath.CATEGORY + '/detail/:id'} element={<CategoryDetail/>}/>
-                  {/* BRAND */}
-                  <Route path={ManagerPath.BRAND} element={<BrandManage/>}/>
-                  <Route path={ManagerPath.BRAND + '/create'} element={<BrandCreate/>}/>
-                  <Route path={ManagerPath.BRAND + '/update/:id'} element={<BrandUpdate/>}/>
-                  {/* SUPPLIER */}
-                  <Route path={ManagerPath.SUPPLIER} element={<SupplierManage/>}/>
-                  <Route path={ManagerPath.SUPPLIER + '/create'} element={<SupplierCreate/>}/>
-                  <Route path={ManagerPath.SUPPLIER + '/update/:id'} element={<SupplierUpdate/>}/>
-                  {/* UNIT */}
-                  <Route path={ManagerPath.UNIT} element={<UnitManage/>}/>
-                  <Route path={ManagerPath.UNIT + '/create'} element={<UnitCreate/>}/>
-                  <Route path={ManagerPath.UNIT + '/update/:id'} element={<UnitUpdate/>}/>
-                  {/* TAG */}
-                  <Route path={ManagerPath.TAG} element={<TagManage/>}/>
-                  <Route path={ManagerPath.TAG + '/create'} element={<TagCreate/>}/>
-                  <Route path={ManagerPath.TAG + '/update/:id'} element={<TagUpdate/>}/>
-                  {/* GUARANTEE */}
-                  <Route path={ManagerPath.GUARANTEE} element={<GuaranteeManage/>}/>
-                  <Route path={ManagerPath.GUARANTEE + '/create'} element={<GuaranteeCreate/>}/>
-                  <Route path={ManagerPath.GUARANTEE + '/update/:id'} element={<GuaranteeUpdate/>}/>
-                  {/* PROPERTY */}
-                  <Route path={ManagerPath.PROPERTY} element={<PropertyManage/>}/>
-                  <Route path={ManagerPath.PROPERTY + '/create'} element={<PropertyCreate/>}/>
-                  <Route path={ManagerPath.PROPERTY + '/update/:id'} element={<PropertyUpdate/>}/>
-                  {/* SPECIFICATION */}
-                  <Route path={ManagerPath.SPECIFICATION} element={<SpecificationManage/>}/>
-                  <Route path={ManagerPath.SPECIFICATION + '/create'} element={<SpecificationCreate/>}/>
-                  <Route path={ManagerPath.SPECIFICATION + '/update/:id'} element={<SpecificationUpdate/>}/>
-                  {/* INVENTORY */}
-                  <Route path={ManagerPath.INVENTORY} element={<InventoryManage/>}/>
-                  {/* TODO: TẠM THỜI COMMENT - ĐƠN GIẢN HÓA HỆ THỐNG KHO */}
-                  {/* WAREHOUSE */}
-                  <Route path={ManagerPath.WAREHOUSE} element={<WarehouseManage/>}/>
-                  <Route path={ManagerPath.WAREHOUSE + '/create'} element={<WarehouseCreate/>}/>
-                  <Route path={ManagerPath.WAREHOUSE + '/update/:id'} element={<WarehouseUpdate/>}/>
+                  
+                  {/* USER & ROLE (ADMIN ONLY) */}
+                  <Route element={<AdminGuard allowedRoles={['ADMIN']} />}>
+                    <Route path={ManagerPath.USER} element={<UserManage/>}/>
+                    <Route path={ManagerPath.USER + '/create'} element={<UserCreate/>}/>
+                    <Route path={ManagerPath.USER + '/update/:id'} element={<UserUpdate/>}/>
+                    <Route path={ManagerPath.ROLE} element={<RoleManage/>}/>
+                    <Route path={ManagerPath.ROLE + '/create'} element={<RoleCreate/>}/>
+                    <Route path={ManagerPath.ROLE + '/update/:id'} element={<RoleUpdate/>}/>
+                  </Route>
 
-                  {/* TODO: TẠM THỜI COMMENT - ĐƠN GIẢN HÓA HỆ THỐNG KHO */}
-                  {/* DESTINATION */}
-                  {/* <Route path={ManagerPath.DESTINATION} element={<DestinationManage/>}/> */}
-                  {/* <Route path={ManagerPath.DESTINATION + '/create'} element={<DestinationCreate/>}/> */}
-                  {/* <Route path={ManagerPath.DESTINATION + '/update/:id'} element={<DestinationUpdate/>}/> */}
-                  {/* TODO: TẠM THỜI COMMENT - ĐƠN GIẢN HÓA HỆ THỐNG KHO */}
-                  {/* DOCKET_REASON */}
-                  {/* <Route path={ManagerPath.DOCKET_REASON} element={<DocketReasonManage/>}/> */}
-                  {/* <Route path={ManagerPath.DOCKET_REASON + '/create'} element={<DocketReasonCreate/>}/> */}
-                  {/* <Route path={ManagerPath.DOCKET_REASON + '/update/:id'} element={<DocketReasonUpdate/>}/> */}
-                  {/* ORDER */}
-                  <Route path={ManagerPath.ORDER} element={<OrderManage/>}/>
-                  <Route path={ManagerPath.ORDER + '/create'} element={<OrderCreate/>}/>
-                  <Route path={ManagerPath.ORDER + '/update/:id'} element={<OrderUpdate/>}/>
-                  {/* ORDER_RESOURCE */}
-                  <Route path={ManagerPath.ORDER_RESOURCE} element={<OrderResourceManage/>}/>
-                  <Route path={ManagerPath.ORDER_RESOURCE + '/create'} element={<OrderResourceCreate/>}/>
-                  <Route path={ManagerPath.ORDER_RESOURCE + '/update/:id'} element={<OrderResourceUpdate/>}/>
-                  {/* ORDER_CANCELLATION_REASON */}
-                  <Route path={ManagerPath.ORDER_CANCELLATION_REASON} element={<OrderCancellationReasonManage/>}/>
-                  <Route
-                    path={ManagerPath.ORDER_CANCELLATION_REASON + '/create'}
-                    element={<OrderCancellationReasonCreate/>}
-                  />
-                  <Route
-                    path={ManagerPath.ORDER_CANCELLATION_REASON + '/update/:id'}
-                    element={<OrderCancellationReasonUpdate/>}
-                  />
-                  {/* TODO: TẠM THỜI COMMENT - ĐƠN GIẢN HÓA HỆ THỐNG KHO */}
-                  {/* PURCHASE_ORDER */}
-                  {/* <Route path={ManagerPath.PURCHASE_ORDER} element={<PurchaseOrderManage/>}/> */}
-                  {/* <Route path={ManagerPath.PURCHASE_ORDER + '/create'} element={<PurchaseOrderCreate/>}/> */}
-                  {/* <Route path={ManagerPath.PURCHASE_ORDER + '/update/:id'} element={<PurchaseOrderUpdate/>}/> */}
-                  {/* TODO: TẠM THỜI COMMENT - ĐƠN GIẢN HÓA HỆ THỐNG KHO */}
-                  {/* DOCKET */}
-                  {/* TODO: TẠM THỜI COMMENT - ĐƠN GIẢN HÓA HỆ THỐNG KHO */}
-                  {/* TRANSFER */}
-                  {/* <Route path={ManagerPath.TRANSFER} element={<TransferManage/>}/> */}
-                  {/* <Route path={ManagerPath.TRANSFER + '/create'} element={<TransferCreate/>}/> */}
-                  {/* <Route path={ManagerPath.TRANSFER + '/update/:id'} element={<TransferUpdate/>}/> */}
-                  {/* COUNT */}
-                  {/* <Route path={ManagerPath.COUNT} element={<CountManage/>}/> */}
-                  {/* <Route path={ManagerPath.COUNT + '/create'} element={<CountCreate/>}/> */}
-                  {/* <Route path={ManagerPath.COUNT + '/update/:id'} element={<CountUpdate/>}/> */}
-                  {/* WAYBILL */}
-                  <Route path={ManagerPath.WAYBILL} element={<WaybillManage/>}/>
-                  <Route path={ManagerPath.WAYBILL + '/create'} element={<WaybillCreate/>}/>
-                  <Route path={ManagerPath.WAYBILL + '/update/:id'} element={<WaybillUpdate/>}/>
-                  {/* REVIEW */}
-                  <Route path={ManagerPath.REVIEW} element={<ReviewManage/>}/>
-                  {/* VOUCHER */}
-                  <Route path={ManagerPath.VOUCHER} element={<VoucherManage/>}/>
-                  {/* PAYMENT_METHOD */}
-                  <Route path={ManagerPath.PAYMENT_METHOD} element={<PaymentMethodManage/>}/>
-                  {/* PROMOTION */}
-                  <Route path={ManagerPath.PROMOTION} element={<PromotionManage/>}/>
-                  <Route path={ManagerPath.PROMOTION + '/create'} element={<PromotionCreate/>}/>
-                  <Route path={ManagerPath.PROMOTION + '/update/:id'} element={<PromotionUpdate/>}/>
-                  {/* CHAT */}
-                  <Route path={ManagerPath.CHAT} element={
-                    <StompSessionProvider url={ApplicationConstants.WEBSOCKET_PATH}>
-                      <ChatDashboard/>
-                    </StompSessionProvider>
-                  }/>
-                  {/* NOTIFICATION */}
+                  {/* PRODUCT & CATEGORY (ADMIN, MANAGER) */}
+                  <Route element={<AdminGuard allowedRoles={['ADMIN', 'MANAGER']} />}>
+                    <Route path={ManagerPath.PRODUCT} element={<ProductManage/>}/>
+                    <Route path={ManagerPath.PRODUCT + '/create'} element={<ProductCreate/>}/>
+                    <Route path={ManagerPath.PRODUCT + '/update/:id'} element={<ProductUpdate/>}/>
+                    <Route path={ManagerPath.CATEGORY} element={<CategoryManage/>}/>
+                    <Route path={ManagerPath.CATEGORY + '/create'} element={<CategoryCreate/>}/>
+                    <Route path={ManagerPath.CATEGORY + '/update/:id'} element={<CategoryUpdate/>}/>
+                    <Route path={ManagerPath.CATEGORY + '/detail/:id'} element={<CategoryDetail/>}/>
+                    <Route path={ManagerPath.BRAND} element={<BrandManage/>}/>
+                    <Route path={ManagerPath.BRAND + '/create'} element={<BrandCreate/>}/>
+                    <Route path={ManagerPath.BRAND + '/update/:id'} element={<BrandUpdate/>}/>
+                    <Route path={ManagerPath.SUPPLIER} element={<SupplierManage/>}/>
+                    <Route path={ManagerPath.SUPPLIER + '/create'} element={<SupplierCreate/>}/>
+                    <Route path={ManagerPath.SUPPLIER + '/update/:id'} element={<SupplierUpdate/>}/>
+                    <Route path={ManagerPath.UNIT} element={<UnitManage/>}/>
+                    <Route path={ManagerPath.UNIT + '/create'} element={<UnitCreate/>}/>
+                    <Route path={ManagerPath.UNIT + '/update/:id'} element={<UnitUpdate/>}/>
+                    <Route path={ManagerPath.TAG} element={<TagManage/>}/>
+                    <Route path={ManagerPath.TAG + '/create'} element={<TagCreate/>}/>
+                    <Route path={ManagerPath.TAG + '/update/:id'} element={<TagUpdate/>}/>
+                    <Route path={ManagerPath.GUARANTEE} element={<GuaranteeManage/>}/>
+                    <Route path={ManagerPath.GUARANTEE + '/create'} element={<GuaranteeCreate/>}/>
+                    <Route path={ManagerPath.GUARANTEE + '/update/:id'} element={<GuaranteeUpdate/>}/>
+                    <Route path={ManagerPath.PROPERTY} element={<PropertyManage/>}/>
+                    <Route path={ManagerPath.PROPERTY + '/create'} element={<PropertyCreate/>}/>
+                    <Route path={ManagerPath.PROPERTY + '/update/:id'} element={<PropertyUpdate/>}/>
+                    <Route path={ManagerPath.SPECIFICATION} element={<SpecificationManage/>}/>
+                    <Route path={ManagerPath.SPECIFICATION + '/create'} element={<SpecificationCreate/>}/>
+                    <Route path={ManagerPath.SPECIFICATION + '/update/:id'} element={<SpecificationUpdate/>}/>
+                    <Route path={ManagerPath.INVENTORY} element={<InventoryManage/>}/>
+                    <Route path={ManagerPath.WAREHOUSE} element={<WarehouseManage/>}/>
+                    <Route path={ManagerPath.WAREHOUSE + '/create'} element={<WarehouseCreate/>}/>
+                    <Route path={ManagerPath.WAREHOUSE + '/update/:id'} element={<WarehouseUpdate/>}/>
+                    <Route path={ManagerPath.PROMOTION} element={<PromotionManage/>}/>
+                    <Route path={ManagerPath.PROMOTION + '/create'} element={<PromotionCreate/>}/>
+                    <Route path={ManagerPath.PROMOTION + '/update/:id'} element={<PromotionUpdate/>}/>
+                  </Route>
+
+                  {/* ORDER & OPERATION (ADMIN, OPERATOR) */}
+                  <Route element={<AdminGuard allowedRoles={['ADMIN', 'OPERATOR']} />}>
+                    <Route path={ManagerPath.ORDER} element={<OrderManage/>}/>
+                    <Route path={ManagerPath.ORDER + '/create'} element={<OrderCreate/>}/>
+                    <Route path={ManagerPath.ORDER + '/update/:id'} element={<OrderUpdate/>}/>
+                    <Route path={ManagerPath.ORDER_RESOURCE} element={<OrderResourceManage/>}/>
+                    <Route path={ManagerPath.ORDER_RESOURCE + '/create'} element={<OrderResourceCreate/>}/>
+                    <Route path={ManagerPath.ORDER_RESOURCE + '/update/:id'} element={<OrderResourceUpdate/>}/>
+                    <Route path={ManagerPath.ORDER_CANCELLATION_REASON} element={<OrderCancellationReasonManage/>}/>
+                    <Route
+                      path={ManagerPath.ORDER_CANCELLATION_REASON + '/create'}
+                      element={<OrderCancellationReasonCreate/>}
+                    />
+                    <Route
+                      path={ManagerPath.ORDER_CANCELLATION_REASON + '/update/:id'}
+                      element={<OrderCancellationReasonUpdate/>}
+                    />
+                    <Route path={ManagerPath.WAYBILL} element={<WaybillManage/>}/>
+                    <Route path={ManagerPath.WAYBILL + '/create'} element={<WaybillCreate/>}/>
+                    <Route path={ManagerPath.WAYBILL + '/update/:id'} element={<WaybillUpdate/>}/>
+                    <Route path={ManagerPath.REVIEW} element={<ReviewManage/>}/>
+                    <Route path={ManagerPath.CHAT} element={
+                      <StompSessionProvider url={ApplicationConstants.WEBSOCKET_PATH}>
+                        <ChatDashboard/>
+                      </StompSessionProvider>
+                    }/>
+                  </Route>
+
                   <Route path={ManagerPath.NOTIFICATION} element={<AdminNotification/>}/>
-                  {/* ACCOUNT */}
                   <Route path={ManagerPath.ACCOUNT} element={<AdminAccount/>}/>
-                  {/* TODO: TẠM THỜI COMMENT - FLOW ĐIỂM THƯỞNG */}
-                  {/* REWARD */}
-                  {/* <Route path={ManagerPath.REWARD_STRATEGY} element={<RewardManage/>}/> */}
                 </Route>
                 <Route path="/payment/success" element={<ClientPaymentSuccess/>}/>
                 <Route path="/payment/cancel" element={<ClientPaymentCancel/>}/>

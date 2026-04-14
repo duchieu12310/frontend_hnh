@@ -21,7 +21,7 @@ import useAppStore from 'stores/use-app-store';
 import DateUtils from 'utils/DateUtils';
 
 function TransitItemManage() {
-  useResetManagePageState();
+  useResetManagePageState(TransitItemConfigs.resourceKey);
   useInitFilterPanelState(TransitItemConfigs.properties);
 
   const {

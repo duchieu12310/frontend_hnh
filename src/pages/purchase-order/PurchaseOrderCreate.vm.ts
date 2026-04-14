@@ -24,7 +24,7 @@ function usePurchaseOrderCreateViewModel() {
 
   const [variants, setVariants] = useState<VariantResponse[]>([]);
 
-  const createApi = useCreateApi<PurchaseOrderRequest, PurchaseOrderResponse>(PurchaseOrderConfigs.resourceUrl);
+  const createApi = useCreateApi<PurchaseOrderRequest, PurchaseOrderResponse>(PurchaseOrderConfigs.resourceUrl, PurchaseOrderConfigs.resourceKey);
   useGetAllApi<SupplierResponse>(SupplierConfigs.resourceUrl, SupplierConfigs.resourceKey,
     { all: 1 },
     (supplierListResponse) => {

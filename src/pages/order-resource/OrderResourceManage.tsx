@@ -22,7 +22,7 @@ import useGetAllApi from 'hooks/use-get-all-api';
 import useAppStore from 'stores/use-app-store';
 
 function OrderResourceManage() {
-  useResetManagePageState();
+  useResetManagePageState(OrderResourceConfigs.resourceKey);
   useInitFilterPanelState(OrderResourceConfigs.properties);
 
   const {

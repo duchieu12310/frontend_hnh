@@ -12,7 +12,10 @@ interface AdminAuthAction {
   updateJwtToken: (value: string) => void;
   updateUser: (value: UserResponse) => void;
   resetAdminAuthState: () => void;
-  isOnlyEmployee: () => boolean;
+  isAdmin: () => boolean;
+  isManager: () => boolean;
+  isOperator: () => boolean;
+  isCustomer: () => boolean;
 }
 
 const initialAuthState: AdminAuthState = {
@@ -28,9 +31,21 @@ const useAdminAuthStore = create<AdminAuthState & AdminAuthAction>()(
         updateJwtToken: (value) => set(() => ({ jwtToken: value }), false, 'AdminAuthStore/updateJwtToken'),
         updateUser: (value) => set(() => ({ user: value }), false, 'AdminAuthStore/updateUser'),
         resetAdminAuthState: () => set(initialAuthState, false, 'AdminAuthStore/resetAdminAuthState'),
-        isOnlyEmployee: () => {
+        isAdmin: () => {
           const user = get().user;
-          return !!(user && !user.roles.map(role => role.code).includes('ADMIN'));
+          return !!(user && user.roles.some(role => role.code === 'ADMIN'));
+        },
+        isManager: () => {
+          const user = get().user;
+          return !!(user && user.roles.some(role => role.code === 'MANAGER'));
+        },
+        isOperator: () => {
+          const user = get().user;
+          return !!(user && user.roles.some(role => role.code === 'OPERATOR'));
+        },
+        isCustomer: () => {
+          const user = get().user;
+          return !!(user && user.roles.some(role => role.code === 'CUSTOMER'));
         },
       }),
       {

@@ -20,7 +20,7 @@ import useAppStore from 'stores/use-app-store';
 import DateUtils from 'utils/DateUtils';
 
 function TransitWarehouseManage() {
-  useResetManagePageState();
+  useResetManagePageState(TransitWarehouseConfigs.resourceKey);
   useInitFilterPanelState(TransitWarehouseConfigs.properties);
 
   const {

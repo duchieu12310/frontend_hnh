@@ -27,7 +27,7 @@ function useOrderCreateViewModel() {
 
   const [variants, setVariants] = useState<VariantResponse[]>([]);
 
-  const createApi = useCreateApi<OrderRequest, OrderResponse>(OrderConfigs.resourceUrl);
+  const createApi = useCreateApi<OrderRequest, OrderResponse>(OrderConfigs.resourceUrl, OrderConfigs.resourceKey);
   useGetAllApi<OrderResourceResponse>(OrderResourceConfigs.resourceUrl, OrderResourceConfigs.resourceKey,
     { sort: 'id,asc', all: 1 },
     (orderResourceListResponse) => {

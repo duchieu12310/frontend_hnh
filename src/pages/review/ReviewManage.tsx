@@ -18,7 +18,7 @@ import useUpdateApi from 'hooks/use-update-api';
 import { useColorScheme } from 'hooks/use-color-scheme';
 
 function ReviewManage() {
-  useResetManagePageState();
+  useResetManagePageState(ReviewConfigs.resourceKey);
 
   const { colorScheme } = useColorScheme();
 
@@ -227,7 +227,7 @@ function ReviewSearchPanel() {
 }
 
 function CheckReviewModal({ review, onClose }: { review: ReviewResponse, onClose: () => void }) {
-  const updateReviewApi = useUpdateApi<ReviewRequest, ReviewResponse>(ReviewConfigs.resourceUrl, ReviewConfigs.resourceKey, review.id);
+  const updateReviewApi = useUpdateApi<ReviewRequest, ReviewResponse>(ReviewConfigs.resourceUrl, ReviewConfigs.resourceKey, review.id, { shouldNavigateBack: false });
 
   const handleCheckReviewButton = () => {
     const requestBody: ReviewRequest = {

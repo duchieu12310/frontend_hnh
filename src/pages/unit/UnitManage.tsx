@@ -22,7 +22,7 @@ import useGetAllApi from 'hooks/use-get-all-api';
 import useAppStore from 'stores/use-app-store';
 
 function UnitManage() {
-  useResetManagePageState();
+  useResetManagePageState(UnitConfigs.resourceKey);
   useInitFilterPanelState(UnitConfigs.properties);
 
   const {

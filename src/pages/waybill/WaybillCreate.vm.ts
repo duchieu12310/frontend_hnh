@@ -1,5 +1,5 @@
 import { useForm, zodResolver } from '@mantine/form';
-import WaybillConfigs from 'pages/waybill/WaybillConfigs';
+import WaybillConfigs from './WaybillConfigs_v2';
 import { RequiredNote, WaybillRequest, WaybillResponse } from 'models/Waybill';
 import useCreateApi from 'hooks/use-create-api';
 import { SelectOption } from 'types';
@@ -10,7 +10,7 @@ function useWaybillCreateViewModel() {
     schema: zodResolver(WaybillConfigs.createUpdateFormSchema),
   });
 
-  const createApi = useCreateApi<WaybillRequest, WaybillResponse>(WaybillConfigs.resourceUrl);
+  const createApi = useCreateApi<WaybillRequest, WaybillResponse>(WaybillConfigs.resourceUrl, WaybillConfigs.resourceKey);
 
   const handleFormSubmit = form.onSubmit((formValues) => {
     const requestBody: WaybillRequest = {

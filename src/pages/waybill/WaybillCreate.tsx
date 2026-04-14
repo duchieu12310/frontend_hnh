@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Divider, Grid, Group, Loader, NumberInput, Paper, Select, Stack, Textarea } from '@mantine/core';
 import { CreateUpdateTitle, DefaultPropertyPanel } from 'components';
-import WaybillConfigs from 'pages/waybill/WaybillConfigs';
+import WaybillConfigs from './WaybillConfigs_v2';
 import useWaybillCreateViewModel from 'pages/waybill/WaybillCreate.vm';
 import { DatePicker } from '@mantine/dates';
 import { useDebouncedValue } from '@mantine/hooks';

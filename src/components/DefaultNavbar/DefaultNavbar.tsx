@@ -23,7 +23,7 @@ interface NavbarLink {
   label: string;
   icon: Icon;
   childLinks?: NavbarChildLink[];
-  disableForEmployee?: boolean;
+  requiredRoles?: string[];
 }
 
 interface NavbarChildLink {
@@ -67,7 +67,7 @@ const navbarLinks: NavbarLink[] = [
         label: 'Quyền',
       },
     ],
-    disableForEmployee: true,
+    requiredRoles: ['ADMIN'],
   },
   // TODO: TẠM THỜI COMMENT - ĐƠN GIẢN HÓA HỆ THỐNG (XÓA CUSTOMER VÀ EMPLOYEE)
   // {
@@ -124,7 +124,8 @@ const navbarLinks: NavbarLink[] = [
   {
     link: '/admin/category',
     label: 'Thể loại',
-    icon: Box
+    icon: Box,
+    requiredRoles: ['ADMIN', 'MANAGER'],
   },
   {
     link: '/admin/product',
@@ -164,12 +165,13 @@ const navbarLinks: NavbarLink[] = [
         label: 'Thông số sách',
       },
     ],
-    disableForEmployee: true,
+    requiredRoles: ['ADMIN', 'MANAGER'],
   },
   {
     link: '/admin/product/guarantee',
     label: 'Bảo hành',
     icon: Box,
+    requiredRoles: ['ADMIN', 'MANAGER'],
   },
   {
     link: '/admin/warehouses',
@@ -181,7 +183,7 @@ const navbarLinks: NavbarLink[] = [
         label: 'Danh sách kho',
       },
     ],
-    disableForEmployee: true,
+    requiredRoles: ['ADMIN', 'MANAGER'],
   },
   {
     link: '/admin/order',
@@ -197,18 +199,21 @@ const navbarLinks: NavbarLink[] = [
     //     label: 'Lý do hủy đơn hàng',
     //   },
     // ],
+    requiredRoles: ['ADMIN', 'OPERATOR'],
   },
   {
     link: '/admin/waybill',
     label: 'Vận đơn',
     icon: Car,
     childLinks: [],
+    requiredRoles: ['ADMIN', 'OPERATOR'],
   },
   {
     link: '/admin/review',
     label: 'Đánh giá',
     icon: Message,
     childLinks: [],
+    requiredRoles: ['ADMIN', 'OPERATOR'],
   },
   // {
   //   link: '/admin/reward-strategy',
@@ -226,6 +231,7 @@ const navbarLinks: NavbarLink[] = [
     link: '/admin/promotion',
     label: 'Khuyến mãi',
     icon: CurrencyDollar,
+    requiredRoles: ['ADMIN', 'MANAGER'],
   },
   // {
   //   link: '/admin/voucher',
@@ -250,7 +256,7 @@ export function DefaultNavbar() {
   const location = useLocation();
   const [active, setActive] = useState('Trang chủ');
 
-  const { isOnlyEmployee } = useAdminAuthStore();
+  const { user } = useAdminAuthStore();
 
   React.useEffect(() => {
     // Set active based on current location
@@ -265,8 +271,13 @@ export function DefaultNavbar() {
 
   const navbarLinksFragment = navbarLinks.map(navbarLink => {
     const isActive = navbarLink.label === active;
-    const isDisabled = isOnlyEmployee() && navbarLink.disableForEmployee;
+    const isVisible = !navbarLink.requiredRoles || 
+      (user && user.roles.some(role => navbarLink.requiredRoles?.includes(role.code)));
     const hasActiveChild = navbarLink.childLinks?.some(child => location.pathname === child.link);
+
+    if (!isVisible) {
+      return null;
+    }
 
     return (
       <div
@@ -280,8 +291,6 @@ export function DefaultNavbar() {
             isActive || hasActiveChild
               ? 'text-blue-700 dark:text-blue-300'
               : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50'
-          } ${
-            isDisabled ? 'opacity-50 pointer-events-none' : ''
           }`}
           title={collapsed ? navbarLink.label : undefined}
         >

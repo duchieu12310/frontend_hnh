@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Menu as HeadlessMenu, Popover as HeadlessPopover } from '@headlessui/react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from 'react-query';
 import {
   Bell,
@@ -35,6 +35,7 @@ import { NotificationResponse, EventInitiationResponse } from 'models/Notificati
 function ClientHeader() {
   const { colorScheme, toggleColorScheme } = useColorScheme();
   const { user, resetAuthState } = useAuthStore();
+  const { pathname } = useLocation();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
@@ -54,12 +55,6 @@ function ClientHeader() {
     { refetchOnWindowFocus: false, keepPreviousData: true }
   );
 
-  // Xử lý sự kiện search
-  const handleSearchInput = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' && search.trim() !== '') {
-      navigate('/search?q=' + search.trim());
-    }
-  };
 
   useNotificationEvents();
 
@@ -85,36 +80,64 @@ function ClientHeader() {
             ))}
 
             <HeadlessPopover className="relative">
-              <HeadlessPopover.Button className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full flex items-center gap-1 transition-all outline-none">
-                <List size={20} />
-                <span>Danh mục</span>
-              </HeadlessPopover.Button>
+              {({ open }) => {
+                const isInCategoryPage = pathname.startsWith('/category/');
+                const isMainCategory = categoryResponses?.content.slice(0, 3).some((cat: any) => pathname === `/category/${cat.categorySlug}`);
+                const isActive = (isInCategoryPage && !isMainCategory) || open;
 
-              <HeadlessPopover.Panel className="absolute left-1/2 -translate-x-1/2 mt-3 w-screen max-w-xs sm:max-w-3xl px-4 z-[110]">
-                <div className="overflow-hidden rounded-2xl shadow-2xl ring-1 ring-black ring-opacity-5 bg-white dark:bg-gray-800 p-2">
-                  <CategoryMenu setOpenedCategoryMenu={() => { }} />
-                </div>
-              </HeadlessPopover.Panel>
+                return (
+                  <>
+                    <HeadlessPopover.Button
+                      className={`px-4 py-2 text-sm transition-all rounded-full flex items-center gap-1 outline-none ${isActive
+                          ? 'font-bold text-black dark:text-white bg-gray-100 dark:bg-gray-800'
+                          : 'font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
+                        }`}
+                    >
+                      <List size={20} className={isActive ? 'stroke-[3px]' : ''} />
+                      <span>Danh mục</span>
+                    </HeadlessPopover.Button>
+
+                    <HeadlessPopover.Panel className="absolute left-1/2 -translate-x-1/2 mt-3 w-screen max-w-xs sm:max-w-3xl px-4 z-[110]">
+                      <div className="overflow-hidden rounded-2xl shadow-2xl ring-1 ring-black ring-opacity-5 bg-white dark:bg-gray-800 p-2">
+                        <CategoryMenu setOpenedCategoryMenu={() => { }} />
+                      </div>
+                    </HeadlessPopover.Panel>
+                  </>
+                );
+              }}
             </HeadlessPopover>
           </nav>
 
           {/* Right: Actions */}
           <div className="flex items-center gap-1 sm:gap-2">
 
-            {/* Search Bar - Hiện đại hơn */}
-            <div className="relative hidden md:block group">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search size={18} className="text-gray-400 group-focus-within:text-black dark:group-focus-within:text-white transition-colors" />
+            {/* Search Bar - Chuyên nghiệp hơn với nút tìm kiếm */}
+            <form 
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (search.trim()) navigate('/search?q=' + search.trim());
+              }}
+              className="relative hidden md:flex items-center group"
+            >
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search size={18} className="text-gray-400 group-focus-within:text-black dark:group-focus-within:text-white transition-colors" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Tìm sách..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="block w-40 lg:w-64 pl-10 pr-12 py-2 border-none bg-gray-100 dark:bg-gray-800 rounded-full text-sm placeholder-gray-500 focus:ring-2 focus:ring-black dark:focus:ring-white focus:bg-white dark:focus:bg-gray-700 transition-all duration-300"
+                />
+                <button
+                  type="submit"
+                  className="absolute right-1 top-1 bottom-1 px-3 bg-black dark:bg-white text-white dark:text-black rounded-full text-[12px] font-bold hover:opacity-80 transition-opacity active:scale-95"
+                >
+                  Tìm
+                </button>
               </div>
-              <input
-                type="text"
-                placeholder="Tìm sách..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={handleSearchInput}
-                className="block w-40 lg:w-60 pl-10 pr-4 py-2 border-none bg-gray-100 dark:bg-gray-800 rounded-full text-sm placeholder-gray-500 focus:ring-2 focus:ring-black dark:focus:ring-white focus:bg-white dark:focus:bg-gray-700 transition-all duration-300"
-              />
-            </div>
+            </form>
 
             {/* Wishlist */}
             <IconButton to="/user/wishlist">
@@ -179,15 +202,26 @@ function ClientHeader() {
 
 // --- Sub-Components để code sạch hơn ---
 
-const NavLink = ({ to, children }: { to: string; children: React.ReactNode }) => (
-  <Link
-    to={to}
-    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white relative group"
-  >
-    {children}
-    <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-black dark:bg-white transition-all group-hover:w-full group-hover:left-0" />
-  </Link>
-);
+const NavLink = ({ to, children }: { to: string; children: React.ReactNode }) => {
+  const { pathname } = useLocation();
+  const isActive = pathname === to;
+
+  return (
+    <Link
+      to={to}
+      className={`px-4 py-2 text-sm transition-all relative group ${isActive
+          ? 'font-bold text-black dark:text-white'
+          : 'font-medium text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white'
+        }`}
+    >
+      {children}
+      <span className={`absolute bottom-0 h-0.5 bg-black dark:bg-white transition-all ${isActive
+          ? 'left-0 w-full'
+          : 'left-1/2 w-0 group-hover:w-full group-hover:left-0'
+        }`} />
+    </Link>
+  );
+};
 
 const IconButton = ({ to, children, className = "" }: any) => (
   <Link

@@ -17,7 +17,7 @@ function usePromotionCreateViewModel() {
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [products, setProducts] = useState<ProductResponse[]>([]);
 
-  const createApi = useCreateApi<PromotionRequest, PromotionResponse>(PromotionConfigs.resourceUrl);
+  const createApi = useCreateApi<PromotionRequest, PromotionResponse>(PromotionConfigs.resourceUrl, PromotionConfigs.resourceKey);
 
   const handleFormSubmit = form.onSubmit((formValues) => {
     if (addProductMode === AddProductMode.CATEGORY && formValues.categoryIds.length === 0) {

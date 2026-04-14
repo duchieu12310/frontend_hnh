@@ -10,7 +10,7 @@ function usePropertyCreateViewModel() {
     schema: zodResolver(PropertyConfigs.createUpdateFormSchema),
   });
 
-  const createApi = useCreateApi<PropertyRequest, PropertyResponse>(PropertyConfigs.resourceUrl);
+  const createApi = useCreateApi<PropertyRequest, PropertyResponse>(PropertyConfigs.resourceUrl, PropertyConfigs.resourceKey);
 
   const handleFormSubmit = form.onSubmit((formValues) => {
     const requestBody: PropertyRequest = {

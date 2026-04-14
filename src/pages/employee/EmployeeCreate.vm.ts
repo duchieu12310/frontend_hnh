@@ -34,7 +34,7 @@ function useEmployeeCreateViewModel() {
   const [jobLevelSelectList, setJobLevelSelectList] = useState<SelectOption[]>([]);
   const [jobTitleSelectList, setJobTitleSelectList] = useState<SelectOption[]>([]);
 
-  const createApi = useCreateApi<EmployeeRequest, EmployeeResponse>(EmployeeConfigs.resourceUrl);
+  const createApi = useCreateApi<EmployeeRequest, EmployeeResponse>(EmployeeConfigs.resourceUrl, EmployeeConfigs.resourceKey);
   useGetAllApi<ProvinceResponse>(ProvinceConfigs.resourceUrl, ProvinceConfigs.resourceKey,
     { all: 1 },
     (provinceListResponse) => {

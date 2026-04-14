@@ -151,7 +151,7 @@ const WarehouseSelectionTree: React.FC<WarehouseSelectionTreeProps> = ({ nodes, 
             if (node.type === 'L2') nextType = 'L3';
             if (node.type === 'L3') nextType = 'Product';
             
-            const newNode = {
+            const newNode: SelectionNode = {
               ...node,
               children: [
                 ...node.children,

@@ -20,7 +20,7 @@ import useGetAllApi from 'hooks/use-get-all-api';
 import useAppStore from 'stores/use-app-store';
 
 function AddressManage() {
-  useResetManagePageState();
+  useResetManagePageState(AddressConfigs.resourceKey);
   useInitFilterPanelState(AddressConfigs.properties);
 
   const {

@@ -10,7 +10,7 @@ function useDepartmentCreateViewModel() {
     schema: zodResolver(DepartmentConfigs.createUpdateFormSchema),
   });
 
-  const createApi = useCreateApi<DepartmentRequest, DepartmentResponse>(DepartmentConfigs.resourceUrl);
+  const createApi = useCreateApi<DepartmentRequest, DepartmentResponse>(DepartmentConfigs.resourceUrl, DepartmentConfigs.resourceKey);
 
   const handleFormSubmit = form.onSubmit((formValues) => {
     const requestBody: DepartmentRequest = {

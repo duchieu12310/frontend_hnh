@@ -10,7 +10,7 @@ function useRoleCreateViewModel() {
     schema: zodResolver(RoleConfigs.createUpdateFormSchema),
   });
 
-  const createApi = useCreateApi<RoleRequest, RoleResponse>(RoleConfigs.resourceUrl);
+  const createApi = useCreateApi<RoleRequest, RoleResponse>(RoleConfigs.resourceUrl, RoleConfigs.resourceKey);
 
   const handleFormSubmit = form.onSubmit((formValues) => {
     const requestBody: RoleRequest = {

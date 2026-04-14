@@ -445,7 +445,7 @@ function useGetStatisticApi() {
     isError: isErrorStatisticResponse,
   } = useQuery<StatisticResponse, ErrorMessage>(
     ['api', 'stats', 'getStatistic'],
-    () => FetchUtils.get(ResourceURL.STATISTIC),
+    () => FetchUtils.getWithToken(ResourceURL.STATISTIC),
     {
       onError: () => NotifyUtils.simpleFailed('Lấy dữ liệu không thành công'),
       keepPreviousData: true,

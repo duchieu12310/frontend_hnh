@@ -24,7 +24,7 @@ function useCategoryCreateViewModel() {
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
 
   const queryClient = useQueryClient();
-  const createApi = useCreateApi<CategoryRequest, CategoryResponse>(CategoryConfigs.resourceUrl);
+  const createApi = useCreateApi<CategoryRequest, CategoryResponse>(CategoryConfigs.resourceUrl, CategoryConfigs.resourceKey);
   useGetAllApi<CategoryResponse>(CategoryConfigs.resourceUrl, CategoryConfigs.resourceKey,
     { all: 1 },
     (categoryListResponse) => {

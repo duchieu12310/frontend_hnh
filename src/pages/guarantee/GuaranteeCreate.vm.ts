@@ -10,7 +10,7 @@ function useGuaranteeCreateViewModel() {
     schema: zodResolver(GuaranteeConfigs.createUpdateFormSchema),
   });
 
-  const createApi = useCreateApi<GuaranteeRequest, GuaranteeResponse>(GuaranteeConfigs.resourceUrl);
+  const createApi = useCreateApi<GuaranteeRequest, GuaranteeResponse>(GuaranteeConfigs.resourceUrl, GuaranteeConfigs.resourceKey);
 
   const handleFormSubmit = form.onSubmit((formValues) => {
     const requestBody: GuaranteeRequest = {

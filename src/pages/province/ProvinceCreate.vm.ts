@@ -9,7 +9,7 @@ function useProvinceCreateViewModel() {
     schema: zodResolver(ProvinceConfigs.createUpdateFormSchema),
   });
 
-  const createApi = useCreateApi<ProvinceRequest, ProvinceResponse>(ProvinceConfigs.resourceUrl);
+  const createApi = useCreateApi<ProvinceRequest, ProvinceResponse>(ProvinceConfigs.resourceUrl, ProvinceConfigs.resourceKey);
 
   const handleFormSubmit = form.onSubmit((formValues) => {
     const requestBody: ProvinceRequest = {

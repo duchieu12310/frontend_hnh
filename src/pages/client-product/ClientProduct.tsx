@@ -39,7 +39,7 @@ function ClientProduct() {
 
           {product.productDescription && <ClientProductDescription product={product}/>}
 
-          <ClientProductReviews productSlug={slug as string}/>
+          <ClientProductReviews productId={product.productId} productSlug={slug as string}/>
 
           {product.productRelatedProducts.length > 0 && <ClientProductRelatedProducts product={product}/>}
         </div>

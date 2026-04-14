@@ -28,7 +28,7 @@ function useCustomerCreateViewModel() {
   const [customerStatusSelectList, setCustomerStatusSelectList] = useState<SelectOption[]>([]);
   const [customerResourceSelectList, setCustomerResourceSelectList] = useState<SelectOption[]>([]);
 
-  const createApi = useCreateApi<CustomerRequest, CustomerResponse>(CustomerConfigs.resourceUrl);
+  const createApi = useCreateApi<CustomerRequest, CustomerResponse>(CustomerConfigs.resourceUrl, CustomerConfigs.resourceKey);
   useGetAllApi<ProvinceResponse>(ProvinceConfigs.resourceUrl, ProvinceConfigs.resourceKey,
     { all: 1 },
     (provinceListResponse) => {

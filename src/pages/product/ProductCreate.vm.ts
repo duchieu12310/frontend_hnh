@@ -55,7 +55,7 @@ function useProductCreateViewModel() {
   const [selectedVariantIndexes, setSelectedVariantIndexes] = useState<number[]>([]);
 
   const queryClient = useQueryClient();
-  const createApi = useCreateApi<ProductRequest, ProductResponse>(ProductConfigs.resourceUrl);
+  const createApi = useCreateApi<ProductRequest, ProductResponse>(ProductConfigs.resourceUrl, ProductConfigs.resourceKey);
   const uploadMultipleImagesApi = useUploadMultipleImagesApi();
   useGetAllApi<CategoryResponse>(CategoryConfigs.resourceUrl, CategoryConfigs.resourceKey,
     { all: 1 },

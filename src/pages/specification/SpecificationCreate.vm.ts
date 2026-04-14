@@ -10,7 +10,7 @@ function useSpecificationCreateViewModel() {
     schema: zodResolver(SpecificationConfigs.createUpdateFormSchema),
   });
 
-  const createApi = useCreateApi<SpecificationRequest, SpecificationResponse>(SpecificationConfigs.resourceUrl);
+  const createApi = useCreateApi<SpecificationRequest, SpecificationResponse>(SpecificationConfigs.resourceUrl, SpecificationConfigs.resourceKey);
 
   const handleFormSubmit = form.onSubmit((formValues) => {
     const requestBody: SpecificationRequest = {

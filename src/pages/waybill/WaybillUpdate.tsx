@@ -15,7 +15,7 @@ import {
 } from '@mantine/core';
 import { useParams } from 'react-router-dom';
 import { CreateUpdateTitle, DefaultPropertyPanel } from 'components';
-import WaybillConfigs from 'pages/waybill/WaybillConfigs';
+import WaybillConfigs from './WaybillConfigs_v2';
 import useWaybillUpdateViewModel from 'pages/waybill/WaybillUpdate.vm';
 import DateUtils from 'utils/DateUtils';
 import MiscUtils from 'utils/MiscUtils';

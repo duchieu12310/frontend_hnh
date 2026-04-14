@@ -22,7 +22,7 @@ function useUserCreateViewModel() {
   const [districtSelectList, setDistrictSelectList] = useState<SelectOption[]>([]);
   const [roleSelectList, setRoleSelectList] = useState<SelectOption[]>([]);
 
-  const createApi = useCreateApi<UserRequest, UserResponse>(UserConfigs.resourceUrl);
+  const createApi = useCreateApi<UserRequest, UserResponse>(UserConfigs.resourceUrl, UserConfigs.resourceKey);
   useGetAllApi<ProvinceResponse>(ProvinceConfigs.resourceUrl, ProvinceConfigs.resourceKey,
     { all: 1 },
     (provinceListResponse) => {

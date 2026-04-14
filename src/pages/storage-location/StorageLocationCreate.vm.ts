@@ -19,7 +19,8 @@ function useStorageLocationCreateViewModel() {
   });
 
   const createApi = useCreateApi<StorageLocationRequest, StorageLocationResponse>(
-    StorageLocationConfigs.resourceUrl
+    StorageLocationConfigs.resourceUrl,
+    StorageLocationConfigs.resourceKey
   );
 
   const [warehouseSelectList, setWarehouseSelectList] = useState<SelectOption[]>([]);

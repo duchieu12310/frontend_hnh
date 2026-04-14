@@ -16,7 +16,7 @@ function useDistrictCreateViewModel() {
 
   const [provinceSelectList, setProvinceSelectList] = useState<SelectOption[]>([]);
 
-  const createApi = useCreateApi<DistrictRequest, DistrictResponse>(DistrictConfigs.resourceUrl);
+  const createApi = useCreateApi<DistrictRequest, DistrictResponse>(DistrictConfigs.resourceUrl, DistrictConfigs.resourceKey);
   useGetAllApi<ProvinceResponse>(ProvinceConfigs.resourceUrl, ProvinceConfigs.resourceKey,
     { all: 1 },
     (provinceListResponse) => {

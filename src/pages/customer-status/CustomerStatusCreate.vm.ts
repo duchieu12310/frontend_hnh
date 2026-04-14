@@ -10,7 +10,7 @@ function useCustomerStatusCreateViewModel() {
     schema: zodResolver(CustomerStatusConfigs.createUpdateFormSchema),
   });
 
-  const createApi = useCreateApi<CustomerStatusRequest, CustomerStatusResponse>(CustomerStatusConfigs.resourceUrl);
+  const createApi = useCreateApi<CustomerStatusRequest, CustomerStatusResponse>(CustomerStatusConfigs.resourceUrl, CustomerStatusConfigs.resourceKey);
 
   const handleFormSubmit = form.onSubmit((formValues) => {
     const requestBody: CustomerStatusRequest = {

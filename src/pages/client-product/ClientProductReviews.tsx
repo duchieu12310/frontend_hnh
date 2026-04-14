@@ -8,13 +8,24 @@ import FetchUtils, { ErrorMessage, ListResponse } from 'utils/FetchUtils';
 import { ClientSimpleReviewResponse } from 'types';
 import ResourceURL from 'constants/ResourceURL';
 import NotifyUtils from 'utils/NotifyUtils';
+import { Rating } from '@smastrom/react-rating';
+import { Button, Textarea } from '@mantine/core';
+import useAuthStore from 'stores/use-auth-store';
+import { useMutation, useQueryClient } from 'react-query';
+import { Link } from 'react-router-dom';
 
 interface ClientProductReviewsProps {
+  productId: number;
   productSlug: string;
 }
 
-function ClientProductReviews({ productSlug }: ClientProductReviewsProps) {
+function ClientProductReviews({ productId, productSlug }: ClientProductReviewsProps) {
   const [activePage, setActivePage] = useState(1);
+  const [rating, setRating] = useState(5);
+  const [content, setContent] = useState('');
+
+  const { user } = useAuthStore();
+  const queryClient = useQueryClient();
 
   const {
     reviewResponses,
@@ -163,6 +174,76 @@ function ClientProductReviews({ productSlug }: ClientProductReviewsProps) {
     );
   }
 
+  const { mutate: submitReview, isLoading: isSubmitting } = useMutation(
+    (request: any) => FetchUtils.postWithToken(ResourceURL.CLIENT_REVIEW, request),
+    {
+      onSuccess: () => {
+        NotifyUtils.simpleSuccess('Đánh giá của bạn đã được gửi thành công!');
+        setRating(5);
+        setContent('');
+        queryClient.invalidateQueries(['client-api', 'reviews/products', 'getAllReviewsByProduct', productSlug]);
+      },
+      onError: (error: any) => {
+        NotifyUtils.simpleFailed(error.message || 'Gửi đánh giá không thành công');
+      },
+    }
+  );
+
+  const handleReviewSubmit = () => {
+    if (!content.trim()) {
+      NotifyUtils.simpleFailed('Vui lòng nhập nội dung đánh giá');
+      return;
+    }
+    submitReview({
+      productId,
+      ratingScore: rating,
+      content,
+      status: 2, // Default to Approved as per backend plan
+    });
+  };
+
+  const reviewFormFragment = user ? (
+    <div className="p-6 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm mb-6">
+      <div className="flex flex-col gap-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 italic">Để lại đánh giá của bạn</h3>
+        <div className="flex flex-col gap-2">
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Xếp hạng của bạn</p>
+          <div style={{ maxWidth: 140 }}>
+            <Rating
+              value={rating}
+              onChange={setRating}
+              isRequired
+            />
+          </div>
+        </div>
+        <div className="flex flex-col gap-2">
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Nội dung đánh giá</p>
+          <Textarea
+            placeholder="Hãy chia sẻ cảm nhận của bạn về cuốn sách này..."
+            minRows={3}
+            value={content}
+            onChange={(e) => setContent(e.currentTarget.value)}
+          />
+        </div>
+        <div className="flex justify-end">
+          <Button
+            loading={isSubmitting}
+            onClick={handleReviewSubmit}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            Gửi đánh giá
+          </Button>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <div className="p-4 rounded-md bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 mb-6">
+      <p className="text-sm text-orange-800 dark:text-orange-200">
+        Vui lòng <Link to="/signin" className="font-bold underline">đăng nhập</Link> để đánh giá sản phẩm này.
+      </p>
+    </div>
+  );
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -173,6 +254,8 @@ function ClientProductReviews({ productSlug }: ClientProductReviewsProps) {
         {reviews && reviews.totalElements > 0 &&
           <span className="px-3 py-1 text-sm font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 rounded">{reviews.totalElements}</span>}
       </div>
+
+      {reviewFormFragment}
 
       {reviewsContentFragment}
     </div>

@@ -31,7 +31,7 @@ function useWarehouseCreateViewModel() {
   // We omit the warehouseId parameter to request the full system catalog from the backend
   const { data: globalHierarchy = [] as CategoryLevel1Node[] } = useQuery(
     [InventoryConfigs.productInventoryHierarchyResourceKey, 'global-hierarchy'],
-    () => FetchUtils.get<any>(InventoryConfigs.productInventoryHierarchyResourceUrl)
+    () => FetchUtils.getWithToken<any>(InventoryConfigs.productInventoryHierarchyResourceUrl)
       .then(res => {
         if (Array.isArray(res)) return res;
         // Search deeply for categories if the response is an object
@@ -40,7 +40,7 @@ function useWarehouseCreateViewModel() {
       })
   );
 
-  const createApi = useCreateApi<WarehouseRequest, WarehouseResponse>(WarehouseConfigs.resourceUrl);
+  const createApi = useCreateApi<WarehouseRequest, WarehouseResponse>(WarehouseConfigs.resourceUrl, WarehouseConfigs.resourceKey);
   
   useGetAllApi<ProvinceResponse>(ProvinceConfigs.resourceUrl, ProvinceConfigs.resourceKey,
     { all: 1 },

@@ -32,7 +32,7 @@ function ProductManage() {
   const categoryId = searchParams.get('categoryId');
   const navigate = useNavigate();
 
-  useResetManagePageState();
+  useResetManagePageState(ProductConfigs.resourceKey);
   useInitFilterPanelState(ProductConfigs.properties);
 
   const { searchToken, activePage, activePageSize, activeFilter } = useAppStore();

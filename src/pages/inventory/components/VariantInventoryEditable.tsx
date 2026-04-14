@@ -40,7 +40,7 @@ const VariantInventoryEditable: React.FC<Props> = ({
   const debouncedData = useDebouncedValue(currentData, 1200);
 
   const mutation = useMutation(
-    (data: InventoryUpdateDto) => FetchUtils.post<InventoryUpdateDto, any>(ResourceURL.PRODUCT_INVENTORY_AUTO_SAVE, data),
+    (data: InventoryUpdateDto) => FetchUtils.postWithToken<InventoryUpdateDto, any>(ResourceURL.PRODUCT_INVENTORY_AUTO_SAVE, data),
     {
       onSuccess: () => {
         setIsSaving(false);

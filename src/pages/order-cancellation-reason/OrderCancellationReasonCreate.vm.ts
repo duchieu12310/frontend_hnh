@@ -10,7 +10,7 @@ function useOrderCancellationReasonCreateViewModel() {
     schema: zodResolver(OrderCancellationReasonConfigs.createUpdateFormSchema),
   });
 
-  const createApi = useCreateApi<OrderCancellationReasonRequest, OrderCancellationReasonResponse>(OrderCancellationReasonConfigs.resourceUrl);
+  const createApi = useCreateApi<OrderCancellationReasonRequest, OrderCancellationReasonResponse>(OrderCancellationReasonConfigs.resourceUrl, OrderCancellationReasonConfigs.resourceKey);
 
   const handleFormSubmit = form.onSubmit((formValues) => {
     const requestBody: OrderCancellationReasonRequest = {
