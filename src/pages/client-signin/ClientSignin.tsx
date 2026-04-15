@@ -11,8 +11,9 @@ import ResourceURL from 'constants/ResourceURL';
 import NotifyUtils from 'utils/NotifyUtils';
 import useAuthStore from 'stores/use-auth-store';
 import { UserResponse } from 'models/User';
-import { AlertCircle, Eye, EyeOff } from 'tabler-icons-react';
+import { AlertCircle, Eye, EyeOff, ArrowLeft } from 'tabler-icons-react';
 import { ClientCartResponse, Empty } from 'types';
+import booksBg from 'assets/auth/books_bg.png';
 
 const initialFormValues = {
   username: '',
@@ -105,7 +106,15 @@ function ClientSignin() {
   });
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 via-white to-amber-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 via-white to-amber-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-12 px-4 sm:px-6 lg:px-8 relative">
+      {/* Back to Home Button */}
+      <Link
+        to="/"
+        className="absolute top-8 left-8 flex items-center gap-2 px-4 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:shadow-lg transition-all duration-200 z-50"
+      >
+        <ArrowLeft size={18} />
+        Trở về trang chủ
+      </Link>
       <div className="w-full max-w-6xl">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden grid md:grid-cols-2 min-h-[600px]">
           {/* Left side - Form */}
@@ -122,9 +131,8 @@ function ClientSignin() {
 
               {openedAlert && (
                 <div
-                  className={`mb-6 p-4 rounded-lg bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-900/20 dark:to-emerald-900/20 border border-teal-200 dark:border-teal-800 transition-all duration-500 ${
-                    openedAlert ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
-                  }`}
+                  className={`mb-6 p-4 rounded-lg bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-900/20 dark:to-emerald-900/20 border border-teal-200 dark:border-teal-800 transition-all duration-500 ${openedAlert ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
+                    }`}
                 >
                   <div className="flex items-start gap-3">
                     <AlertCircle size={20} className="text-teal-600 dark:text-teal-400 mt-0.5 flex-shrink-0" />
@@ -188,8 +196,8 @@ function ClientSignin() {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <Link 
-                    to="/forgot" 
+                  <Link
+                    to="/forgot"
                     className="text-sm font-medium text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
                   >
                     Quên mật khẩu?
@@ -208,8 +216,8 @@ function ClientSignin() {
               <div className="mt-8 text-center">
                 <p className="text-gray-600 dark:text-gray-400">
                   Không có tài khoản?{' '}
-                  <Link 
-                    to="/signup" 
+                  <Link
+                    to="/signup"
                     className="font-semibold text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
                   >
                     Đăng ký ngay
@@ -221,18 +229,21 @@ function ClientSignin() {
 
           {/* Right side - Image/Decoration */}
           <div className="hidden md:flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black p-12 relative overflow-hidden">
-            <div className="absolute inset-0 bg-[url(https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=1200&auto=format&fit=crop)] bg-cover bg-center opacity-40"></div>
+            <div
+              className="absolute inset-0 bg-cover bg-center opacity-60"
+              style={{ backgroundImage: `url(${booksBg})` }}
+            ></div>
             <div className="relative z-10 text-center text-white">
               <div className="mb-6">
-                <div className="inline-block p-4 bg-white/20 backdrop-blur-sm rounded-2xl mb-4">
-                  <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
+                <div className="inline-block p-4 bg-white/20 backdrop-blur-md rounded-2xl mb-4">
+                  <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                   </svg>
                 </div>
               </div>
-              <h3 className="text-3xl font-bold mb-4">Fashion Hub</h3>
-              <p className="text-lg text-white/90 max-w-md">
-                Khám phá phong cách thời trang dẫn đầu xu hướng
+              <h3 className="text-4xl font-extrabold mb-4 tracking-tight">Thế Giới Sách</h3>
+              <p className="text-lg text-white/90 max-w-md font-medium leading-relaxed">
+                Khám phá tri thức mênh mông qua từng trang sách tinh tuyển
               </p>
             </div>
           </div>

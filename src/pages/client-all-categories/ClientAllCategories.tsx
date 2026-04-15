@@ -4,6 +4,7 @@ import {
   Breadcrumbs,
   Card,
   Container,
+  Divider,
   Grid,
   Group,
   Skeleton,
@@ -64,48 +65,74 @@ function ClientAllCategories() {
   }
 
   if (categoryResponses) {
-    resultFragment = categoryResponses.content.map((firstCategory, index) => {
-      const FirstCategoryIcon = PageConfigs.categorySlugIconMap[firstCategory.categorySlug];
+    resultFragment = (
+      <Stack spacing={40}>
+        {categoryResponses.content.map((firstCategory, index) => {
+          const FirstCategoryIcon = PageConfigs.categorySlugIconMap[firstCategory.categorySlug] || AlertTriangle;
 
-      return (
-        <Stack key={index}>
-          <Group>
-            <ThemeIcon variant="light" size={42}>
-              <FirstCategoryIcon/>
-            </ThemeIcon>
-            <Anchor
-              component={Link}
-              to={'/category/' + firstCategory.categorySlug}
-              sx={{ fontSize: theme.fontSizes.sm * 2 }}
-              weight={500}
-            >
-              {firstCategory.categoryName}
-            </Anchor>
-          </Group>
-          <Grid>
-            {firstCategory.categoryChildren.map((secondCategory, index) => (
-              <Grid.Col span={6} xs={4} sm={3} md={2.4} mb="sm" key={index}>
-                <Stack spacing="xs">
+          return (
+            <div key={index} className="flex flex-col gap-6">
+              {/* Level 1: Standard Group Header */}
+              <div className="flex flex-col gap-2">
+                <Group spacing="md">
+                  <div className="p-2.5 bg-gray-100 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300">
+                    <FirstCategoryIcon size={24} strokeWidth={2} />
+                  </div>
                   <Anchor
                     component={Link}
-                    to={'/category/' + secondCategory.categorySlug}
-                    weight={500}
-                    color="pink"
+                    to={'/category/' + firstCategory.categorySlug}
+                    className="text-[20px] font-bold text-gray-900 dark:text-gray-100 hover:text-emerald-600 no-underline transition-colors"
                   >
-                    {secondCategory.categoryName}
+                    {firstCategory.categoryName}
                   </Anchor>
-                  {secondCategory.categoryChildren.map((thirdCategory, index) => (
-                    <Anchor key={index} component={Link} to={'/category/' + thirdCategory.categorySlug}>
-                      {thirdCategory.categoryName}
-                    </Anchor>
-                  ))}
-                </Stack>
-              </Grid.Col>
-            ))}
-          </Grid>
-        </Stack>
-      );
-    });
+                </Group>
+                <Divider size="sm" color="gray" className="opacity-20" />
+              </div>
+
+              {/* Level 2 & 3: Structured Grid */}
+              <Grid gutter={24}>
+                {firstCategory.categoryChildren.map((secondCategory, secondIndex) => (
+                  <Grid.Col span={12} sm={6} md={4} lg={3} key={secondIndex}>
+                    {/* Consistent spacing between L2 groups provided by Grid gutter or manual mb if needed */}
+                    <div className="flex flex-col mb-2">
+                      {/* Level 2: Sub-header */}
+                      <Anchor
+                        component={Link}
+                        to={'/category/' + secondCategory.categorySlug}
+                        className="text-[16px] font-semibold text-black dark:text-white hover:text-emerald-500 no-underline transition-colors mb-2 block"
+                      >
+                        {secondCategory.categoryName}
+                      </Anchor>
+
+                      {/* Level 3: Vertical List */}
+                      <div className="flex flex-col gap-[8px] pl-1">
+                        {secondCategory.categoryChildren.map((thirdCategory, thirdIndex) => (
+                          <Group key={thirdIndex} spacing={6} noWrap className="group/item">
+                            <span className="text-gray-300 dark:text-gray-600 font-medium">↳</span>
+                            <Anchor
+                              component={Link}
+                              to={'/category/' + thirdCategory.categorySlug}
+                              className="text-[14px] font-normal text-gray-600 dark:text-gray-400 hover:text-emerald-600 no-underline transition-colors"
+                            >
+                              {thirdCategory.categoryName}
+                            </Anchor>
+                          </Group>
+                        ))}
+                        {secondCategory.categoryChildren.length === 0 && (
+                          <Text size="xs" color="dimmed" sx={{ fontStyle: 'italic' }} pl={20}>
+                            Không có danh mục con
+                          </Text>
+                        )}
+                      </div>
+                    </div>
+                  </Grid.Col>
+                ))}
+              </Grid>
+            </div>
+          );
+        })}
+      </Stack>
+    );
   }
 
   return (

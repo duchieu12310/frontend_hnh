@@ -204,7 +204,7 @@ function ClientHeader() {
 
 const NavLink = ({ to, children }: { to: string; children: React.ReactNode }) => {
   const { pathname } = useLocation();
-  const isActive = pathname === to;
+  const isActive = pathname === to || (to !== '/' && pathname.startsWith(to));
 
   return (
     <Link
@@ -215,13 +215,14 @@ const NavLink = ({ to, children }: { to: string; children: React.ReactNode }) =>
         }`}
     >
       {children}
-      <span className={`absolute bottom-0 h-0.5 bg-black dark:bg-white transition-all ${isActive
-          ? 'left-0 w-full'
-          : 'left-1/2 w-0 group-hover:w-full group-hover:left-0'
+      <span className={`absolute -bottom-1 left-4 right-4 h-[3px] bg-black dark:bg-white transition-all duration-300 ${isActive
+          ? 'opacity-100'
+          : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100'
         }`} />
     </Link>
   );
 };
+
 
 const IconButton = ({ to, children, className = "" }: any) => (
   <Link

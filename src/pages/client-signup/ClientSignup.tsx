@@ -18,7 +18,7 @@ import FetchUtils, { ErrorMessage } from 'utils/FetchUtils';
 import ResourceURL from 'constants/ResourceURL';
 import NotifyUtils from 'utils/NotifyUtils';
 import useAuthStore from 'stores/use-auth-store';
-import { Check, MailOpened, ShieldCheck, UserCheck, Eye, EyeOff } from 'tabler-icons-react';
+import { Check, MailOpened, ShieldCheck, UserCheck, Eye, EyeOff, ArrowLeft } from 'tabler-icons-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import MiscUtils from 'utils/MiscUtils';
 import { Dialog } from '@headlessui/react';
@@ -64,7 +64,15 @@ function ClientSignup() {
   ];
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-amber-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-amber-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-12 px-4 sm:px-6 lg:px-8 relative">
+      {/* Back to Home Button */}
+      <Link
+        to="/"
+        className="absolute top-8 left-8 flex items-center gap-2 px-4 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:shadow-lg transition-all duration-200 z-50"
+      >
+        <ArrowLeft size={18} />
+        Trở về trang chủ
+      </Link>
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-10">
           <h2 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">Đăng ký tài khoản</h2>

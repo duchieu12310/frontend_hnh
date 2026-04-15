@@ -2,9 +2,27 @@ import React from 'react';
 import { List } from 'tabler-icons-react';
 import PageConfigs from 'pages/PageConfigs';
 import { Link } from 'react-router-dom';
-import MockUtils from 'utils/MockUtils';
+import { useQuery } from 'react-query';
+import FetchUtils, { ErrorMessage } from 'utils/FetchUtils';
+import ResourceURL from 'constants/ResourceURL';
+import { ClientCategoryResponse, CollectionWrapper } from 'types';
+import { Skeleton } from '@mantine/core';
 
 function ClientHomeFeaturedCategories() {
+
+  const {
+    data: categoryResponses,
+    isLoading: isLoadingCategoryResponses,
+  } = useQuery<CollectionWrapper<ClientCategoryResponse>, ErrorMessage>(
+    ['client-api', 'categories', 'getFeaturedCategories'],
+    () => FetchUtils.get(ResourceURL.CLIENT_CATEGORY),
+    {
+      refetchOnWindowFocus: false,
+      keepPreviousData: true,
+    }
+  );
+
+  const featuredCategories = categoryResponses?.content || [];
 
   return (
     <div className="flex flex-col gap-6">
@@ -24,45 +42,52 @@ function ClientHomeFeaturedCategories() {
         </Link>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {MockUtils.featuredCategories.map((category, index) => {
-          const CategoryIcon = PageConfigs.categorySlugIconMap[category.categorySlug];
-          const gradientColors = [
-            'from-emerald-500 to-teal-600',
-            'from-blue-500 to-cyan-600',
-            'from-purple-500 to-pink-600',
-            'from-orange-500 to-red-600',
-            'from-amber-500 to-yellow-600',
-            'from-indigo-500 to-purple-600',
-          ];
-          const bgGradient = gradientColors[index % gradientColors.length];
+        {isLoadingCategoryResponses ? (
+          Array(6).fill(0).map((_, index) => (
+            <Skeleton key={index} height={180} radius="xl" />
+          ))
+        ) : (
+          featuredCategories.map((category, index) => {
+            const CategoryIcon = PageConfigs.categorySlugIconMap[category.categorySlug];
+            const gradientColors = [
+              'from-emerald-500 to-teal-600',
+              'from-blue-500 to-cyan-600',
+              'from-purple-500 to-pink-600',
+              'from-orange-500 to-red-600',
+              'from-amber-500 to-yellow-600',
+              'from-indigo-500 to-purple-600',
+            ];
+            const bgGradient = gradientColors[index % gradientColors.length];
 
-          return (
-            <Link
-              key={category.categorySlug}
-              to={'/category/' + category.categorySlug}
-              className="group relative overflow-hidden bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 dark:border-gray-700"
-            >
-              {/* Gradient Background Effect */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${bgGradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
-              
-              {/* Content */}
-              <div className="relative z-10 flex flex-col items-center gap-4 text-center">
-                <div className={`p-4 bg-gradient-to-br ${bgGradient} rounded-2xl shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
-                  <CategoryIcon size={40} className="text-white" strokeWidth={1.5} />
+            return (
+              <Link
+                key={category.categorySlug}
+                to={'/category/' + category.categorySlug}
+                className="group relative overflow-hidden bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 dark:border-gray-700"
+              >
+                {/* Gradient Background Effect */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${bgGradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
+                
+                {/* Content */}
+                <div className="relative z-10 flex flex-col items-center gap-4 text-center">
+                  <div className={`p-4 bg-gradient-to-br ${bgGradient} rounded-2xl shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                    <CategoryIcon size={40} className="text-white" strokeWidth={1.5} />
+                  </div>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors leading-tight">
+                    {category.categoryName}
+                  </p>
                 </div>
-                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors leading-tight">
-                  {category.categoryName}
-                </p>
-              </div>
 
-              {/* Hover Border Effect */}
-              <div className={`absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-gradient-to-r group-hover:from-emerald-400 group-hover:to-teal-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
-            </Link>
-          );
-        })}
+                {/* Hover Border Effect */}
+                <div className={`absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-gradient-to-r group-hover:from-emerald-400 group-hover:to-teal-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+              </Link>
+            );
+          })
+        )}
       </div>
     </div>
   );
 }
 
 export default ClientHomeFeaturedCategories;
+

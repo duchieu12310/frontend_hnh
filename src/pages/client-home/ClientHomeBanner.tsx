@@ -11,7 +11,7 @@ function ClientHomeBanner() {
           <ClientCarousel>
             <div className="relative">
               <img
-                src='https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=1200&auto=format&fit=crop'
+                src='/images/banners/banner_literature.png'
                 alt='Thế Giới Văn Học'
                 className="w-full h-[400px] lg:h-[450px] object-cover"
               />
@@ -24,7 +24,7 @@ function ClientHomeBanner() {
             </div>
             <div className="relative">
               <img
-                src='https://images.unsplash.com/photo-1507733108721-c0157973715d?q=80&w=1200&auto=format&fit=crop'
+                src='/images/banners/banner_business.png'
                 alt='Kinh Tế - Khởi Nghiệp'
                 className="w-full h-[400px] lg:h-[450px] object-cover"
               />
@@ -37,7 +37,7 @@ function ClientHomeBanner() {
             </div>
             <div className="relative">
               <img
-                src='https://images.unsplash.com/photo-1491843351663-73149e36b473?q=80&w=1200&auto=format&fit=crop'
+                src='/images/banners/banner_children.png'
                 alt='Sách Thiếu Nhi'
                 className="w-full h-[400px] lg:h-[450px] object-cover"
               />
