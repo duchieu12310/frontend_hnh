@@ -17,11 +17,23 @@ export interface ManageTableProps<T> {
   actionButtonsFragment?: (entity: T) => React.ReactNode;
   customViewEntityLink?: (entity: T) => string;
   renderExpandedRow?: (entity: T) => React.ReactNode;
-  hideEdit?: boolean;
-  hideDelete?: boolean;
+  hideEdit?: boolean | ((entity: T) => boolean);
+  hideDelete?: boolean | ((entity: T) => boolean);
 }
 
 function ManageTable<T extends BaseResponse>(props: ManageTableProps<T>) {
+  const { hideEdit, hideDelete } = props;
+
+  const shouldHideEdit = (entity: T) => {
+    if (typeof hideEdit === 'function') return hideEdit(entity);
+    return !!hideEdit;
+  };
+
+  const shouldHideDelete = (entity: T) => {
+    if (typeof hideDelete === 'function') return hideDelete(entity);
+    return !!hideDelete;
+  };
+
   const {
     listResponse,
     selection,
@@ -126,7 +138,7 @@ function ManageTable<T extends BaseResponse>(props: ManageTableProps<T>) {
                   <Eye size={18}/>
                 </button>
               )}
-              {!props.hideEdit && (
+              {!shouldHideEdit(entity as T) && (
                 <Link
                   to={'update/' + entity.id}
                   title="Cập nhật"
@@ -135,7 +147,7 @@ function ManageTable<T extends BaseResponse>(props: ManageTableProps<T>) {
                   <Edit size={18}/>
                 </Link>
               )}
-              {!props.hideDelete && (
+              {!shouldHideDelete(entity as T) && (
                 <button
                   onClick={() => handleDeleteEntityButton(entity.id)}
                   title="Xóa"

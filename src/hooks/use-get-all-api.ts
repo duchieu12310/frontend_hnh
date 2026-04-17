@@ -10,7 +10,7 @@ function useGetAllApi<O>(
   resourceKey: string,
   requestParams?: RequestParams,
   successCallback?: (data: ListResponse<O>) => void,
-  options?: UseQueryOptions<ListResponse<O>, ErrorMessage>
+  options?: UseQueryOptions<ListResponse<O>, ErrorMessage> & { activeOnly?: boolean }
 ) {
   const {
     activePage,
@@ -19,7 +19,23 @@ function useGetAllApi<O>(
     searchToken,
   } = useAppStore();
 
-  if (!requestParams) {
+  const shouldForceActive = options?.activeOnly || resourceUrl.includes('/client-api');
+
+  if (requestParams) {
+    // Nếu là yêu cầu có sẵn params (thường là lookup hoặc client page), 
+    // đảm bảo status == 1 nếu được yêu cầu hoặc là Client API
+    if (shouldForceActive) {
+      if (!requestParams.filter?.includes('status')) {
+        requestParams.filter = requestParams.filter 
+          ? `${requestParams.filter};status==1` 
+          : 'status==1';
+      }
+      // Đảm bảo cả tham số status ở mức cao nhất cũng là 1
+      if (requestParams.status === undefined) {
+        requestParams.status = 1;
+      }
+    }
+  } else {
     requestParams = {
       page: activePage,
       size: activePageSize,

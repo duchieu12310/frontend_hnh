@@ -152,7 +152,8 @@ function useWarehouseUpdateViewModel(id: number) {
         label: item.name,
       }));
       setProvinceSelectList(selectList);
-    }
+    },
+    { activeOnly: true }
   );
 
   useGetAllApi<DistrictResponse>(DistrictConfigs.resourceUrl, DistrictConfigs.resourceKey,
@@ -163,7 +164,8 @@ function useWarehouseUpdateViewModel(id: number) {
         label: item.name,
       }));
       setDistrictSelectList(selectList);
-    }
+    },
+    { activeOnly: true }
   );
 
   useGetAllApi<WardResponse>(WardConfigs.resourceUrl, WardConfigs.resourceKey,
@@ -174,7 +176,8 @@ function useWarehouseUpdateViewModel(id: number) {
         label: item.name,
       }));
       setWardSelectList(selectList);
-    }
+    },
+    { activeOnly: true }
   );
 
   // Helper selectors from Global Hierarchy

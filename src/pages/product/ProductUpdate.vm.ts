@@ -124,7 +124,8 @@ function useProductUpdateViewModel(id: number) {
 
       setCategories(categories);
       setCategorySelectList(selectList);
-    }
+    },
+    { activeOnly: true }
   );
   useGetAllApi<BrandResponse>(BrandConfigs.resourceUrl, BrandConfigs.resourceKey,
     { all: 1 },
@@ -134,7 +135,8 @@ function useProductUpdateViewModel(id: number) {
         label: item.name,
       }));
       setBrandSelectList(selectList);
-    }
+    },
+    { activeOnly: true }
   );
   useGetAllApi<SupplierResponse>(SupplierConfigs.resourceUrl, SupplierConfigs.resourceKey,
     { all: 1 },
@@ -144,7 +146,8 @@ function useProductUpdateViewModel(id: number) {
         label: item.displayName,
       }));
       setSupplierSelectList(selectList);
-    }
+    },
+    { activeOnly: true }
   );
   useGetAllApi<UnitResponse>(UnitConfigs.resourceUrl, UnitConfigs.resourceKey,
     { all: 1 },
@@ -154,7 +157,8 @@ function useProductUpdateViewModel(id: number) {
         label: item.name,
       }));
       setUnitSelectList(selectList);
-    }
+    },
+    { activeOnly: true }
   );
   useGetAllApi<TagResponse>(TagConfigs.resourceUrl, TagConfigs.resourceKey,
     { all: 1 },
@@ -166,7 +170,8 @@ function useProductUpdateViewModel(id: number) {
           label: item.name,
         }));
       setTagSelectList(selectList);
-    }
+    },
+    { activeOnly: true }
   );
   useGetAllApi<GuaranteeResponse>(GuaranteeConfigs.resourceUrl, GuaranteeConfigs.resourceKey,
     { all: 1 },
@@ -176,7 +181,8 @@ function useProductUpdateViewModel(id: number) {
         label: item.name,
       }));
       setGuaranteeSelectList(selectList);
-    }
+    },
+    { activeOnly: true }
   );
   useGetAllApi<SpecificationResponse>(SpecificationConfigs.resourceUrl, SpecificationConfigs.resourceKey,
     { all: 1 },
@@ -193,7 +199,8 @@ function useProductUpdateViewModel(id: number) {
         return option;
       });
       setSpecificationSelectList(selectList);
-    }
+    },
+    { activeOnly: true }
   );
   useGetAllApi<PropertyResponse>(PropertyConfigs.resourceUrl, PropertyConfigs.resourceKey,
     { all: 1 },
@@ -210,7 +217,8 @@ function useProductUpdateViewModel(id: number) {
         return option;
       });
       setProductPropertySelectList(selectList);
-    }
+    },
+    { activeOnly: true }
   );
 
   const transformTags = (tags: string[]): ProductRequest_TagRequest[] => tags.map((tagIdOrName) => {

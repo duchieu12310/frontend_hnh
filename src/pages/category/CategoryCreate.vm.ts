@@ -34,7 +34,8 @@ function useCategoryCreateViewModel() {
         label: item.parentCategory ? item.name + ' ← ' + item.parentCategory.name : item.name,
       }));
       setCategorySelectList(selectList);
-    }
+    },
+    { activeOnly: true }
   );
 
   const handleFormSubmit = form.onSubmit((formValues) => {

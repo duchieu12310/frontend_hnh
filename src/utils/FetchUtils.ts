@@ -69,7 +69,8 @@ class FetchUtils {
    * Hàm get cho các trường hợp truy vấn dữ liệu bên client
    */
   static async get<O>(resourceUrl: string, requestParams?: BasicRequestParams): Promise<O> {
-    const response = await fetch(FetchUtils.concatParams(resourceUrl, requestParams));
+    const params = requestParams || (resourceUrl.includes('/client-api') ? {} : undefined);
+    const response = await fetch(FetchUtils.concatParams(resourceUrl, params));
     return await FetchUtils.safeJson<O>(response);
   }
 
@@ -109,7 +110,8 @@ class FetchUtils {
   static async getWithToken<O>(resourceUrl: string, requestParams?: BasicRequestParams, isAdmin?: boolean): Promise<O> {
     const token = JSON.parse(localStorage.getItem(FetchUtils.getAuthStoreKey(resourceUrl, isAdmin)) || '{}').state?.jwtToken;
 
-    const response = await fetch(FetchUtils.concatParams(resourceUrl, requestParams), {
+    const params = requestParams || (resourceUrl.includes('/client-api') ? {} : undefined);
+    const response = await fetch(FetchUtils.concatParams(resourceUrl, params), {
       method: 'GET',
       headers: {
         'Content-type': 'application/json',
@@ -126,7 +128,8 @@ class FetchUtils {
   static async getAllWithToken<O>(resourceUrl: string, requestParams?: RequestParams, isAdmin?: boolean): Promise<ListResponse<O>> {
     const token = JSON.parse(localStorage.getItem(FetchUtils.getAuthStoreKey(resourceUrl, isAdmin)) || '{}').state?.jwtToken;
 
-    const response = await fetch(FetchUtils.concatParams(resourceUrl, { ...requestParams }), {
+    const params = requestParams || (resourceUrl.includes('/client-api') ? {} : undefined);
+    const response = await fetch(FetchUtils.concatParams(resourceUrl, params), {
       method: 'GET',
       headers: {
         'Content-type': 'application/json',
@@ -223,7 +226,8 @@ class FetchUtils {
    * Hàm getAll
    */
   static async getAll<O>(resourceUrl: string, requestParams?: RequestParams): Promise<ListResponse<O>> {
-    const response = await fetch(FetchUtils.concatParams(resourceUrl, { ...requestParams }));
+    const params = requestParams || (resourceUrl.includes('/client-api') ? {} : undefined);
+    const response = await fetch(FetchUtils.concatParams(resourceUrl, params));
     const json = await FetchUtils.safeJson<any>(response);
     
     return {
@@ -323,6 +327,19 @@ class FetchUtils {
    */
   private static concatParams = (url: string, requestParams?: BasicRequestParams) => {
     if (requestParams) {
+      // Tự động gán status=1 cho các yêu cầu Client API nếu chưa có tham số trạng thái
+      if (url.includes('/client-api')) {
+        if (requestParams.status === undefined) {
+          requestParams.status = 1;
+        }
+        // Đảm bảo cả RSQL filter cũng có status==1 (nếu backend yêu cầu)
+        if (requestParams.filter == null) {
+          (requestParams as any).filter = 'status==1';
+        } else if (typeof requestParams.filter === 'string' && !requestParams.filter.includes('status')) {
+          (requestParams as any).filter = requestParams.filter + ';status==1';
+        }
+      }
+
       const filteredRequestParams = Object.fromEntries(Object.entries(requestParams)
         .filter(([, v]) => v != null && String(v).trim() !== '')) as Record<string, string>;
       if (Object.keys(filteredRequestParams).length === 0) {

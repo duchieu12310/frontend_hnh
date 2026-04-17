@@ -34,8 +34,8 @@ function ClientPromotionProducts() {
 
   const products = productResponses as ListResponse<ClientListedProductResponse>;
 
-  // Lọc chỉ lấy sản phẩm có promotion (Tạm thời hiện tất cả để xem layout)
-  const promotionProducts = products?.content || [];
+  // Lọc chỉ lấy sản phẩm có promotion
+  const promotionProducts = products?.content?.filter(p => p.productPromotion !== null) || [];
 
   let resultFragment;
 
@@ -83,10 +83,30 @@ function ClientPromotionProducts() {
     <main className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <div className="flex flex-col gap-8">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-[#14372fe4] dark:text-gray-100">
-              Sản phẩm khuyến mại
-            </h1>
+          {/* Banner Section */}
+          <div className="relative rounded-2xl overflow-hidden shadow-xl border border-pink-100 dark:border-pink-900/30">
+            <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 opacity-90"></div>
+            <div className="absolute inset-0 mix-blend-overlay opacity-20 bg-cover bg-center" style={{ backgroundImage: "url('/images/auth/books_bg.png')" }}></div>
+            <div className="relative p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="text-white max-w-2xl">
+                <h1 className="text-4xl md:text-5xl font-extrabold mb-4 drop-shadow-md">
+                  Cửa Hàng Khuyến Mãi
+                </h1>
+                <p className="text-lg md:text-xl text-pink-50 opacity-95 leading-relaxed max-w-xl drop-shadow-sm">
+                  Khám phá những tựa sách tuyệt vời với mức giá vô cùng hấp dẫn. Đừng bỏ lỡ cơ hội sở hữu sách hay với ưu đãi đặc biệt!
+                </p>
+              </div>
+              <div className="hidden lg:flex flex-col gap-3">
+                 <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-xl px-6 py-3 flex items-center gap-4 shadow-lg transform transition-all hover:scale-105">
+                  <div className="bg-white text-pink-600 px-3 py-1 rounded-lg font-bold text-lg">-50%</div>
+                  <span className="text-white font-medium text-lg tracking-wide">Siêu Sale Cuối Tuần</span>
+                </div>
+                 <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-xl px-6 py-3 flex items-center gap-4 shadow-lg transform transition-all hover:scale-105">
+                  <div className="bg-white text-purple-600 px-3 py-1 rounded-lg font-bold text-lg">Freeship</div>
+                  <span className="text-white font-medium text-lg tracking-wide">Đơn từ 200K</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {resultFragment}

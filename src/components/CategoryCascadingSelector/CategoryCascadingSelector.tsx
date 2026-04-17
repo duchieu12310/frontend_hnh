@@ -21,15 +21,18 @@ const CategoryCascadingSelector: React.FC<CategoryCascadingSelectorProps> = ({
   const [level2Id, setLevel2Id] = React.useState<string | null>(null);
   const [level3Id, setLevel3Id] = React.useState<string | null>(null);
 
+  // Lọc chỉ lấy các danh mục đang hoạt động
+  const activeCategories = useMemo(() => categories.filter(c => c.status === 1), [categories]);
+
   // Initialize levels when selectedId is provided (e.g., on edit)
   React.useEffect(() => {
     if (selectedId) {
-      const category = categories.find(c => c.id === selectedId);
+      const category = activeCategories.find(c => c.id === selectedId);
       if (category) {
         if (category.level === 3) {
           setLevel3Id(String(category.id));
           setLevel2Id(category.parentCategory ? String(category.parentCategory.id) : null);
-          const parent = categories.find(c => c.id === category.parentCategory?.id);
+          const parent = activeCategories.find(c => c.id === category.parentCategory?.id);
           setLevel1Id(parent?.parentCategory ? String(parent.parentCategory.id) : null);
         } else if (category.level === 2) {
           setLevel2Id(String(category.id));
@@ -46,11 +49,11 @@ const CategoryCascadingSelector: React.FC<CategoryCascadingSelectorProps> = ({
       setLevel2Id(null);
       setLevel3Id(null);
     }
-  }, [selectedId, categories.length]); // Only re-run if selectedId or categories list changes
+  }, [selectedId, activeCategories]); // Only re-run if selectedId or categories list changes
 
   // Filter categories by level
   const level1Options = useMemo(() => 
-    categories
+    activeCategories
       .filter(c => c.level === 1)
       .map(c => ({ value: String(c.id), label: c.name })),
     [categories]
@@ -58,17 +61,17 @@ const CategoryCascadingSelector: React.FC<CategoryCascadingSelectorProps> = ({
 
   const level2Options = useMemo(() => {
     if (!level1Id) return [];
-    return categories
+    return activeCategories
       .filter(c => c.level === 2 && c.parentCategory?.id === Number(level1Id))
       .map(c => ({ value: String(c.id), label: c.name }));
-  }, [categories, level1Id]);
+  }, [activeCategories, level1Id]);
 
   const level3Options = useMemo(() => {
     if (!level2Id) return [];
-    return categories
+    return activeCategories
       .filter(c => c.level === 3 && c.parentCategory?.id === Number(level2Id))
       .map(c => ({ value: String(c.id), label: c.name }));
-  }, [categories, level2Id]);
+  }, [activeCategories, level2Id]);
 
   const handleLevel1Change = (val: string | null) => {
     setLevel1Id(val);

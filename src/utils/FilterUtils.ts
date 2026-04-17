@@ -265,6 +265,13 @@ class FilterUtils {
     }
     return '';
   };
+
+  static generateDefaultStatusFilter = (propertyName: string = 'status'): FilterCriteria => ({
+    property: propertyName,
+    type: EntityPropertyType.NUMBER,
+    operator: NumberOperator.EQUALS,
+    value: '1',
+  });
 }
 
 export default FilterUtils;

@@ -7,9 +7,9 @@ import { ClientListedProductResponse } from 'types';
 import ResourceURL from 'constants/ResourceURL';
 import NotifyUtils from 'utils/NotifyUtils';
 
-function ClientHomeSlowSellingProducts() {
+function ClientHomeTopSellingProducts() {
 
-  const requestParams = { size: 12, slowSelling: true, saleable: true };
+  const requestParams = { size: 12, topSelling: true, saleable: true };
 
   const { 
     data: productResponses,
@@ -81,5 +81,4 @@ function ClientHomeSlowSellingProducts() {
   );
 }
 
-export default ClientHomeSlowSellingProducts;
-
+export default ClientHomeTopSellingProducts;

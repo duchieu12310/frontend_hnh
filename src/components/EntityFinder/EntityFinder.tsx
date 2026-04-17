@@ -39,7 +39,9 @@ function EntityFinder<T extends BaseResponse>({
   const { data: entityResponses, isFetching } = useGetAllApi<T>(
     options.resourceUrl,
     options.resourceKey,
-    { size: options.resultListSize, search: debouncedKeyword }
+    { size: options.resultListSize, search: debouncedKeyword },
+    undefined,
+    { activeOnly: true }
   );
 
   const selectionIds = selections.map(selection => selection.id);

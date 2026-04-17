@@ -46,7 +46,8 @@ function useCategoryUpdateViewModel(id: number) {
         disabled: (item.id === id) || (item.parentCategory ? item.parentCategory.id === id : false),
       }));
       setCategorySelectList(selectList);
-    }
+    },
+    { activeOnly: true }
   );
 
   const handleFormSubmit = form.onSubmit((formValues) => {
