@@ -40,6 +40,7 @@ import ProductVariants from 'components/ProductVariants/ProductVariants';
 import ProductVariantRow from 'components/ProductVariantRow/ProductVariantRow';
 import ProductVariantsForUpdate from 'components/ProductVariantsForUpdate/ProductVariantsForUpdate';
 import AddVariantsModal from 'components/AddVariantsModal/AddVariantsModal';
+import CategoryCascadingSelector from 'components/CategoryCascadingSelector/CategoryCascadingSelector';
 
 // Variant
 import VariantFinder from 'components/VariantFinder/VariantFinder';
@@ -101,6 +102,7 @@ export {
   ProductVariantRow,
   ProductVariantsForUpdate,
   AddVariantsModal,
+  CategoryCascadingSelector,
 
   VariantFinder,
   VariantTable,

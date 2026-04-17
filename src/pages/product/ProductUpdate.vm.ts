@@ -42,6 +42,7 @@ function useProductUpdateViewModel(id: number) {
 
   const [product, setProduct] = useState<ProductResponse>();
   const [prevFormValues, setPrevFormValues] = useState<typeof form.values>();
+  const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [categorySelectList, setCategorySelectList] = useState<SelectOption[]>([]);
   const [brandSelectList, setBrandSelectList] = useState<SelectOption[]>([]);
   const [supplierSelectList, setSupplierSelectList] = useState<SelectOption[]>([]);
@@ -72,7 +73,7 @@ function useProductUpdateViewModel(id: number) {
         description: productResponse.description || '',
         images: productResponse.images,
         status: String(productResponse.status),
-        categoryId: productResponse.category ? String(productResponse.category.id) : null,
+        categoryIds: productResponse.categories.map(c => c.id),
         brandId: productResponse.brand ? String(productResponse.brand.id) : null,
         supplierId: productResponse.supplier ? String(productResponse.supplier.id) : null,
         unitId: productResponse.unit ? String(productResponse.unit.id) : null,
@@ -95,10 +96,33 @@ function useProductUpdateViewModel(id: number) {
   useGetAllApi<CategoryResponse>(CategoryConfigs.resourceUrl, CategoryConfigs.resourceKey,
     { all: 1 },
     (categoryListResponse) => {
-      const selectList: SelectOption[] = categoryListResponse.content.map((item) => ({
-        value: String(item.id),
-        label: item.parentCategory ? item.name + ' ← ' + item.parentCategory.name : item.name,
-      }));
+      const categories = categoryListResponse.content;
+      const categoryMap = new Map(categories.map((c) => [c.id, c]));
+
+      const getFullPath = (category: CategoryResponse): string => {
+        const paths: string[] = [category.name];
+        let current = category;
+        while (current.parentCategory) {
+          const parent = categoryMap.get(current.parentCategory.id);
+          if (parent) {
+            paths.unshift(parent.name);
+            current = parent;
+          } else {
+            paths.unshift(current.parentCategory.name);
+            break;
+          }
+        }
+        return paths.join(' > ');
+      };
+
+      const selectList: SelectOption[] = categories
+        .map((item) => ({
+          value: String(item.id),
+          label: getFullPath(item),
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+
+      setCategories(categories);
       setCategorySelectList(selectList);
     }
   );
@@ -253,7 +277,7 @@ function useProductUpdateViewModel(id: number) {
           description: formValues.description || null,
           images: [...formValues.images, ...(uploadedImageResponses ? transformImages(uploadedImageResponses) : [])],
           status: Number(formValues.status),
-          categoryId: Number(formValues.categoryId) || null,
+          categoryIds: formValues.categoryIds,
           brandId: Number(formValues.brandId) || null,
           supplierId: Number(formValues.supplierId) || null,
           unitId: Number(formValues.unitId) || null,
@@ -301,6 +325,7 @@ function useProductUpdateViewModel(id: number) {
     prevFormValues,
     handleFormSubmit,
     statusSelectList,
+    categories,
     categorySelectList,
     brandSelectList,
     supplierSelectList,

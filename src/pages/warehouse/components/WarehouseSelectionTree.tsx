@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Group, Select, ActionIcon, Stack, Button, Paper, Text, Box, Tooltip } from '@mantine/core';
+import { Group, Select, ActionIcon, Stack, Button, Paper, Text, Box, Tooltip, MultiSelect } from '@mantine/core';
 import { Plus, Trash, ChevronRight } from 'tabler-icons-react';
 import { SelectOption } from 'types';
 
 export interface SelectionNode {
   id: string; // Temporary ID for React keys
   type: 'L1' | 'L2' | 'L3' | 'Product';
-  value: string | null;
+  value: string | string[] | null;
   children: SelectionNode[];
 }
 
@@ -24,12 +24,11 @@ interface WarehouseSelectionTreeProps {
 const SelectionRow: React.FC<{
   node: SelectionNode;
   options: SelectOption[];
-  onUpdate: (val: string | null) => void;
+  onUpdate: (val: string | string[] | null) => void;
   onRemove: () => void;
-  onAddChild: () => void;
-  canAddChild: boolean;
-  childLabel: string;
-}> = ({ node, options, onUpdate, onRemove, onAddChild, canAddChild, childLabel }) => {
+  onAddSubCategory?: () => void;
+  onAddProduct?: () => void;
+}> = ({ node, options, onUpdate, onRemove, onAddSubCategory, onAddProduct }) => {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -40,29 +39,57 @@ const SelectionRow: React.FC<{
       onMouseLeave={() => setHovered(false)}
       sx={{ minHeight: 42 }}
     >
-        <Select
-          placeholder="Tất cả (Mặc định)"
-          value={node.value}
-          onChange={onUpdate}
-          data={options}
-          sx={{ flex: 1, maxWidth: 350 }}
-          searchable
-          clearable
-          size="sm"
-          nothingFound="Không tìm thấy mục nào"
-        />
+        {node.type === 'Product' ? (
+          <MultiSelect
+            placeholder="Chọn các sản phẩm..."
+            value={Array.isArray(node.value) ? node.value : []}
+            onChange={onUpdate as any}
+            data={options}
+            sx={{ flex: 1, maxWidth: 500 }}
+            searchable
+            clearable
+            size="sm"
+            nothingFound="Không tìm thấy mục nào"
+          />
+        ) : (
+          <Select
+            placeholder="Vui lòng chọn..."
+            value={node.value as string}
+            onChange={onUpdate as any}
+            data={options}
+            sx={{ flex: 1, maxWidth: 350 }}
+            searchable
+            clearable
+            size="sm"
+            nothingFound="Không tìm thấy mục nào"
+          />
+        )}
         
         <Group spacing={4} sx={{ opacity: hovered ? 1 : 0, transition: 'opacity 0.2s ease', visibility: hovered ? 'visible' : 'hidden' }}>
-          {canAddChild && (
-            <Tooltip label={`Thêm ${childLabel}`} withArrow position="top">
+          {onAddSubCategory && (
+            <Tooltip label="Thêm danh mục con" withArrow position="top">
               <ActionIcon 
                 color="blue" 
                 variant="light" 
                 radius="xl" 
                 size="md"
-                onClick={onAddChild}
+                onClick={onAddSubCategory}
               >
                 <Plus size={16} />
+              </ActionIcon>
+            </Tooltip>
+          )}
+
+          {onAddProduct && (
+            <Tooltip label="Thêm sản phẩm" withArrow position="top">
+              <ActionIcon 
+                color="orange" 
+                variant="light" 
+                radius="xl" 
+                size="md"
+                onClick={onAddProduct}
+              >
+                <ChevronRight size={16} />
               </ActionIcon>
             </Tooltip>
           )}
@@ -91,13 +118,13 @@ const WarehouseSelectionTree: React.FC<WarehouseSelectionTreeProps> = ({ nodes, 
     ]);
   };
 
-  const updateNode = (path: number[], updatedNode: SelectionNode) => {
+  const updateNode = (path: number[], newNode: SelectionNode) => {
     const newNodes = [...nodes];
     let current: any = { children: newNodes };
-    for (let i = 0; i < path.length - 1; i++) {
-      current = current.children[path[i]];
-    }
-    current.children[path[path.length - 1]] = updatedNode;
+    path.forEach((index) => {
+      current = current.children[index];
+    });
+    Object.assign(current, newNode);
     onNodesChange(newNodes);
   };
 
@@ -107,11 +134,27 @@ const WarehouseSelectionTree: React.FC<WarehouseSelectionTreeProps> = ({ nodes, 
       newNodes.splice(path[0], 1);
     } else {
       let current: any = { children: newNodes };
-      for (let i = 0; i < path.length - 1; i++) {
-        current = current.children[path[i]];
-      }
+      path.slice(0, -1).forEach((index) => {
+        current = current.children[index];
+      });
       current.children.splice(path[path.length - 1], 1);
     }
+    onNodesChange(newNodes);
+  };
+
+  const addChild = (path: number[], type: SelectionNode['type']) => {
+    const newNodes = [...nodes];
+    let current: any = { children: newNodes };
+    path.forEach((index) => {
+      current = current.children[index];
+    });
+    
+    current.children.push({
+      id: Math.random().toString(36).substr(2, 9),
+      type,
+      value: type === 'Product' ? [] : null,
+      children: []
+    });
     onNodesChange(newNodes);
   };
 
@@ -140,26 +183,17 @@ const WarehouseSelectionTree: React.FC<WarehouseSelectionTreeProps> = ({ nodes, 
           node={node}
           options={options}
           onUpdate={(val) => {
-             const newNode = { ...node, value: val, children: [] };
+             const newNode = { ...node, value: val };
              updateNode(path, newNode);
           }}
           onRemove={() => removeNode(path)}
-          canAddChild={canAddChild}
-          childLabel={childLabel}
-          onAddChild={() => {
-            let nextType: SelectionNode['type'] = 'L2';
-            if (node.type === 'L2') nextType = 'L3';
-            if (node.type === 'L3') nextType = 'Product';
-            
-            const newNode: SelectionNode = {
-              ...node,
-              children: [
-                ...node.children,
-                { id: Math.random().toString(36).substr(2, 9), type: nextType, value: null, children: [] }
-              ]
-            };
-            updateNode(path, newNode);
-          }}
+          onAddSubCategory={node.type !== 'L3' && node.type !== 'Product' ? () => {
+             const nextType: SelectionNode['type'] = node.type === 'L1' ? 'L2' : 'L3';
+             addChild(path, nextType);
+          } : undefined}
+          onAddProduct={node.type !== 'Product' ? () => {
+             addChild(path, 'Product');
+          } : undefined}
         />
         
         <Stack spacing={8} mt="xs" sx={(theme) => ({
@@ -169,9 +203,10 @@ const WarehouseSelectionTree: React.FC<WarehouseSelectionTreeProps> = ({ nodes, 
           border: node.children.length > 0 && node.type === 'L1' ? `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[2]}` : 'none',
         })}>
           {node.children.map((child, index) => {
-            const childOptions = child.type === 'L2' ? metadata.l2Options(node.value) : 
-                               child.type === 'L3' ? metadata.l3Options(node.value) : 
-                               metadata.productOptions(node.value);
+            const parentValue = node.value as string;
+            const childOptions = child.type === 'L2' ? metadata.l2Options(parentValue) : 
+                               child.type === 'L3' ? metadata.l3Options(parentValue) : 
+                               metadata.productOptions(parentValue);
             return renderRecursive(child, [...path, index], childOptions);
           })}
         </Stack>

@@ -21,7 +21,7 @@ import useResetManagePageState from 'hooks/use-reset-manage-page-state';
 import useInitFilterPanelState from 'hooks/use-init-filter-panel-state';
 import useGetAllApi from 'hooks/use-get-all-api';
 import useAppStore from 'stores/use-app-store';
-import { QuestionMark } from 'tabler-icons-react';
+import { QuestionMark, Folder, Tag, Photo } from 'tabler-icons-react';
 import { useColorScheme } from 'hooks/use-color-scheme';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import FilterUtils from 'utils/FilterUtils';
@@ -38,7 +38,7 @@ function ProductManage() {
   const { searchToken, activePage, activePageSize, activeFilter } = useAppStore();
 
   const activeFilterRSQL = FilterUtils.convertToFilterRSQL(activeFilter);
-  const defaultFilter = categoryId ? `category.id==${categoryId}` : '';
+  const defaultFilter = categoryId ? `categories.id==${categoryId}` : '';
 
   const requestParams = {
     page: activePage,
@@ -78,34 +78,52 @@ function ProductManage() {
           {highlightText(entity.code, searchToken)}
         </td>
         <td>
-          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center border border-gray-200 dark:border-gray-600 shadow-sm">
-            {thumbnailImage?.path ? (
-              <img src={thumbnailImage.path} alt={entity.name} className="w-full h-full object-cover" />
-            ) : (
-              <QuestionMark size={30} className="text-gray-400" />
-            )}
+          <div className="flex justify-center">
+            <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shadow-sm group-hover:shadow-md transition-shadow">
+              {thumbnailImage?.path ? (
+                <img src={thumbnailImage.path} alt={entity.name} className="w-full h-full object-cover" />
+              ) : (
+                <Photo size={24} className="text-slate-300 dark:text-slate-600" />
+              )}
+            </div>
           </div>
         </td>
         <td className="text-sm">
-          {highlightText(entity.category?.name || '', searchToken)}
+          <div className="flex justify-center">
+            {entity.categories.length > 0 ? (
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50/50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg text-xs font-semibold border border-blue-100 dark:border-blue-800/50 shadow-sm">
+                <Folder size={13} strokeWidth={2.5} />
+                <span>{highlightText(entity.categories[0].name, searchToken)}</span>
+              </div>
+            ) : (
+              <span className="text-xs text-slate-400 italic">Chưa chọn</span>
+            )}
+          </div>
         </td>
         <td>
-          <div className="flex flex-wrap gap-1.5 items-center">
-            {entity.tags
-              .sort((a, b) => a.name.localeCompare(b.name))
-              .slice(0, 2)
-              .map((tag, index) => (
-                <span
-                  key={index}
-                  className="px-2.5 py-0.5 text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-md border border-slate-200 dark:border-slate-700"
-                >
-                  {tag.name}
-                </span>
-              ))}
-            {entity.tags.length > 2 && (
-              <span className="px-2.5 py-0.5 text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-md border border-slate-200 dark:border-slate-700">
-                +{entity.tags.length - 2}
-              </span>
+          <div className="flex flex-wrap gap-1.5 items-center justify-center">
+            {entity.tags.length > 0 ? (
+              <>
+                {entity.tags
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .slice(0, 2)
+                  .map((tag, index) => (
+                    <div
+                      key={index}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 rounded-md border border-slate-200 dark:border-slate-700 shadow-sm"
+                    >
+                      <Tag size={10} />
+                      {tag.name}
+                    </div>
+                  ))}
+                {entity.tags.length > 2 && (
+                  <span className="px-2 py-0.5 text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-md border border-slate-200 dark:border-slate-700">
+                    +{entity.tags.length - 2}
+                  </span>
+                )}
+              </>
+            ) : (
+              <span className="text-[11px] text-slate-400">-</span>
             )}
           </div>
         </td>
@@ -157,11 +175,11 @@ function ProductManage() {
         <tr>
           <td>{ProductConfigs.properties.thumbnail.label}</td>
           <td>
-            <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center border border-gray-200 dark:border-gray-600 shadow-sm">
+            <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shadow-sm">
               {thumbnailImage?.path ? (
                 <img src={thumbnailImage.path} alt={entity.name} className="w-full h-full object-cover" />
               ) : (
-                <QuestionMark size={30} className="text-gray-400" />
+                <Photo size={32} className="text-slate-300 dark:text-slate-600" />
               )}
             </div>
           </td>
@@ -193,7 +211,18 @@ function ProductManage() {
         </tr>
         <tr>
           <td>{ProductConfigs.properties['category.name'].label}</td>
-          <td>{entity.category?.name}</td>
+          <td>
+            <div className="flex flex-wrap gap-1">
+              {entity.categories.length > 0 ? (
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50/50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg text-xs font-semibold border border-blue-100 dark:border-blue-800/50">
+                  <Folder size={14} strokeWidth={2.5} />
+                  <span>{entity.categories[0].name}</span>
+                </div>
+              ) : (
+                <span className="text-xs text-slate-400 italic">Chưa chọn</span>
+              )}
+            </div>
+          </td>
         </tr>
         <tr>
           <td>{ProductConfigs.properties['brand.name'].label}</td>

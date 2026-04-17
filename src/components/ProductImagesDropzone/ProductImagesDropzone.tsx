@@ -37,12 +37,17 @@ function ProductImagesDropzone({
       setDropzoneStatus('accepted');
       setTimeout(() => setDropzoneStatus('idle'), 2000);
       
-      if ((imageResponses || []).every((imageResponse) => imageResponse.isEliminated)) {
+      // Auto-set thumbnail if none exists
+      if (!thumbnailName && (imageResponses || []).every((imageResponse) => imageResponse.isEliminated)) {
         setThumbnailName(acceptedFiles[0].name);
       }
-      setImageFiles(acceptedFiles.map((file) => Object.assign(file, { preview: URL.createObjectURL(file) })));
+
+      setImageFiles((prev) => [
+        ...prev,
+        ...acceptedFiles.map((file) => Object.assign(file, { preview: URL.createObjectURL(file) }))
+      ]);
     }
-  }, [imageResponses, setImageFiles, setThumbnailName]);
+  }, [imageResponses, setImageFiles, setThumbnailName, thumbnailName]);
 
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
     onDrop,

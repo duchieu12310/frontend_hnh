@@ -4,12 +4,14 @@ export interface CategoryLevel1Node {
     id: number;
     name: string;
     children: CategoryLevel2Node[];
+    products: ProductStorageNode[];
 }
 
 export interface CategoryLevel2Node {
     id: number;
     name: string;
     children: CategoryLevel3Node[];
+    products: ProductStorageNode[];
 }
 
 export interface CategoryLevel3Node {

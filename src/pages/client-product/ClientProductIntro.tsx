@@ -117,7 +117,7 @@ function ClientProductIntro({ product }: ClientProductIntroProps) {
           <Link to="/" className="text-blue-600 dark:text-blue-400 hover:underline">
             Trang chủ
           </Link>
-          {product.productCategory && MiscUtils.makeCategoryBreadcrumbs(product.productCategory).map(c => (
+          {product.productCategories && product.productCategories.length > 0 && MiscUtils.makeCategoryBreadcrumbs(product.productCategories[0]).map(c => (
             <React.Fragment key={c.categorySlug}>
               <span className="text-gray-400">/</span>
               <Link to={'/category/' + c.categorySlug} className="text-blue-600 dark:text-blue-400 hover:underline">
@@ -174,12 +174,19 @@ function ClientProductIntro({ product }: ClientProductIntroProps) {
                     </Link>
                   </div>
                 )}
-                {product.productCategory && (
-                  <div className="flex items-center gap-1 text-sm">
+                {product.productCategories && product.productCategories.length > 0 && (
+                  <div className="flex items-center gap-1 text-sm flex-wrap">
                     <span className="text-gray-600 dark:text-gray-400">Thể loại:</span>
-                    <Link to={'/category/' + product.productCategory.categorySlug} className="text-blue-600 dark:text-blue-400 font-medium hover:underline text-sm">
-                      {product.productCategory.categoryName}
-                    </Link>
+                    <div className="flex gap-2">
+                      {product.productCategories.map((cat, idx) => (
+                        <React.Fragment key={cat.categorySlug}>
+                          {idx > 0 && <span className="text-gray-400">,</span>}
+                          <Link to={'/category/' + cat.categorySlug} className="text-blue-600 dark:text-blue-400 font-medium hover:underline text-sm">
+                            {cat.categoryName}
+                          </Link>
+                        </React.Fragment>
+                      ))}
+                    </div>
                   </div>
                 )}
                 {product.productSupplier && (

@@ -83,7 +83,7 @@ export interface ClientProductResponse {
   productDescription: string | null;
   productOrigin: string | null;
   productImages: ImageResponse[];
-  productCategory: ClientCategoryResponse | null;
+  productCategories: ClientCategoryResponse[];
   productBrand: ClientProductResponse_ClientBrandResponse | null;
   productSpecifications: CollectionWrapper<SpecificationItem> | null;
   productVariants: ClientProductResponse_ClientVariantResponse[];

@@ -53,63 +53,79 @@ function useWarehouseUpdateViewModel(id: number) {
       const categories = warehouseResponse.categories || [];
       const products = warehouseResponse.products || [];
       
-      // RECURSIVE MAPPING: Handles both nested and flat category structures
-      const buildTree = (allCats: CategoryResponse[], allProducts: ProductResponse[], parentId: number | null = null, level: number = 1): SelectionNode[] => {
-        const nodes: SelectionNode[] = [];
-        
-        // Find categories at this level under this parent
-        const matches = allCats.filter(c => c.level === level && (parentId === null || c.parentCategory?.id === parentId));
-        
-        matches.forEach(cat => {
-          const node: SelectionNode = {
-            id: Math.random().toString(36).substr(2, 9),
-            type: ('L' + level) as any,
-            value: String(cat.id),
-            children: buildTree(allCats, allProducts, cat.id, level + 1)
-          };
+      // RECURSIVE RECONSTRUCTION: Build tree based on manually selected products and their categories
+      const buildTree = (savedProducts: ProductResponse[]): SelectionNode[] => {
+        const l1Map = new Map<string, SelectionNode>();
 
-          // If this is Level 3, append products
-          if (level === 3) {
-            const catProducts = allProducts.filter(p => p.category?.id === cat.id);
-            catProducts.forEach(p => {
-              node.children.push({
-                id: Math.random().toString(36).substr(2, 9),
-                type: 'Product',
-                value: String(p.id),
-                children: []
-              });
-            });
-          }
-          
-          nodes.push(node);
+        savedProducts.forEach(product => {
+          // Each product has categories (usually 1 but many-to-many is supported)
+          product.categories.forEach(leafCat => {
+            // 1. Find the full ancestry of this leaf category in globalHierarchy
+            let l1: any = null, l2: any = null, l3: any = null;
+
+            for (const root of globalHierarchy) {
+              if (root.id === leafCat.id) { l1 = root; break; }
+              for (const child2 of root.children || []) {
+                if (child2.id === leafCat.id) { l1 = root; l2 = child2; break; }
+                for (const child3 of (child2 as any).children || []) {
+                  if (child3.id === leafCat.id) { l1 = root; l2 = child2; l3 = child3; break; }
+                }
+                if (l1) break;
+              }
+              if (l1) break;
+            }
+
+            if (!l1) return; // Not found in current global catalog
+
+            // 2. Build/Merge into L1
+            const l1Key = String(l1.id);
+            if (!l1Map.has(l1Key)) {
+              l1Map.set(l1Key, { id: Math.random().toString(36).substr(2, 9), type: 'L1', value: l1Key, children: [] });
+            }
+            const l1Node = l1Map.get(l1Key)!;
+
+            let parentForProduct: SelectionNode = l1Node;
+
+            // 3. Merge L2 if exists
+            if (l2) {
+              const l2Key = String(l2.id);
+              let l2Node = l1Node.children.find(c => c.value === l2Key);
+              if (!l2Node) {
+                l2Node = { id: Math.random().toString(36).substr(2, 9), type: 'L2', value: l2Key, children: [] };
+                l1Node.children.push(l2Node);
+              }
+              parentForProduct = l2Node;
+
+              // 4. Merge L3 if exists
+              if (l3) {
+                const l3Key = String(l3.id);
+                let l3Node = l2Node.children.find(c => c.value === l3Key);
+                if (!l3Node) {
+                  l3Node = { id: Math.random().toString(36).substr(2, 9), type: 'L3', value: l3Key, children: [] };
+                  l2Node.children.push(l3Node);
+                }
+                parentForProduct = l3Node;
+              }
+            }
+
+            // 5. Add/Update Product node
+            let prodNode = parentForProduct.children.find(c => c.type === 'Product');
+            if (!prodNode) {
+              prodNode = { id: Math.random().toString(36).substr(2, 9), type: 'Product', value: [], children: [] };
+              parentForProduct.children.push(prodNode);
+            }
+            const currentProductIds = prodNode.value as string[];
+            const prodIdStr = String(product.id);
+            if (!currentProductIds.includes(prodIdStr)) {
+               currentProductIds.push(prodIdStr);
+            }
+          });
         });
 
-        // FALLBACK: If level 1 finds nothing but the array isn't empty, check if it's already nested
-        if (level === 1 && nodes.length === 0 && allCats.length > 0) {
-           allCats.forEach(cat => {
-              const node: SelectionNode = { id: Math.random().toString(36).substr(2, 9), type: 'L1', value: String(cat.id), children: [] };
-              if (cat.children) {
-                 cat.children.forEach(l2 => {
-                    const l2Node: SelectionNode = { id: Math.random().toString(36).substr(2, 9), type: 'L2', value: String(l2.id), children: [] };
-                    if (l2.children) {
-                       l2.children.forEach(l3 => {
-                          const l3Node: SelectionNode = { id: Math.random().toString(36).substr(2, 9), type: 'L3', value: String(l3.id), children: [] };
-                          allProducts.filter(p => p.category?.id === l3.id).forEach(p => {
-                             l3Node.children.push({ id: Math.random().toString(36).substr(2, 9), type: 'Product', value: String(p.id), children: [] });
-                          });
-                          l2Node.children.push(l3Node);
-                       });
-                    }
-                    node.children.push(l2Node);
-                 });
-              }
-              nodes.push(node);
-           });
-        }
-        return nodes;
+        return Array.from(l1Map.values());
       };
 
-      const reconstructedTree = buildTree(categories, products);
+      const reconstructedTree = buildTree(products);
 
       const formValues: typeof form.values = {
         code: warehouseResponse.code,
@@ -189,49 +205,83 @@ function useWarehouseUpdateViewModel(id: number) {
   };
 
   const productOptions = (parentId: string | null) => {
+    // Recursive search for the category and collect products from all its subcategories
+    const collectProducts = (cat: any): any[] => {
+      let products: any[] = cat.products || [];
+      if (cat.children) {
+        cat.children.forEach((child: any) => {
+          products = [...products, ...collectProducts(child)];
+        });
+      }
+      return products;
+    };
+
     if (!parentId) {
-      // Return ALL products
-      const allL2s = globalHierarchy.flatMap(l1 => l1.children || []);
-      const allL3s = allL2s.flatMap(l2 => l2.children || []);
-      return allL3s.flatMap(l3 => l3.products || []).map(p => ({ value: String(p.productId), label: p.productName }));
+      // Return ALL products from ALL categories
+      let allProducts: any[] = [];
+      globalHierarchy.forEach(l1 => {
+          allProducts = [...allProducts, ...collectProducts(l1)];
+      });
+      return allProducts.map(p => ({ value: String(p.productId), label: p.productName }));
     }
-    for (const l1 of globalHierarchy) {
-      for (const l2 of l1.children || []) {
-        const l3 = l2.children?.find(c => String(c.id) === parentId);
-        if (l3) return (l3.products || []).map(p => ({ value: String(p.productId), label: p.productName }));
+
+    // Find cat at L1
+    const l1 = globalHierarchy.find(c => String(c.id) === parentId);
+    if (l1) return collectProducts(l1).map(p => ({ value: String(p.productId), label: p.productName }));
+
+    // Find cat at L2
+    for (const l1Node of globalHierarchy) {
+      const l2 = l1Node.children?.find(c => String(c.id) === parentId);
+      if (l2) return collectProducts(l2).map(p => ({ value: String(p.productId), label: p.productName }));
+    }
+
+    // Find cat at L3
+    for (const l1Node of globalHierarchy) {
+      for (const l2Node of l1Node.children || []) {
+        const l3 = l2Node.children?.find(c => String(c.id) === parentId);
+        if (l3) return collectProducts(l3).map(p => ({ value: String(p.productId), label: p.productName }));
       }
     }
+
     return [];
   };
 
+
   /**
-   * RECURSIVE EXPANSION Logic
+   * RECURSIVE EXPANSION Logic: Collects all products from a category down to its leaves
    */
   const expandAllProducts = (nodeId: string | null, type: SelectionNode['type'], map: Map<number, Set<number>>) => {
-    const collectFromL3 = (l3: any) => {
-      if (!l3.products) return;
-      if (!map.has(l3.id)) map.set(l3.id, new Set());
-      l3.products.forEach((p: any) => map.get(l3.id)!.add(p.productId));
-    };
+    const processCategory = (cat: any) => {
+        if (!cat) return;
+        if (cat.products && cat.products.length > 0) {
+            if (!map.has(cat.id)) map.set(cat.id, new Set());
+            cat.products.forEach((p: any) => map.get(cat.id)!.add(p.productId));
+        }
+        if (cat.children) {
+            cat.children.forEach(processCategory);
+        }
+    }
 
-    const collectFromL2 = (l2: any) => l2.children?.forEach(collectFromL3);
-    const collectFromL1 = (l1: any) => l1.children?.forEach(collectFromL2);
+    if (!nodeId) {
+        globalHierarchy.forEach(processCategory);
+        return;
+    }
 
     if (type === 'L1') {
-      const roots = nodeId ? globalHierarchy.filter(c => String(c.id) === nodeId) : globalHierarchy;
-      roots.forEach(collectFromL1);
+        const target = globalHierarchy.find(c => String(c.id) === nodeId);
+        if (target) processCategory(target);
     } else if (type === 'L2') {
-      for (const l1 of globalHierarchy) {
-        const matches = nodeId ? l1.children?.filter(c => String(c.id) === nodeId) : l1.children;
-        matches?.forEach(collectFromL2);
-      }
-    } else if (type === 'L3') {
-      for (const l1 of globalHierarchy) {
-        for (const l2 of l1.children || []) {
-          const matches = nodeId ? l2.children?.filter(c => String(c.id) === nodeId) : l2.children;
-          matches?.forEach(collectFromL3);
+        for (const l1 of globalHierarchy) {
+            const target = l1.children?.find(c => String(c.id) === nodeId);
+            if (target) { processCategory(target); break; }
         }
-      }
+    } else if (type === 'L3') {
+        for (const l1 of globalHierarchy) {
+            for (const l2 of l1.children || []) {
+                const target = l2.children?.find(c => String(c.id) === nodeId);
+                if (target) { processCategory(target); return; }
+            }
+        }
     }
   };
 
@@ -241,26 +291,25 @@ function useWarehouseUpdateViewModel(id: number) {
       const categoriesMap = new Map<number, Set<number>>();
 
       const traverse = (node: SelectionNode, parentCategoryId: number | null) => {
-        if (node.value === null) {
-          // SELECT ALL LOGIC: Expand this branch recursively
-          expandAllProducts(node.value, node.type, categoriesMap);
+        const currentCatId = node.value ? Number(node.value as string) : parentCategoryId;
+
+        if (node.type === 'Product') {
+           if (parentCategoryId && Array.isArray(node.value) && node.value.length > 0) {
+              if (!categoriesMap.has(parentCategoryId)) categoriesMap.set(parentCategoryId, new Set());
+              node.value.forEach(id => categoriesMap.get(parentCategoryId)!.add(Number(id)));
+           }
         } else {
-          let currentCatId = parentCategoryId;
-          if (node.type !== 'Product') {
-            currentCatId = Number(node.value);
-            if (!categoriesMap.has(currentCatId)) categoriesMap.set(currentCatId, new Set());
-          } else {
-            // It's a specific product
-            if (currentCatId) {
-              categoriesMap.get(currentCatId)!.add(Number(node.value));
-            }
-          }
-          node.children.forEach(child => traverse(child, currentCatId));
+           if (node.children.length === 0 && currentCatId) {
+              // AUTO-EXPAND: If no sub-nodes are added, treat it as "Select All" for this category
+              expandAllProducts(String(currentCatId), node.type, categoriesMap);
+           } else {
+              node.children.forEach(child => traverse(child, currentCatId));
+           }
         }
       };
 
       if (formValues.selectionTree.length === 0) {
-        // DEFAULT ALL LOGIC: If no selection is made, allow ALL products and categories
+        // DEFAULT ALL: If no tree is built, allow EVERYTHING
         expandAllProducts(null, 'L1', categoriesMap);
       } else {
         formValues.selectionTree.forEach(root => traverse(root, null));

@@ -109,12 +109,36 @@ function useWarehouseCreateViewModel() {
       const allL3s = allL2s.flatMap(l2 => l2.children || []);
       return allL3s.flatMap(l3 => l3.products || []).map(p => ({ value: String(p.productId), label: p.productName }));
     }
+
+    // Recursive search for the category and collect products from all its subcategories
+    const collectProducts = (cat: any): any[] => {
+      let products: any[] = cat.products || [];
+      if (cat.children) {
+        cat.children.forEach((child: any) => {
+          products = [...products, ...collectProducts(child)];
+        });
+      }
+      return products;
+    };
+
+    // Find cat at L1
+    const l1 = globalHierarchy.find(c => String(c.id) === parentId);
+    if (l1) return collectProducts(l1).map(p => ({ value: String(p.productId), label: p.productName }));
+
+    // Find cat at L2
+    for (const l1 of globalHierarchy) {
+      const l2 = l1.children?.find(c => String(c.id) === parentId);
+      if (l2) return collectProducts(l2).map(p => ({ value: String(p.productId), label: p.productName }));
+    }
+
+    // Find cat at L3
     for (const l1 of globalHierarchy) {
       for (const l2 of l1.children || []) {
         const l3 = l2.children?.find(c => String(c.id) === parentId);
-        if (l3) return (l3.products || []).map(p => ({ value: String(p.productId), label: p.productName }));
+        if (l3) return collectProducts(l3).map(p => ({ value: String(p.productId), label: p.productName }));
       }
     }
+
     return [];
   };
 
@@ -153,20 +177,20 @@ function useWarehouseCreateViewModel() {
     const categoriesMap = new Map<number, Set<number>>();
 
     const traverse = (node: SelectionNode, parentCategoryId: number | null) => {
-      if (node.value === null) {
-        // Recursive expansion for "Select All"
-        expandAllProducts(node.value, node.type, categoriesMap);
+      const currentCatId = node.value ? Number(node.value as string) : parentCategoryId;
+
+      if (node.type === 'Product') {
+         if (parentCategoryId && Array.isArray(node.value) && node.value.length > 0) {
+            if (!categoriesMap.has(parentCategoryId)) categoriesMap.set(parentCategoryId, new Set());
+            node.value.forEach(id => categoriesMap.get(parentCategoryId)!.add(Number(id)));
+         }
       } else {
-        let currentCatId = parentCategoryId;
-        if (node.type !== 'Product') {
-          currentCatId = Number(node.value);
-          if (!categoriesMap.has(currentCatId)) categoriesMap.set(currentCatId, new Set());
-        } else {
-          if (currentCatId) {
-            categoriesMap.get(currentCatId)!.add(Number(node.value));
-          }
-        }
-        node.children.forEach(child => traverse(child, currentCatId));
+         if (node.children.length === 0 && currentCatId) {
+            // AUTO-EXPAND: If no sub-nodes are added, treat it as "Select All" for this category
+            expandAllProducts(String(currentCatId), node.type, categoriesMap);
+         } else {
+            node.children.forEach(child => traverse(child, currentCatId));
+         }
       }
     };
 

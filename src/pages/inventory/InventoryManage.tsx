@@ -106,36 +106,44 @@ const InventoryManage: React.FC = () => {
     }
   );
 
-  // Flatten logic
+  // Flatten logic with recursive traversal
   const flattenedRows = useMemo(() => {
     const rows: FlattenedInventoryRow[] = [];
-    categories.forEach(l1 => {
-      l1.children?.forEach(l2 => {
-        l2.children?.forEach(l3 => {
-          l3.products?.forEach(product => {
-            product.variants?.forEach(variant => {
-              rows.push({
-                l1Name: l1.name,
-                l2Name: l2.name,
-                l3Name: l3.name,
-                productId: product.productId,
-                productName: product.productName,
-                productCode: product.productCode,
-                storageLocationId: product.storageLocationId,
-                aisle: product.aisle,
-                shelf: product.shelf,
-                bin: product.bin,
-                variantId: variant.variantId,
-                sku: variant.sku,
-                properties: variant.properties,
-                quantityInLocation: variant.quantityInLocation,
-                totalVariantQuantity: variant.totalVariantQuantity
-              });
-            });
+    
+    const processCategory = (cat: any, l1: string, l2: string, l3: string, level: number) => {
+      let curL1 = l1, curL2 = l2, curL3 = l3;
+      if (level === 1) curL1 = cat.name;
+      else if (level === 2) curL2 = cat.name;
+      else if (level === 3) curL3 = cat.name;
+
+      // Add products found at this level
+      cat.products?.forEach((product: any) => {
+        product.variants?.forEach((variant: any) => {
+          rows.push({
+            l1Name: curL1,
+            l2Name: curL2,
+            l3Name: curL3,
+            productId: product.productId,
+            productName: product.productName,
+            productCode: product.productCode,
+            storageLocationId: product.storageLocationId,
+            aisle: product.aisle,
+            shelf: product.shelf,
+            bin: product.bin,
+            variantId: variant.variantId,
+            sku: variant.sku,
+            properties: variant.properties,
+            quantityInLocation: variant.quantityInLocation,
+            totalVariantQuantity: variant.totalVariantQuantity
           });
         });
       });
-    });
+
+      // Traverse children
+      cat.children?.forEach((child: any) => processCategory(child, curL1, curL2, curL3, level + 1));
+    };
+
+    categories.forEach(l1Node => processCategory(l1Node, '', '', '', 1));
     return rows;
   }, [categories]);
 
@@ -147,9 +155,10 @@ const InventoryManage: React.FC = () => {
   const l2Options = useMemo(() => {
     const list: { value: string, label: string }[] = [];
     categories.forEach(l1 => {
-        l1.children?.forEach(l2 => {
-            list.push({ value: String(l2.id), label: l2.name });
-        });
+      l1.children?.forEach(l2 => {
+        list.push({ value: String(l2.id), label: l2.name });
+        // Although the original only took children of L1, we should also handle deeper levels if any
+      });
     });
     return list;
   }, [categories]);
@@ -157,27 +166,27 @@ const InventoryManage: React.FC = () => {
   const l3Options = useMemo(() => {
     const list: { value: string, label: string }[] = [];
     categories.forEach(l1 => {
-        l1.children?.forEach(l2 => {
-            l2.children?.forEach(l3 => {
-                list.push({ value: String(l3.id), label: l3.name });
-            });
+      l1.children?.forEach(l2 => {
+        l2.children?.forEach(l3 => {
+          list.push({ value: String(l3.id), label: l3.name });
         });
+      });
     });
     return list;
   }, [categories]);
 
   const productOptions = useMemo(() => {
     const list: { value: string, label: string }[] = [];
-    categories.forEach(l1 => {
-        l1.children?.forEach(l2 => {
-            l2.children?.forEach(l3 => {
-                l3.products?.forEach(p => {
-                    list.push({ value: String(p.productId), label: p.productName });
-                });
-            });
-        });
-    });
-    return list;
+    const collectProducts = (cat: any) => {
+      cat.products?.forEach((p: any) => {
+        list.push({ value: String(p.productId), label: p.productName });
+      });
+      cat.children?.forEach(collectProducts);
+    };
+    categories.forEach(collectProducts);
+    // Remove duplicates if any
+    const unique = Array.from(new Map(list.map(item => [item.value, item])).values());
+    return unique;
   }, [categories]);
 
   // Filtered rows for Client-side Search

@@ -87,7 +87,7 @@ function PromotionCreate() {
                         <Text size="sm">{productResponse.name}</Text>
                         <Group spacing="xs">
                           <Text size="xs" color="dimmed">Mã: {productResponse.code}</Text>
-                          <Text size="xs" color="dimmed">Danh mục: {productResponse.category?.name}</Text>
+                          <Text size="xs" color="dimmed">Danh mục: {productResponse.categories[0]?.name}</Text>
                         </Group>
                       </Stack>
                     ),
@@ -98,7 +98,7 @@ function PromotionCreate() {
                         <Text size="sm">{productResponse.name}</Text>
                         <Group spacing="xs">
                           <Text size="xs" color="dimmed">Mã: {productResponse.code}</Text>
-                          <Text size="xs" color="dimmed">Danh mục: {productResponse.category?.name}</Text>
+                          <Text size="xs" color="dimmed">Danh mục: {productResponse.categories[0]?.name}</Text>
                         </Group>
                       </Stack>
                     ),

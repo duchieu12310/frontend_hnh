@@ -16,7 +16,7 @@ export interface ProductResponse extends BaseResponse {
   description: string | null;
   images: ImageResponse[];
   status: number;
-  category: CategoryResponse | null;
+  categories: CategoryResponse[];
   brand: BrandResponse | null;
   supplier: SupplierResponse | null;
   unit: UnitResponse | null;
@@ -66,7 +66,7 @@ export interface ProductRequest {
   description: string | null;
   images: ImageRequest[];
   status: number;
-  categoryId: number | null;
+  categoryIds: number[];
   brandId: number | null;
   supplierId: number | null;
   unitId: number | null;

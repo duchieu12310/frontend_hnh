@@ -15,6 +15,7 @@ import {
   ProductProperties,
   ProductSpecifications,
   ProductVariantsForUpdate,
+  CategoryCascadingSelector,
 } from 'components';
 import ProductConfigs from 'pages/product/ProductConfigs';
 import useProductUpdateViewModel from 'pages/product/ProductUpdate.vm';
@@ -31,6 +32,7 @@ function ProductUpdate() {
     prevFormValues,
     handleFormSubmit,
     statusSelectList,
+    categories,
     categorySelectList,
     brandSelectList,
     supplierSelectList,
@@ -180,12 +182,10 @@ function ProductUpdate() {
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
               <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Phân loại</p>
               <div className="flex flex-col gap-3">
-                <Select
-                  label={ProductConfigs.properties.categoryId.label}
-                  placeholder="-- Chọn danh mục --"
-                  clearable searchable
-                  data={categorySelectList}
-                  {...form.getInputProps('categoryId')}
+                <CategoryCascadingSelector
+                  categories={categories}
+                  selectedId={form.values.categoryIds[0] || null}
+                  onChange={(id) => form.setFieldValue('categoryIds', id ? [id] : [])}
                 />
                 <Select
                   label={ProductConfigs.properties.brandId.label}

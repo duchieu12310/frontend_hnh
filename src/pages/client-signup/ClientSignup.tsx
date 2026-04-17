@@ -139,7 +139,7 @@ function ClientSignup() {
           {/* Step Content */}
           <div className="pt-8">
             {active === 0 && <ClientSignupStepOne nextStep={nextStep} />}
-            {active === 1 && <ClientSignupStepTwo nextStep={nextStep} userId={Number(userId) || null} />}
+            {active === 1 && <ClientSignupStepTwo nextStep={nextStep} userId={Number(userId) || null} setActive={setActive} />}
             {active === 2 && <ClientSignupStepThree />}
           </div>
         </div>
@@ -245,7 +245,15 @@ function ClientSignupStepOne({ nextStep }: { nextStep: () => void }) {
         updateCurrentSignupUserId(registrationResponse.userId);
         nextStep();
       },
-      onError: () => NotifyUtils.simpleFailed('Tạo tài khoản không thành công'),
+      onError: (error) => {
+        if (error.message.toLowerCase().includes('email')) {
+          NotifyUtils.simpleFailed('Email đã được sử dụng, vui lòng dùng email khác');
+        } else if (error.message.toLowerCase().includes('username') || error.message.toLowerCase().includes('tên tài khoản')) {
+          NotifyUtils.simpleFailed('Tên tài khoản đã tồn tại, vui lòng chọn tên khác');
+        } else {
+          NotifyUtils.simpleFailed(error.message || 'Tạo tài khoản không thành công');
+        }
+      },
     }
   );
 
@@ -501,9 +509,10 @@ function ClientSignupStepOne({ nextStep }: { nextStep: () => void }) {
   );
 }
 
-function ClientSignupStepTwo({ nextStep, userId }: { nextStep: () => void, userId: number | null }) {
+function ClientSignupStepTwo({ nextStep, userId, setActive }: { nextStep: () => void, userId: number | null, setActive: (value: React.SetStateAction<number>) => void }) {
   const { colorScheme } = useColorScheme();
   const { updateCurrentSignupUserId } = useAuthStore();
+  const navigate = useNavigate();
 
   const [resendTokenDialogOpen, setResendTokenDialogOpen] = useState(false);
   const [changeEmailDialogOpen, setChangeEmailDialogOpen] = useState(false);
@@ -521,15 +530,26 @@ function ClientSignupStepTwo({ nextStep, userId }: { nextStep: () => void, userI
     schema: zodResolver(formSchema),
   });
 
+  const handleError = (error: ErrorMessage) => {
+    if (error.message.includes('does not exist')) {
+      NotifyUtils.simpleFailed('Tài khoản không tồn tại hoặc dữ liệu đã bị reset. Vui lòng đăng ký lại.');
+      updateCurrentSignupUserId(null);
+      setActive(0);
+      navigate('/signup', { replace: true });
+    } else {
+      NotifyUtils.simpleFailed(error.message || 'Thao tác không thành công');
+    }
+  };
+
   const confirmRegistrationApi = useMutation<void, ErrorMessage, RegistrationRequest>(
     (requestBody) => FetchUtils.post(ResourceURL.CLIENT_REGISTRATION_CONFIRM, requestBody),
     {
       onSuccess: () => {
         NotifyUtils.simpleSuccess('Xác nhận tài khoản thành công');
         updateCurrentSignupUserId(null);
-        nextStep();
+        navigate('/');
       },
-      onError: () => NotifyUtils.simpleFailed('Xác nhận tài khoản không thành công'),
+      onError: (error) => handleError(error),
     }
   );
 
@@ -540,7 +560,28 @@ function ClientSignupStepTwo({ nextStep, userId }: { nextStep: () => void, userI
         NotifyUtils.simpleSuccess('Đã gửi lại mã xác nhận thành công');
         setResendTokenDialogOpen(false);
       },
-      onError: () => NotifyUtils.simpleFailed('Gửi lại mã xác nhận không thành công'),
+      onError: (error) => {
+        setResendTokenDialogOpen(false);
+        handleError(error);
+      },
+    }
+  );
+
+  const changeRegistrationEmailApi = useMutation<Empty, ErrorMessage, { userId: number, email: string }>(
+    (request) => FetchUtils.put(
+      ResourceURL.CLIENT_REGISTRATION_CHANGE_EMAIL(request.userId),
+      {},
+      { email: request.email }
+    ),
+    {
+      onSuccess: () => {
+        NotifyUtils.simpleSuccess('Đã đổi email thành công và đã gửi lại mã xác nhận mới');
+        setChangeEmailDialogOpen(false);
+      },
+      onError: (error) => {
+        setChangeEmailDialogOpen(false);
+        handleError(error);
+      },
     }
   );
 
@@ -659,7 +700,7 @@ function ClientSignupStepTwo({ nextStep, userId }: { nextStep: () => void, userI
             <Dialog.Title className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
               Thay đổi email
             </Dialog.Title>
-            <ChangeEmailModal userId={userId} onClose={() => setChangeEmailDialogOpen(false)} />
+            <ChangeEmailModal userId={userId} onClose={() => setChangeEmailDialogOpen(false)} handleError={handleError} />
           </Dialog.Panel>
         </div>
       </Dialog>
@@ -694,7 +735,7 @@ function ClientSignupStepThree() {
   );
 }
 
-function ChangeEmailModal({ userId, onClose }: { userId: number | null; onClose: () => void }) {
+function ChangeEmailModal({ userId, onClose, handleError }: { userId: number | null; onClose: () => void, handleError: (error: ErrorMessage) => void }) {
 
   const initialFormValues = {
     email: '',
@@ -721,7 +762,10 @@ function ChangeEmailModal({ userId, onClose }: { userId: number | null; onClose:
         NotifyUtils.simpleSuccess('Đã đổi email thành công và đã gửi lại mã xác nhận mới');
         onClose();
       },
-      onError: () => NotifyUtils.simpleFailed('Thay đổi email không thành công'),
+      onError: (error) => {
+        onClose();
+        handleError(error);
+      },
     }
   );
 
