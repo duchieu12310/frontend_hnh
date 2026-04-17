@@ -51,7 +51,7 @@ function useWarehouseCreateViewModel() {
       }));
       setProvinceSelectList(selectList);
     },
-    { activeOnly: true }
+    { refetchOnWindowFocus: false }
   );
 
   useGetAllApi<DistrictResponse>(DistrictConfigs.resourceUrl, DistrictConfigs.resourceKey,
@@ -63,7 +63,7 @@ function useWarehouseCreateViewModel() {
       }));
       setDistrictSelectList(selectList);
     },
-    { activeOnly: true }
+    { refetchOnWindowFocus: false }
   );
 
   useGetAllApi<WardResponse>(WardConfigs.resourceUrl, WardConfigs.resourceKey,
@@ -75,7 +75,7 @@ function useWarehouseCreateViewModel() {
       }));
       setWardSelectList(selectList);
     },
-    { activeOnly: true }
+    { refetchOnWindowFocus: false }
   );
 
   // Helper selectors from Hierarchy

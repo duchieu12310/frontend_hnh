@@ -19,7 +19,8 @@ function useGetAllApi<O>(
     searchToken,
   } = useAppStore();
 
-  const shouldForceActive = options?.activeOnly || resourceUrl.includes('/client-api');
+  const isAddressResource = resourceUrl.includes('/provinces') || resourceUrl.includes('/districts') || resourceUrl.includes('/wards');
+  const shouldForceActive = !isAddressResource && (options?.activeOnly || resourceUrl.includes('/client-api'));
 
   if (requestParams) {
     // Nếu là yêu cầu có sẵn params (thường là lookup hoặc client page), 

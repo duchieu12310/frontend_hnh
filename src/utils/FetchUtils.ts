@@ -328,7 +328,8 @@ class FetchUtils {
   private static concatParams = (url: string, requestParams?: BasicRequestParams) => {
     if (requestParams) {
       // Tự động gán status=1 cho các yêu cầu Client API nếu chưa có tham số trạng thái
-      if (url.includes('/client-api')) {
+      const isAddressResource = url.includes('/provinces') || url.includes('/districts') || url.includes('/wards');
+      if (url.includes('/client-api') && !isAddressResource) {
         if (requestParams.status === undefined) {
           requestParams.status = 1;
         }
