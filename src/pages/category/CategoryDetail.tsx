@@ -60,13 +60,13 @@ function CategoryDetail() {
       <tr className="border-t border-gray-200 dark:border-gray-700">
         <td colSpan={2} className="py-4">
           <p className="font-semibold mb-3">Danh sách thể loại con</p>
-          {entity.children && entity.children.length > 0 ? (
+          {(entity.children?.length || 0) > 0 ? (
             <ManageTable
               listResponse={{
                 content: entity.children,
                 page: 1,
-                size: entity.children.length,
-                totalElements: entity.children.length,
+                size: entity.children?.length || 0,
+                totalElements: entity.children?.length || 0,
                 totalPages: 1,
                 last: true,
               }}

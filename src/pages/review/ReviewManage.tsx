@@ -93,7 +93,7 @@ function ReviewManage() {
         <ReviewStarGroup ratingScore={entity.ratingScore}/>
       </td>
       <td className="px-4 py-2 max-w-[300px]">
-        {highlightText(entity.content.length > 120 ? entity.content.substring(0, 120).concat('...') : entity.content, searchToken)}
+        {highlightText((entity.content?.length || 0) > 120 ? entity.content.substring(0, 120).concat('...') : (entity.content || ''), searchToken)}
       </td>
       <td className="px-4 py-2">{entity.reply && <Check size={16} className="text-teal-500" />}</td>
       <td className="px-4 py-2"><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={ReviewConfigs.resourceUrl} resourceKey={ReviewConfigs.resourceKey} /></td>

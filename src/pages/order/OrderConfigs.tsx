@@ -209,7 +209,7 @@ class OrderConfigs extends Configs {
         </tr>
         <tr>
           <td>Số mặt hàng</td>
-          <td>{entity.orderVariants.length} SKU</td>
+          <td>{(entity.orderVariants?.length || 0)} SKU</td>
         </tr>
         <tr>
           <td>Tổng thành tiền</td>

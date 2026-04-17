@@ -67,7 +67,7 @@ function ProductManage() {
   };
 
   const showedPropertiesFragment = (entity: ProductResponse) => {
-    const thumbnailImage = entity.images.find((image) => image.isThumbnail);
+    const thumbnailImage = (entity.images || []).find((image) => image.isThumbnail);
 
     return (
       <>
@@ -91,7 +91,7 @@ function ProductManage() {
         </td>
         <td className="text-sm">
           <div className="flex justify-center">
-            {entity.categories.length > 0 ? (
+            {(entity.categories?.length || 0) > 0 ? (
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50/50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg text-xs font-semibold border border-blue-100 dark:border-blue-800/50 shadow-sm">
                 <Folder size={13} strokeWidth={2.5} />
                 <span>{highlightText(entity.categories[0].name, searchToken)}</span>
@@ -103,7 +103,7 @@ function ProductManage() {
         </td>
         <td>
           <div className="flex flex-wrap gap-1.5 items-center justify-center">
-            {entity.tags.length > 0 ? (
+            {(entity.tags?.length || 0) > 0 ? (
               <>
                 {entity.tags
                   .sort((a, b) => a.name.localeCompare(b.name))
@@ -117,9 +117,9 @@ function ProductManage() {
                       {tag.name}
                     </div>
                   ))}
-                {entity.tags.length > 2 && (
+                {(entity.tags?.length || 0) > 2 && (
                   <span className="px-2 py-0.5 text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-md border border-slate-200 dark:border-slate-700">
-                    +{entity.tags.length - 2}
+                    +{(entity.tags?.length || 0) - 2}
                   </span>
                 )}
               </>
@@ -137,7 +137,7 @@ function ProductManage() {
   };
 
   const entityDetailTableRowsFragment = (entity: ProductResponse) => {
-    const thumbnailImage = entity.images.find((image) => image.isThumbnail);
+    const thumbnailImage = (entity.images || []).find((image) => image.isThumbnail);
 
     return (
       <>
@@ -189,7 +189,7 @@ function ProductManage() {
           <td>{ProductConfigs.properties.images.label}</td>
           <td className="max-w-[300px]">
             <div className="flex flex-wrap gap-2">
-              {entity.images.filter((image) => !image.isEliminated).map((image) => (
+              {(entity.images || []).filter((image) => !image.isEliminated).map((image) => (
                 <div
                   key={image.name}
                   className={`relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center shadow-sm ${
@@ -214,7 +214,7 @@ function ProductManage() {
           <td>{ProductConfigs.properties['category.name'].label}</td>
           <td>
             <div className="flex flex-wrap gap-1">
-              {entity.categories.length > 0 ? (
+              {(entity.categories?.length || 0) > 0 ? (
                 <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50/50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg text-xs font-semibold border border-blue-100 dark:border-blue-800/50">
                   <Folder size={14} strokeWidth={2.5} />
                   <span>{entity.categories[0].name}</span>
@@ -241,7 +241,7 @@ function ProductManage() {
           <td>{ProductConfigs.properties.tags.label}</td>
           <td className="max-w-[300px]">
             <div className="flex flex-wrap gap-1.5 items-center">
-              {entity.tags
+              {(entity.tags || [])
                 .sort((a, b) => a.name.localeCompare(b.name))
                 .map((tag, index) => (
                   <span
@@ -301,7 +301,7 @@ function ProductManage() {
         </tr>
         <tr>
           <td>{ProductConfigs.properties.variants.label}</td>
-          <td>{entity.variants.length === 0 ? <em>không có</em> : entity.variants.length + ' phiên bản'}</td>
+          <td>{(entity.variants?.length || 0) === 0 ? <em>không có</em> : (entity.variants?.length || 0) + ' phiên bản'}</td>
         </tr>
         <tr>
           <td>{ProductConfigs.properties.weight.label}</td>

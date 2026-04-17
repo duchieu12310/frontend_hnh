@@ -177,7 +177,7 @@ function TransitWarehouseCreate() {
                             <Group spacing="sm">
                                 <Bookmark size={16} color="green" />
                                 <Text size="sm" weight={600}>{category.name}</Text>
-                                <Badge size="xs" variant="outline">{`${category.products.length} sản phẩm`}</Badge>
+                                <Badge size="xs" variant="outline">{`${category.products?.length || 0} sản phẩm`}</Badge>
                             </Group>
                         </Group>
                     }

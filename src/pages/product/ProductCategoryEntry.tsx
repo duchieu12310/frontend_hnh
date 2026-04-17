@@ -169,7 +169,7 @@ const ProductCategoryEntry: React.FC = () => {
 
     // Product Table Properties
     const productShowedPropertiesFragment = (entity: ProductResponse) => {
-        const thumbnailImage = entity.images.find((image) => image.isThumbnail);
+        const thumbnailImage = (entity.images || []).find((image) => image.isThumbnail);
         return (
             <>
                 <td>{entity.id}</td>
@@ -192,7 +192,7 @@ const ProductCategoryEntry: React.FC = () => {
                 </td>
                 <td className="text-xs">
                     <div className="flex justify-center">
-                        {entity.categories.length > 0 ? (
+                        {(entity.categories?.length || 0) > 0 ? (
                             <Badge variant="light" color="blue" leftSection={<Folder size={10} strokeWidth={3} />}>
                                 {entity.categories[0].name}
                             </Badge>
@@ -203,7 +203,7 @@ const ProductCategoryEntry: React.FC = () => {
                 </td>
                 <td>
                     <div className="flex flex-wrap gap-1 items-center justify-center">
-                        {entity.tags.length > 0 ? (
+                        {(entity.tags?.length || 0) > 0 ? (
                             entity.tags.slice(0, 2).map((tag, index) => (
                                 <Badge key={index} variant="outline" size="xs" color="gray" leftSection={<TagIcon size={10} />}>
                                     {tag.name}

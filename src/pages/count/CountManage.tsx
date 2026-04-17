@@ -54,7 +54,7 @@ function CountManage() {
         {highlightText(entity.code, searchToken)}
       </td>
       <td className="text-right">
-        {MiscUtils.formatPrice(entity.countVariants.length)} SKU
+        {MiscUtils.formatPrice(entity.countVariants?.length || 0)} SKU
       </td>
       <td className="text-sm">
         {highlightText(entity.warehouse.name, searchToken)}
@@ -87,7 +87,7 @@ function CountManage() {
       </tr>
       <tr>
         <td>{CountConfigs.properties.totalVariants.label}</td>
-        <td>{MiscUtils.formatPrice(entity.countVariants.length)} SKU</td>
+        <td>{MiscUtils.formatPrice(entity.countVariants?.length || 0)} SKU</td>
       </tr>
       <tr>
         <td>Ghi chú phiếu kiểm kho</td>

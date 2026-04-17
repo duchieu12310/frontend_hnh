@@ -54,7 +54,7 @@ function PromotionManage() {
       <td>{DateUtils.isoDateToString(entity.startDate)}</td>
       <td>{DateUtils.isoDateToString(entity.endDate)}</td>
       <td>{entity.percent}%</td>
-      <td>{entity.products.length} sản phẩm</td>
+      <td>{(entity.products?.length || 0)} sản phẩm</td>
     
       <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={PromotionConfigs.resourceUrl} resourceKey={PromotionConfigs.resourceKey} /></td></>
   );
@@ -95,7 +95,7 @@ function PromotionManage() {
       </tr>
       <tr>
         <td>{PromotionConfigs.properties.numberOfProducts.label}</td>
-        <td>{entity.products.length} sản phẩm</td>
+        <td>{(entity.products?.length || 0)} sản phẩm</td>
       </tr>
     </>
   );

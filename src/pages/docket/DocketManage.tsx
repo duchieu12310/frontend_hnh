@@ -64,7 +64,7 @@ function DocketManage() {
         {highlightText(entity.code, searchToken)}
       </td>
       <td className="text-right">
-        {MiscUtils.formatPrice(entity.docketVariants.length)} SKU
+        {MiscUtils.formatPrice(entity.docketVariants?.length || 0)} SKU
       </td>
       <td className="text-sm">
         {highlightText(entity.reason.name, searchToken)}
@@ -100,7 +100,7 @@ function DocketManage() {
       </tr>
       <tr>
         <td>{DocketConfigs.properties.totalVariants.label}</td>
-        <td>{MiscUtils.formatPrice(entity.docketVariants.length)} SKU</td>
+        <td>{MiscUtils.formatPrice(entity.docketVariants?.length || 0)} SKU</td>
       </tr>
       <tr>
         <td>{DocketConfigs.properties['reason.name'].label}</td>
