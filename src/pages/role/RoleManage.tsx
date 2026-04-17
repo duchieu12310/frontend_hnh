@@ -56,7 +56,14 @@ function RoleManage() {
         {highlightText(entity.name, searchToken)}
       </td>
     
-      <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={RoleConfigs.resourceUrl} resourceKey={RoleConfigs.resourceKey} /></td></>
+      <td>
+        <div className="flex justify-center">
+          <div className={`px-3 py-1 rounded-full text-xs font-bold ${entity.status === 1 ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-700'}`}>
+            {entity.status === 1 ? 'BẬT' : 'TẮT'}
+          </div>
+        </div>
+      </td>
+    </>
   );
 
   const entityDetailTableRowsFragment = (entity: RoleResponse) => (
@@ -83,7 +90,11 @@ function RoleManage() {
       </tr>
       <tr>
         <td>{RoleConfigs.properties.status.label}</td>
-        <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={RoleConfigs.resourceUrl} resourceKey={RoleConfigs.resourceKey} /></td>
+        <td>
+          <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${entity.status === 1 ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-700'}`}>
+            {entity.status === 1 ? 'Đang hoạt động' : 'Đã khóa'}
+          </div>
+        </td>
       </tr>
     </>
   );
@@ -94,11 +105,6 @@ function RoleManage() {
         <ManageHeaderTitle
           titleLinks={RoleConfigs.manageTitleLinks}
           title={RoleConfigs.manageTitle}
-        />
-        <ManageHeaderButtons
-          listResponse={listResponse}
-          resourceUrl={RoleConfigs.resourceUrl}
-          resourceKey={RoleConfigs.resourceKey}
         />
       </ManageHeader>
 
@@ -117,6 +123,8 @@ function RoleManage() {
           resourceKey={RoleConfigs.resourceKey}
           showedPropertiesFragment={showedPropertiesFragment}
           entityDetailTableRowsFragment={entityDetailTableRowsFragment}
+          hideEdit={true}
+          hideDelete={true}
         />
       </ManageMain>
 
