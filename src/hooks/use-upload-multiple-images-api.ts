@@ -9,7 +9,7 @@ function useUploadMultipleImagesApi() {
     (images) => FetchUtils.uploadMultipleImages(images),
     {
       onSuccess: () => NotifyUtils.simpleSuccess('Tải hình lên thành công'),
-      onError: () => NotifyUtils.simpleFailed('Tải hình lên không thành công'),
+      onError: (error) => NotifyUtils.simpleFailed(error, 'Tải hình lên không thành công'),
     }
   );
 }

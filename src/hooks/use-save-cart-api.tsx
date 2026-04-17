@@ -18,7 +18,7 @@ function useSaveCartApi() {
         (currentCartId !== cartResponse.cartId) && updateCurrentCartId(cartResponse.cartId);
         (currentTotalCartItems !== cartResponse.cartItems.length) && updateCurrentTotalCartItems(cartResponse.cartItems.length);
       },
-      onError: () => NotifyUtils.simpleFailed('Không lưu được thay đổi trên giỏ hàng'),
+      onError: (error) => NotifyUtils.simpleFailed(error, 'Không lưu được thay đổi trên giỏ hàng'),
     }
   );
 }

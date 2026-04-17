@@ -17,7 +17,7 @@ function useCreateApi<I, O>(resourceUrl: string, resourceKey?: string, options: 
           navigate(-1);
         }
       },
-      onError: () => NotifyUtils.simpleFailed('Tạo không thành công'),
+      onError: (error) => NotifyUtils.simpleFailed(error, 'Thêm không thành công'),
     }
   );
 }

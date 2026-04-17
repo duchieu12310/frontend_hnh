@@ -23,6 +23,7 @@ import useInitFilterPanelState from 'hooks/use-init-filter-panel-state';
 import useGetAllApi from 'hooks/use-get-all-api';
 import useAppStore from 'stores/use-app-store';
 import { FilePlus } from 'tabler-icons-react';
+import ManagerPath from 'constants/ManagerPath';
 
 function CategoryManage() {
   useResetManagePageState(CategoryConfigs.resourceKey);

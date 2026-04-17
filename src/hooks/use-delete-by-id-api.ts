@@ -14,7 +14,7 @@ function useDeleteByIdApi<T = number>(resourceUrl: string, resourceKey: string) 
         NotifyUtils.simpleSuccess('Xóa thành công');
         void queryClient.invalidateQueries([resourceKey, 'getAll']);
       },
-      onError: () => NotifyUtils.simpleFailed('Xóa không thành công'),
+      onError: (error) => NotifyUtils.simpleFailed(error, 'Xóa không thành công'),
     }
   );
 }

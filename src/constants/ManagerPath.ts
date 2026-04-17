@@ -20,6 +20,7 @@ class ManagerPath {
   static CUSTOMER_RESOURCE = '/admin/customer/resource';
 
   static PRODUCT = '/admin/product';
+  static PRODUCT_CATEGORY_ENTRY = '/admin/product/category-entry';
   static CATEGORY = '/admin/category';
   static BRAND = '/admin/product/brand';
   static SUPPLIER = '/admin/product/supplier';

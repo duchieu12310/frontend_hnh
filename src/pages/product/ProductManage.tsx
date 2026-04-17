@@ -23,7 +23,8 @@ import useGetAllApi from 'hooks/use-get-all-api';
 import useAppStore from 'stores/use-app-store';
 import { QuestionMark, Folder, Tag, Photo } from 'tabler-icons-react';
 import { useColorScheme } from 'hooks/use-color-scheme';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import ManagerPath from 'constants/ManagerPath';
 import FilterUtils from 'utils/FilterUtils';
 
 function ProductManage() {
@@ -322,6 +323,13 @@ function ProductManage() {
           title={ProductConfigs.manageTitle}
         />
         <div className="flex items-center gap-2">
+          <Link
+            to={ManagerPath.PRODUCT_CATEGORY_ENTRY}
+            className="flex items-center gap-2 px-4 py-2 bg-teal-500 hover:bg-teal-600 dark:bg-teal-600 dark:hover:bg-teal-700 text-white rounded-md font-medium text-sm transition-colors shadow-sm"
+          >
+            <Folder size={18} />
+            <span>Nhập theo danh mục</span>
+          </Link>
           {categoryId && (
             <button
               onClick={() => navigate('/admin/product')}

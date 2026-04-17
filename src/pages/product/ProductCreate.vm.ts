@@ -1,4 +1,5 @@
 import { useForm, zodResolver } from '@mantine/form';
+import { useSearchParams } from 'react-router-dom';
 import ProductConfigs from 'pages/product/ProductConfigs';
 import {
   ProductPropertyItem,
@@ -34,8 +35,14 @@ import PropertyConfigs from 'pages/property/PropertyConfigs';
 import { VariantRequest } from 'models/Variant';
 
 function useProductCreateViewModel() {
+  const [searchParams] = useSearchParams();
+  const categoryIdParam = searchParams.get('categoryId');
+
   const form = useForm({
-    initialValues: ProductConfigs.initialCreateUpdateFormValues,
+    initialValues: {
+      ...ProductConfigs.initialCreateUpdateFormValues,
+      categoryIds: categoryIdParam ? [Number(categoryIdParam)] : [],
+    },
     schema: zodResolver(ProductConfigs.createUpdateFormSchema),
   });
 

@@ -22,7 +22,7 @@ export default function useUpdateStatusApi(resourceUrl: string, resourceKey: str
         void queryClient.invalidateQueries([resourceKey, 'getAll']);
         void queryClient.invalidateQueries([resourceKey, 'getById']);
       },
-      onError: () => NotifyUtils.simpleFailed('Cập nhật trạng thái không thành công'),
+      onError: (error: any) => NotifyUtils.simpleFailed(error, 'Cập nhật trạng thái không thành công'),
     }
   );
 }

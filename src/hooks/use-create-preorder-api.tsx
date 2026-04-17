@@ -10,7 +10,7 @@ function useCreatePreorderApi() {
     {
       onSuccess: (response) =>
         NotifyUtils.simpleSuccess(`Đã thêm sản phẩm ${response.preorderProduct.productName} vào danh sách đặt trước`),
-      onError: () => NotifyUtils.simpleFailed('Không thêm được sản phẩm vào danh sách đặt trước'),
+      onError: (error) => NotifyUtils.simpleFailed(error, 'Không thêm được sản phẩm vào danh sách đặt trước'),
     }
   );
 }

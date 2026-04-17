@@ -18,7 +18,7 @@ function useUpdateApi<I, O>(resourceUrl: string, resourceKey: string, entityId: 
           navigate(-1);
         }
       },
-      onError: () => NotifyUtils.simpleFailed('Cập nhật không thành công'),
+      onError: (error) => NotifyUtils.simpleFailed(error, 'Cập nhật không thành công'),
     }
   );
 }

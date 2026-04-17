@@ -16,7 +16,7 @@ import ProvinceManage, { ProvinceCreate, ProvinceUpdate } from 'pages/province';
 import DistrictManage, { DistrictCreate, DistrictUpdate } from 'pages/district';
 import UserManage, { UserCreate, UserUpdate } from 'pages/user';
 import RoleManage, { RoleCreate, RoleUpdate } from 'pages/role';
-import ProductManage, { ProductCreate, ProductUpdate } from 'pages/product';
+import ProductManage, { ProductCreate, ProductUpdate, ProductCategoryEntry } from 'pages/product';
 import CategoryManage, { CategoryCreate, CategoryUpdate, CategoryDetail } from 'pages/category';
 import BrandManage, { BrandCreate, BrandUpdate } from 'pages/brand';
 import PropertyManage, { PropertyCreate, PropertyUpdate } from 'pages/property';
@@ -215,6 +215,7 @@ function App() {
                   <Route element={<AdminGuard allowedRoles={['ADMIN', 'MANAGER']} />}>
                     <Route path={ManagerPath.PRODUCT} element={<ProductManage/>}/>
                     <Route path={ManagerPath.PRODUCT + '/create'} element={<ProductCreate/>}/>
+                    <Route path={ManagerPath.PRODUCT + '/category-entry'} element={<ProductCategoryEntry/>}/>
                     <Route path={ManagerPath.PRODUCT + '/update/:id'} element={<ProductUpdate/>}/>
                     <Route path={ManagerPath.CATEGORY} element={<CategoryManage/>}/>
                     <Route path={ManagerPath.CATEGORY + '/create'} element={<CategoryCreate/>}/>

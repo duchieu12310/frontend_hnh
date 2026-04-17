@@ -323,7 +323,7 @@ function CheckReviewModal({ review, onClose }: { review: ReviewResponse, onClose
 function ReplyReviewModal({ review, onClose }: { review: ReviewResponse, onClose: () => void }) {
   const [reply, setReply] = useState(review.reply || '');
 
-  const updateReviewApi = useUpdateApi<ReviewRequest, ReviewResponse>(ReviewConfigs.resourceUrl, ReviewConfigs.resourceKey, review.id);
+  const updateReviewApi = useUpdateApi<ReviewRequest, ReviewResponse>(ReviewConfigs.resourceUrl, ReviewConfigs.resourceKey, review.id, { shouldNavigateBack: false });
 
   const handleReplyReviewButton = () => {
     const requestBody: ReviewRequest = {
