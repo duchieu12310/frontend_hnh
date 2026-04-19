@@ -86,7 +86,7 @@ function CategoryDetail() {
               entityDetailTableRowsFragment={() => <></>}
               entityDetailActionsFragment={() => <></>}
               actionButtonsFragment={(childEntity) => {
-                if (childEntity.level >= 2) return null;
+                if (childEntity.level >= 3) return null;
                 return (
                   <Link
                     to={`/admin/category/create?parentCategoryId=${childEntity.id}`}
@@ -97,8 +97,6 @@ function CategoryDetail() {
                   </Link>
                 );
               }}
-              hideEdit={true}
-              hideDelete={true}
               customViewEntityLink={(childEntity) => `/admin/category/detail/${childEntity.id}`}
             />
           ) : <em>không có danh sách con</em>}
@@ -133,27 +131,25 @@ function CategoryDetail() {
       >
         Xem sản phẩm
       </Link>
-      {entity.level < 2 && (
-        <>
-          <button 
-            className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors"
-            onClick={() => openDeleteModal(entity.id)}
-          >
-            Xóa
-          </button>
-          <Link
-            to={`/admin/category/update/${entity.id}`}
-            className="px-4 py-2 text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-md transition-colors"
-          >
-            Sửa
-          </Link>
-          <Link
-            to={`/admin/category/create?parentCategoryId=${entity.id}`}
-            className="px-4 py-2 text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 rounded-md transition-colors"
-          >
-            Thêm thể loại con
-          </Link>
-        </>
+      <button 
+        className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors"
+        onClick={() => openDeleteModal(entity.id)}
+      >
+        Xóa
+      </button>
+      <Link
+        to={`/admin/category/update/${entity.id}`}
+        className="px-4 py-2 text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-md transition-colors"
+      >
+        Sửa
+      </Link>
+      {entity.level < 3 && (
+        <Link
+          to={`/admin/category/create?parentCategoryId=${entity.id}`}
+          className="px-4 py-2 text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 rounded-md transition-colors"
+        >
+          Thêm thể loại con
+        </Link>
       )}
     </>
   );
