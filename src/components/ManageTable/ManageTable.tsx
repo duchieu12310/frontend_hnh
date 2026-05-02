@@ -16,6 +16,7 @@ export interface ManageTableProps<T> {
   entityDetailActionsFragment?: (entity: T, handlers: { onClose: () => void, onDelete: (id: number) => void }) => React.ReactNode;
   actionButtonsFragment?: (entity: T) => React.ReactNode;
   customViewEntityLink?: (entity: T) => string;
+  customUpdateEntityLink?: (entity: T) => string;
   renderExpandedRow?: (entity: T) => React.ReactNode;
   hideEdit?: boolean | ((entity: T) => boolean);
   hideDelete?: boolean | ((entity: T) => boolean);
@@ -92,13 +93,12 @@ function ManageTable<T extends BaseResponse>(props: ManageTableProps<T>) {
     return (
       <React.Fragment key={entity.id}>
         <tr
-          className={`border-b border-gray-300 dark:border-gray-600 divide-x divide-gray-300 dark:divide-gray-600 transition-colors duration-200 ${
-            selected
+          className={`border-b border-gray-300 dark:border-gray-600 divide-x divide-gray-300 dark:divide-gray-600 transition-colors duration-200 ${selected
               ? 'bg-blue-50/50 dark:bg-blue-900/20'
               : isExpanded
-              ? 'bg-slate-50 dark:bg-slate-800'
-              : 'bg-white dark:bg-gray-800 hover:bg-slate-50 dark:hover:bg-gray-700/50'
-          }`}
+                ? 'bg-slate-50 dark:bg-slate-800'
+                : 'bg-white dark:bg-gray-800 hover:bg-slate-50 dark:hover:bg-gray-700/50'
+            }`}
         >
           <td className="px-3 py-4">
             <input
@@ -127,7 +127,7 @@ function ManageTable<T extends BaseResponse>(props: ManageTableProps<T>) {
                   title="Xem"
                   className="p-1.5 text-blue-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"
                 >
-                  <Eye size={18}/>
+                  <Eye size={18} />
                 </Link>
               ) : (
                 <button
@@ -135,16 +135,16 @@ function ManageTable<T extends BaseResponse>(props: ManageTableProps<T>) {
                   title="Xem"
                   className="p-1.5 text-blue-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"
                 >
-                  <Eye size={18}/>
+                  <Eye size={18} />
                 </button>
               )}
               {!shouldHideEdit(entity as T) && (
                 <Link
-                  to={'update/' + entity.id}
+                  to={props.customUpdateEntityLink ? props.customUpdateEntityLink(entity as T) : 'update/' + entity.id}
                   title="Cập nhật"
                   className="p-1.5 text-orange-400 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-md transition-colors"
                 >
-                  <Edit size={18}/>
+                  <Edit size={18} />
                 </Link>
               )}
               {!shouldHideDelete(entity as T) && (
@@ -153,7 +153,7 @@ function ManageTable<T extends BaseResponse>(props: ManageTableProps<T>) {
                   title="Xóa"
                   className="p-1.5 text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
                 >
-                  <Trash size={18}/>
+                  <Trash size={18} />
                 </button>
               )}
               {props.actionButtonsFragment && props.actionButtonsFragment(entity as T)}
@@ -163,7 +163,7 @@ function ManageTable<T extends BaseResponse>(props: ManageTableProps<T>) {
         {isExpanded && props.renderExpandedRow && (
           <tr>
             <td colSpan={tableHeads.length + 3} className="px-8 py-4 bg-slate-50/50 dark:bg-slate-800/50 border-b border-gray-200 shadow-inner">
-               {props.renderExpandedRow(entity as T)}
+              {props.renderExpandedRow(entity as T)}
             </td>
           </tr>
         )}

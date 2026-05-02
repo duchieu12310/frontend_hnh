@@ -8,6 +8,9 @@ export interface AddressResponse extends BaseResponse {
   province: ProvinceResponse | null;
   district: AddressResponse_DistrictResponse | null;
   ward: AddressResponse_WardResponse | null;
+  latitude: number | null;
+  longitude: number | null;
+  isDefault: boolean;
 }
 
 type AddressResponse_DistrictResponse = Omit<DistrictResponse, 'province'>;
@@ -19,4 +22,8 @@ export interface AddressRequest {
   provinceId: number | null;
   districtId: number | null;
   wardId: number | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
+
+

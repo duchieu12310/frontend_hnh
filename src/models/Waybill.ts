@@ -1,5 +1,7 @@
 import BaseResponse from 'models/BaseResponse';
 import { OrderResponse } from 'models/Order';
+import { WarehouseResponse } from 'models/Warehouse';
+import { UserResponse } from 'models/User';
 
 export interface WaybillResponse extends BaseResponse {
   code: string;
@@ -16,6 +18,8 @@ export interface WaybillResponse extends BaseResponse {
   note: string | null;
   ghnPaymentTypeId: number;
   ghnRequiredNote: RequiredNote;
+  fromWarehouse: WarehouseResponse | null;
+  shipper: UserResponse | null;
 }
 
 export interface WaybillRequest {

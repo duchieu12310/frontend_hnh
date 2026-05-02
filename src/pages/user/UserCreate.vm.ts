@@ -5,12 +5,15 @@ import useCreateApi from 'hooks/use-create-api';
 import useGetAllApi from 'hooks/use-get-all-api';
 import { ProvinceResponse } from 'models/Province';
 import ProvinceConfigs from 'pages/province/ProvinceConfigs';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SelectOption } from 'types';
 import { DistrictResponse } from 'models/District';
 import DistrictConfigs from 'pages/district/DistrictConfigs';
 import { RoleResponse } from 'models/Role';
 import RoleConfigs from 'pages/role/RoleConfigs';
+import { WardResponse } from 'models/Ward';
+import WardConfigs from 'pages/ward/WardConfigs';
+
 
 function useUserCreateViewModel() {
   const form = useForm({
@@ -20,6 +23,7 @@ function useUserCreateViewModel() {
 
   const [provinceSelectList, setProvinceSelectList] = useState<SelectOption[]>([]);
   const [districtSelectList, setDistrictSelectList] = useState<SelectOption[]>([]);
+  const [wardSelectList, setWardSelectList] = useState<SelectOption[]>([]);
   const [roleSelectList, setRoleSelectList] = useState<SelectOption[]>([]);
 
   const createApi = useCreateApi<UserRequest, UserResponse>(UserConfigs.resourceUrl, UserConfigs.resourceKey);
@@ -34,13 +38,23 @@ function useUserCreateViewModel() {
     }
   );
   useGetAllApi<DistrictResponse>(DistrictConfigs.resourceUrl, DistrictConfigs.resourceKey,
-    { all: 1 },
+    { all: 1, filter: `province.id==${form.values['address.provinceId'] || 0}` },
     (districtListResponse) => {
       const selectList: SelectOption[] = districtListResponse.content.map((item) => ({
         value: String(item.id),
         label: item.name,
       }));
       setDistrictSelectList(selectList);
+    }
+  );
+  useGetAllApi<WardResponse>(WardConfigs.resourceUrl, WardConfigs.resourceKey,
+    { all: 1, filter: `district.id==${form.values['address.districtId'] || 0}` },
+    (wardListResponse) => {
+      const selectList: SelectOption[] = wardListResponse.content.map((item) => ({
+        value: String(item.id),
+        label: item.name,
+      }));
+      setWardSelectList(selectList);
     }
   );
   useGetAllApi<RoleResponse>(RoleConfigs.resourceUrl, RoleConfigs.resourceKey,
@@ -54,6 +68,7 @@ function useUserCreateViewModel() {
     }
   );
 
+
   const handleFormSubmit = form.onSubmit((formValues) => {
     const requestBody: UserRequest = {
       username: formValues.username,
@@ -66,7 +81,7 @@ function useUserCreateViewModel() {
         line: formValues['address.line'],
         provinceId: Number(formValues['address.provinceId']),
         districtId: Number(formValues['address.districtId']),
-        wardId: null,
+        wardId: Number(formValues['address.wardId']),
       },
       avatar: formValues.avatar.trim() || null,
       status: Number(formValues.status),
@@ -103,6 +118,7 @@ function useUserCreateViewModel() {
     genderSelectList,
     provinceSelectList,
     districtSelectList,
+    wardSelectList,
     statusSelectList,
     roleSelectList,
   };

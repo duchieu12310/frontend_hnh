@@ -84,7 +84,6 @@ function CategoryDetail() {
                 </>
               )}
               entityDetailTableRowsFragment={() => <></>}
-              entityDetailActionsFragment={() => <></>}
               actionButtonsFragment={(childEntity) => {
                 if (childEntity.level >= 3) return null;
                 return (
@@ -98,6 +97,7 @@ function CategoryDetail() {
                 );
               }}
               customViewEntityLink={(childEntity) => `/admin/category/detail/${childEntity.id}`}
+              customUpdateEntityLink={(childEntity) => `/admin/category/update/${childEntity.id}`}
             />
           ) : <em>không có danh sách con</em>}
         </td>

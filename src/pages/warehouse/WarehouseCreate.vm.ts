@@ -2,7 +2,7 @@ import { useForm, zodResolver } from '@mantine/form';
 import WarehouseConfigs from 'pages/warehouse/WarehouseConfigs';
 import { WarehouseRequest, WarehouseResponse } from 'models/Warehouse';
 import useCreateApi from 'hooks/use-create-api';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { SelectOption } from 'types';
 import useGetAllApi from 'hooks/use-get-all-api';
 import { ProvinceResponse } from 'models/Province';
@@ -55,7 +55,7 @@ function useWarehouseCreateViewModel() {
   );
 
   useGetAllApi<DistrictResponse>(DistrictConfigs.resourceUrl, DistrictConfigs.resourceKey,
-    { all: 1 },
+    { all: 1, filter: `province.id==${form.values['address.provinceId'] || 0}` },
     (districtListResponse) => {
       const selectList: SelectOption[] = districtListResponse.content.map((item) => ({
         value: String(item.id),
@@ -67,7 +67,7 @@ function useWarehouseCreateViewModel() {
   );
 
   useGetAllApi<WardResponse>(WardConfigs.resourceUrl, WardConfigs.resourceKey,
-    { all: 1 },
+    { all: 1, filter: `district.id==${form.values['address.districtId'] || 0}` },
     (wardListResponse) => {
       const selectList: SelectOption[] = wardListResponse.content.map((item) => ({
         value: String(item.id),
@@ -77,6 +77,23 @@ function useWarehouseCreateViewModel() {
     },
     { refetchOnWindowFocus: false }
   );
+
+  // Xử lý logic xóa phân cấp khi thay đổi Tỉnh/Huyện
+  const provinceId = form.values['address.provinceId'];
+  const districtId = form.values['address.districtId'];
+
+  useEffect(() => {
+    if (provinceId) {
+      form.setFieldValue('address.districtId', null);
+      form.setFieldValue('address.wardId', null);
+    }
+  }, [provinceId]);
+
+  useEffect(() => {
+    if (districtId) {
+      form.setFieldValue('address.wardId', null);
+    }
+  }, [districtId]);
 
   // Helper selectors from Hierarchy
   const l1Options = useMemo(() => 

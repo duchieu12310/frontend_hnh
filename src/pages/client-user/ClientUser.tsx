@@ -72,9 +72,13 @@ function ClientUser() {
                         <Stack spacing={0}>
                           <Text weight={500}>Địa chỉ</Text>
                           <Text>
-                            {[user?.address.line, user?.address.ward?.name, user?.address.district?.name, user?.address.province?.name]
-                              .filter(Boolean)
-                              .join(', ')}
+                            {(() => {
+                              const defaultAddress = user?.addresses?.find(a => a.isDefault) || user?.addresses?.[0];
+                              if (!defaultAddress) return 'Chưa có địa chỉ';
+                              return [defaultAddress.line, defaultAddress.ward?.name, defaultAddress.district?.name, defaultAddress.province?.name]
+                                .filter(Boolean)
+                                .join(', ');
+                            })()}
                           </Text>
                         </Stack>
                       </Group>

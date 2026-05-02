@@ -9,6 +9,8 @@ class ResourceURL {
   static PROVINCE = apiPath + '/provinces';
   static DISTRICT = apiPath + '/districts';
   static WARD = apiPath + '/wards';
+  static GEOCODE = apiPath + '/geocode';
+
 
   static USER = apiPath + '/users';
   static ROLE = apiPath + '/roles';
@@ -63,6 +65,10 @@ class ResourceURL {
 
   static WAYBILL = apiPath + '/waybills';
 
+  static SHIPPER = apiPath + '/shipper';
+  static SHIPPER_WAYBILL_AVAILABLE = ResourceURL.SHIPPER + '/waybills/available';
+  static SHIPPER_WAYBILL_CONFIRM_PICKUP = (id: number) => `${ResourceURL.SHIPPER}/waybills/${id}/confirm-pickup`;
+
   static REVIEW = apiPath + '/reviews';
 
   static REWARD_STRATEGY = apiPath + '/reward-strategies';
@@ -113,6 +119,7 @@ class ResourceURL {
   static CLIENT_REGISTRATION_RESEND_TOKEN = (userId: number) => apiPath + `/auth/registration/${userId}/resend-token`;
   static CLIENT_REGISTRATION_CONFIRM = apiPath + '/auth/registration/confirm';
   static CLIENT_REGISTRATION_CHANGE_EMAIL = (userId: number) => apiPath + `/auth/registration/${userId}/change-email`;
+  static CLIENT_REGISTRATION_CANCEL = (userId: number) => apiPath + `/auth/registration/${userId}/cancel`;
   static CLIENT_FORGOT_PASSWORD = apiPath + '/auth/forgot-password';
   static CLIENT_RESET_PASSWORD = apiPath + '/auth/reset-password';
 }

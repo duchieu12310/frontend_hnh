@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useTitle from 'hooks/use-title';
 import { Button, Card, Container, Grid, Select, Stack, TextInput, Title } from '@mantine/core';
 import { ClientUserNavbar } from 'components';
@@ -22,49 +22,43 @@ import { WardResponse } from 'models/Ward';
 import WardConfigs from 'pages/ward/WardConfigs';
 import useSelectAddress from 'hooks/use-select-address';
 
+
+
 const formSchema = z.object({
   username: z.string({ invalid_type_error: 'Vui lòng không bỏ trống' })
     .min(2, MessageUtils.min('Tên tài khoản', 2)),
   fullname: z.string({ invalid_type_error: 'Vui lòng không bỏ trống' }),
   gender: z.string({ invalid_type_error: 'Vui lòng không bỏ trống' }),
   'address.line': z.string({ invalid_type_error: 'Vui lòng không bỏ trống' }),
-  'address.provinceId': z.string({ invalid_type_error: 'Vui lòng không bỏ trống' }),
-  'address.districtId': z.string({ invalid_type_error: 'Vui lòng không bỏ trống' }),
-  'address.wardId': z.string({ invalid_type_error: 'Vui lòng không bỏ trống' }),
+  'address.provinceId': z.string({ invalid_type_error: 'Vui lòng không bỏ trống' }).nullable(),
+  'address.districtId': z.string({ invalid_type_error: 'Vui lòng không bỏ trống' }).nullable(),
+  'address.wardId': z.string({ invalid_type_error: 'Vui lòng không bỏ trống' }).nullable(),
 });
 
 const genderSelectList: SelectOption[] = [
-  {
-    value: 'M',
-    label: 'Nam',
-  },
-  {
-    value: 'F',
-    label: 'Nữ',
-  },
+  { value: 'M', label: 'Nam' },
+  { value: 'F', label: 'Nữ' },
 ];
 
 function ClientSettingPersonal() {
   useTitle();
-
   const { user, updateUser } = useAuthStore();
 
-  const initialFormValues = {
-    username: user?.username as string,
-    fullname: user?.fullname as string,
-    gender: user?.gender as 'M' | 'F',
-    'address.line': user?.address.line as string,
-    'address.provinceId': String(user?.address.province?.id) as string | null,
-    'address.districtId': String(user?.address.district?.id) as string | null,
-    'address.wardId': String(user?.address.ward?.id) as string | null,
-  };
-
   const form = useForm({
-    initialValues: initialFormValues,
-    schema: zodResolver(formSchema),
+    initialValues: {
+      username: user?.username || '',
+      fullname: user?.fullname || '',
+      gender: user?.gender || 'M',
+      'address.line': user?.address?.line || '',
+      'address.provinceId': user?.address?.province?.id ? String(user.address.province.id) : null,
+      'address.districtId': user?.address?.district?.id ? String(user.address.district.id) : null,
+      'address.wardId': user?.address?.ward?.id ? String(user.address.ward.id) : null,
+    },
+    validate: zodResolver(formSchema),
   });
 
   useSelectAddress(form, 'address.provinceId', 'address.districtId', 'address.wardId');
+
 
   const [provinceSelectList, setProvinceSelectList] = useState<SelectOption[]>([]);
   const [districtSelectList, setDistrictSelectList] = useState<SelectOption[]>([]);
@@ -73,31 +67,21 @@ function ClientSettingPersonal() {
   useGetAllApi<ProvinceResponse>(ProvinceConfigs.resourceUrl, ProvinceConfigs.resourceKey,
     { all: 1 },
     (provinceListResponse) => {
-      const selectList: SelectOption[] = provinceListResponse.content.map((item) => ({
-        value: String(item.id),
-        label: item.name,
-      }));
-      setProvinceSelectList(selectList);
+      setProvinceSelectList(provinceListResponse.content.map(p => ({ value: String(p.id), label: p.name })));
     }
   );
+
   useGetAllApi<DistrictResponse>(DistrictConfigs.resourceUrl, DistrictConfigs.resourceKey,
     { all: 1, filter: `province.id==${form.values['address.provinceId'] || 0}` },
     (districtListResponse) => {
-      const selectList: SelectOption[] = districtListResponse.content.map((item) => ({
-        value: String(item.id),
-        label: item.name,
-      }));
-      setDistrictSelectList(selectList);
+      setDistrictSelectList(districtListResponse.content.map(d => ({ value: String(d.id), label: d.name })));
     }
   );
+
   useGetAllApi<WardResponse>(WardConfigs.resourceUrl, WardConfigs.resourceKey,
     { all: 1, filter: `district.id==${form.values['address.districtId'] || 0}` },
     (wardListResponse) => {
-      const selectList: SelectOption[] = wardListResponse.content.map((item) => ({
-        value: String(item.id),
-        label: item.name,
-      }));
-      setWardSelectList(selectList);
+      setWardSelectList(wardListResponse.content.map(w => ({ value: String(w.id), label: w.name })));
     }
   );
 
@@ -124,7 +108,6 @@ function ClientSettingPersonal() {
         wardId: Number(formValues['address.wardId']),
       },
     };
-
     updatePersonalSettingApi.mutate(requestBody);
   });
 
@@ -132,84 +115,24 @@ function ClientSettingPersonal() {
     <main>
       <Container size="xl">
         <Grid gutter="lg">
-          <Grid.Col md={3}>
-            <ClientUserNavbar/>
-          </Grid.Col>
-
+          <Grid.Col md={3}><ClientUserNavbar/></Grid.Col>
           <Grid.Col md={9}>
             <Card radius="md" shadow="sm" p="lg">
               <Stack>
-                <Title order={2}>
-                  Cập nhật thông tin cá nhân
-                </Title>
+                <Title order={2}>Cập nhật thông tin cá nhân</Title>
                 <Grid>
                   <Grid.Col lg={6}>
                     <form onSubmit={handleFormSubmit}>
                       <Stack>
-                        <TextInput
-                          required
-                          radius="md"
-                          label="Tên tài khoản"
-                          placeholder="Nhập tên tài khoản của bạn"
-                          {...form.getInputProps('username')}
-                          disabled
-                          // TODO: Hiện tại chưa cho phép sửa username
-                        />
-                        <TextInput
-                          required
-                          radius="md"
-                          label="Họ và tên"
-                          placeholder="Nhập họ và tên của bạn"
-                          {...form.getInputProps('fullname')}
-                        />
-                        <Select
-                          required
-                          radius="md"
-                          label="Giới tính"
-                          placeholder="Chọn giới tính"
-                          data={genderSelectList}
-                          {...form.getInputProps('gender')}
-                        />
-                        <Select
-                          required
-                          radius="md"
-                          label="Tỉnh thành"
-                          placeholder="Chọn tỉnh thành"
-                          data={provinceSelectList}
-                          {...form.getInputProps('address.provinceId')}
-                        />
-                        <Select
-                          required
-                          radius="md"
-                          label="Quận huyện"
-                          placeholder="Chọn quận huyện"
-                          data={districtSelectList}
-                          disabled={form.values['address.provinceId'] === null}
-                          {...form.getInputProps('address.districtId')}
-                        />
-                        <Select
-                          required
-                          radius="md"
-                          label="Phường xã"
-                          placeholder="Chọn phường xã"
-                          data={wardSelectList}
-                          disabled={form.values['address.districtId'] === null}
-                          {...form.getInputProps('address.wardId')}
-                        />
-                        <TextInput
-                          required
-                          radius="md"
-                          label="Địa chỉ"
-                          placeholder="Nhập địa chỉ của bạn"
-                          {...form.getInputProps('address.line')}
-                        />
-                        <Button
-                          radius="md"
-                          type="submit"
-                          disabled={MiscUtils.isEquals(initialFormValues, form.values)}
-                        >
-                          Cập nhật
-                        </Button>
+                        <TextInput label="Tên tài khoản" {...form.getInputProps('username')} disabled />
+                        <TextInput required label="Họ và tên" {...form.getInputProps('fullname')} />
+                        <Select required label="Giới tính" data={genderSelectList} {...form.getInputProps('gender')} />
+                        <Select required label="Tỉnh thành" data={provinceSelectList} {...form.getInputProps('address.provinceId')} />
+                        <Select required label="Quận huyện" data={districtSelectList} disabled={!form.values['address.provinceId']} {...form.getInputProps('address.districtId')} />
+                        <Select required label="Phường xã" data={wardSelectList} disabled={!form.values['address.districtId']} {...form.getInputProps('address.wardId')} />
+                        <TextInput required label="Địa chỉ" {...form.getInputProps('address.line')} />
+
+                        <Button radius="md" type="submit" loading={updatePersonalSettingApi.isLoading}>Cập nhật</Button>
                       </Stack>
                     </form>
                   </Grid.Col>

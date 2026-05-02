@@ -9,6 +9,7 @@ export interface UserResponse extends BaseResponse {
   phone: string;
   gender: 'M' | 'F';
   address: AddressResponse;
+  addresses: AddressResponse[];
   avatar: string | null;
   status: number;
   roles: RoleResponse[];

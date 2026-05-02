@@ -209,6 +209,12 @@ const navbarLinks: NavbarLink[] = [
     requiredRoles: ['ADMIN', 'OPERATOR'],
   },
   {
+    link: '/admin/shipper/waybills',
+    label: 'Giao hàng',
+    icon: Car,
+    requiredRoles: ['ADMIN', 'SHIPPER'],
+  },
+  {
     link: '/admin/review',
     label: 'Đánh giá',
     icon: Message,

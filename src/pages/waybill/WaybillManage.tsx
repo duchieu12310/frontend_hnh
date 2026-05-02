@@ -84,6 +84,8 @@ function WaybillManage() {
             <p className="text-xs">Chiều cao: <b>{entity.height}</b> (cm)</p>
           </div>
         </td>
+        <td>{entity.fromWarehouse?.name}</td>
+        <td>{entity.shipper?.fullname || 'Chưa phân công'}</td>
       
         <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={WaybillConfigs.resourceUrl} resourceKey={WaybillConfigs.resourceKey} /></td></>
     );
@@ -141,6 +143,14 @@ function WaybillManage() {
             <p className="text-xs">Chiều cao: <b>{entity.height}</b> (cm)</p>
           </div>
         </td>
+      </tr>
+      <tr>
+        <td>Kho lấy hàng</td>
+        <td>{entity.fromWarehouse?.name}</td>
+      </tr>
+      <tr>
+        <td>Người vận chuyển</td>
+        <td>{entity.shipper?.fullname || 'Chưa phân công'}</td>
       </tr>
       <tr>
         <td>Ghi chú vận đơn</td>

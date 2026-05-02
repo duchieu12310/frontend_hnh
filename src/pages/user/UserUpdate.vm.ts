@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, zodResolver } from '@mantine/form';
 import UserConfigs from 'pages/user/UserConfigs';
 import { UserRequest, UserResponse } from 'models/User';
@@ -10,10 +10,13 @@ import { ProvinceResponse } from 'models/Province';
 import ProvinceConfigs from 'pages/province/ProvinceConfigs';
 import { DistrictResponse } from 'models/District';
 import DistrictConfigs from 'pages/district/DistrictConfigs';
+import RoleConfigs from 'pages/role/RoleConfigs';
+import { WardResponse } from 'models/Ward';
 import { RoleResponse } from 'models/Role';
 import { SelectOption } from 'types';
-import RoleConfigs from 'pages/role/RoleConfigs';
+import WardConfigs from 'pages/ward/WardConfigs';
 import useAdminAuthStore from 'stores/use-admin-auth-store';
+
 
 function useUserUpdateViewModel(id: number) {
   const form = useForm({
@@ -27,6 +30,7 @@ function useUserUpdateViewModel(id: number) {
   const [prevFormValues, setPrevFormValues] = useState<typeof form.values>();
   const [provinceSelectList, setProvinceSelectList] = useState<SelectOption[]>([]);
   const [districtSelectList, setDistrictSelectList] = useState<SelectOption[]>([]);
+  const [wardSelectList, setWardSelectList] = useState<SelectOption[]>([]);
   const [roleSelectList, setRoleSelectList] = useState<SelectOption[]>([]);
 
   const updateApi = useUpdateApi<UserRequest, UserResponse>(UserConfigs.resourceUrl, UserConfigs.resourceKey, id);
@@ -43,6 +47,9 @@ function useUserUpdateViewModel(id: number) {
         'address.line': userResponse.address.line || '',
         'address.provinceId': userResponse.address.province ? String(userResponse.address.province.id) : null,
         'address.districtId': userResponse.address.district ? String(userResponse.address.district.id) : null,
+        'address.wardId': userResponse.address.ward ? String(userResponse.address.ward.id) : null,
+        'address.latitude': userResponse.address.latitude,
+        'address.longitude': userResponse.address.longitude,
         avatar: userResponse.avatar || '',
         status: String(userResponse.status),
         roles: userResponse.roles.map((role) => String(role.id)),
@@ -51,6 +58,8 @@ function useUserUpdateViewModel(id: number) {
       setPrevFormValues(formValues);
     }
   );
+  
+
   useGetAllApi<ProvinceResponse>(ProvinceConfigs.resourceUrl, ProvinceConfigs.resourceKey,
     { all: 1 },
     (provinceListResponse) => {
@@ -62,13 +71,23 @@ function useUserUpdateViewModel(id: number) {
     }
   );
   useGetAllApi<DistrictResponse>(DistrictConfigs.resourceUrl, DistrictConfigs.resourceKey,
-    { all: 1 },
+    { all: 1, filter: `province.id==${form.values['address.provinceId'] || 0}` },
     (districtListResponse) => {
       const selectList: SelectOption[] = districtListResponse.content.map((item) => ({
         value: String(item.id),
         label: item.name,
       }));
       setDistrictSelectList(selectList);
+    }
+  );
+  useGetAllApi<WardResponse>(WardConfigs.resourceUrl, WardConfigs.resourceKey,
+    { all: 1, filter: `district.id==${form.values['address.districtId'] || 0}` },
+    (wardListResponse) => {
+      const selectList: SelectOption[] = wardListResponse.content.map((item) => ({
+        value: String(item.id),
+        label: item.name,
+      }));
+      setWardSelectList(selectList);
     }
   );
   useGetAllApi<RoleResponse>(RoleConfigs.resourceUrl, RoleConfigs.resourceKey,
@@ -105,7 +124,7 @@ function useUserUpdateViewModel(id: number) {
             line: formValues['address.line'],
             provinceId: Number(formValues['address.provinceId']),
             districtId: Number(formValues['address.districtId']),
-            wardId: null,
+            wardId: Number(formValues['address.wardId']),
           },
           avatar: formValues.avatar.trim() || null,
           status: Number(formValues.status),
@@ -153,6 +172,7 @@ function useUserUpdateViewModel(id: number) {
     genderSelectList,
     provinceSelectList,
     districtSelectList,
+    wardSelectList,
     statusSelectList,
     roleSelectList,
     isDisabledUpdateButton,

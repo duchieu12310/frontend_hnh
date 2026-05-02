@@ -26,6 +26,7 @@ function UserUpdate() {
     provinceSelectList,
     districtSelectList,
     statusSelectList,
+    wardSelectList,
     roleSelectList,
     isDisabledUpdateButton,
   } = useUserUpdateViewModel(Number(id));
@@ -125,6 +126,18 @@ function UserUpdate() {
                   {...form.getInputProps('address.districtId')}
                 />
               </Grid.Col>
+              <Grid.Col xs={6}>
+                <Select
+                  required
+                  label={UserConfigs.properties['address.wardId'].label}
+                  placeholder="--"
+                  searchable
+                  data={wardSelectList}
+                  {...form.getInputProps('address.wardId')}
+                />
+              </Grid.Col>
+              {/* Ẩn Vĩ độ và Kinh độ vì Backend tự động lấy */}
+
               <Grid.Col>
                 <TextInput
                   label={UserConfigs.properties.avatar.label}

@@ -70,6 +70,7 @@ import AdminAccount from 'pages/admin-account';
 import ClientSignup from 'pages/client-signup';
 import ClientForgotPassword, { ClientChangePassword } from 'pages/client-forgot-password';
 import ClientContact from 'pages/client-contact';
+import ShipperWaybillManage from 'pages/shipper-waybill/ShipperWaybillManage';
 
 const queryClient = new QueryClient();
 
@@ -277,6 +278,10 @@ function App() {
                         <ChatDashboard/>
                       </StompSessionProvider>
                     }/>
+                  </Route>
+
+                  <Route element={<AdminGuard allowedRoles={['ADMIN', 'SHIPPER']} />}>
+                    <Route path={ManagerPath.SHIPPER_WAYBILL} element={<ShipperWaybillManage/>}/>
                   </Route>
 
                   <Route path={ManagerPath.NOTIFICATION} element={<AdminNotification/>}/>

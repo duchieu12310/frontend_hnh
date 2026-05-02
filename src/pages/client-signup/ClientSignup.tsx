@@ -23,6 +23,8 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import MiscUtils from 'utils/MiscUtils';
 import { Dialog } from '@headlessui/react';
 import { useColorScheme } from 'hooks/use-color-scheme';
+
+
 const genderSelectList: SelectOption[] = [
   {
     value: 'M',
@@ -163,7 +165,10 @@ function ClientSignupStepOne({ nextStep }: { nextStep: () => void }) {
     'address.provinceId': null as string | null,
     'address.districtId': null as string | null,
     'address.wardId': null as string | null,
+    'address.latitude': null as number | null,
+    'address.longitude': null as number | null,
     avatar: null, // Không dùng
+
     status: '2', // Không dùng
     roles: [] as string[], // Không dùng
   };
@@ -187,7 +192,10 @@ function ClientSignupStepOne({ nextStep }: { nextStep: () => void }) {
     'address.provinceId': z.string({ invalid_type_error: 'Vui lòng không bỏ trống' }),
     'address.districtId': z.string({ invalid_type_error: 'Vui lòng không bỏ trống' }),
     'address.wardId': z.string({ invalid_type_error: 'Vui lòng không bỏ trống' }),
+    'address.latitude': z.number().nullable(),
+    'address.longitude': z.number().nullable(),
     avatar: z.string().nullable(),
+
     status: z.string(),
     roles: z.array(z.string()),
   });
@@ -198,6 +206,8 @@ function ClientSignupStepOne({ nextStep }: { nextStep: () => void }) {
   });
 
   useSelectAddress(form, 'address.provinceId', 'address.districtId', 'address.wardId');
+
+
 
   const [provinceSelectList, setProvinceSelectList] = useState<SelectOption[]>([]);
   const [districtSelectList, setDistrictSelectList] = useState<SelectOption[]>([]);
@@ -246,13 +256,7 @@ function ClientSignupStepOne({ nextStep }: { nextStep: () => void }) {
         nextStep();
       },
       onError: (error) => {
-        if (error.message.toLowerCase().includes('email')) {
-          NotifyUtils.simpleFailed('Email đã được sử dụng, vui lòng dùng email khác');
-        } else if (error.message.toLowerCase().includes('username') || error.message.toLowerCase().includes('tên tài khoản')) {
-          NotifyUtils.simpleFailed('Tên tài khoản đã tồn tại, vui lòng chọn tên khác');
-        } else {
-          NotifyUtils.simpleFailed(error.message || 'Tạo tài khoản không thành công');
-        }
+        NotifyUtils.simpleFailed(error.message || 'Tạo tài khoản không thành công');
       },
     }
   );
@@ -270,7 +274,10 @@ function ClientSignupStepOne({ nextStep }: { nextStep: () => void }) {
         provinceId: Number(formValues['address.provinceId']),
         districtId: Number(formValues['address.districtId']),
         wardId: Number(formValues['address.wardId']),
+        latitude: formValues['address.latitude'],
+        longitude: formValues['address.longitude'],
       },
+
       avatar: formValues.avatar,
       status: Number(formValues.status),
       roles: [],
@@ -494,6 +501,10 @@ function ClientSignupStepOne({ nextStep }: { nextStep: () => void }) {
             )}
           </div>
 
+          {/* Ẩn Vĩ độ và Kinh độ vì Backend tự động lấy */}
+
+
+
           <div className="md:col-span-2">
             <button
               type="submit"
@@ -585,6 +596,19 @@ function ClientSignupStepTwo({ nextStep, userId, setActive }: { nextStep: () => 
     }
   );
 
+  const cancelRegistrationApi = useMutation<void, ErrorMessage, { userId: number }>(
+    (request) => FetchUtils.post(ResourceURL.CLIENT_REGISTRATION_CANCEL(request.userId), {}),
+    {
+      onSuccess: () => {
+        NotifyUtils.simpleSuccess('Đã hủy đăng ký thành công');
+        updateCurrentSignupUserId(null);
+        setActive(0);
+        navigate('/signup', { replace: true });
+      },
+      onError: (error) => handleError(error),
+    }
+  );
+
   const handleFormSubmit = form.onSubmit((formValues) => {
     if (userId) {
       const requestBody: RegistrationRequest = {
@@ -658,6 +682,14 @@ function ClientSignupStepTwo({ nextStep, userId, setActive }: { nextStep: () => 
             className="w-full px-6 py-3 border-2 border-teal-200 dark:border-teal-700 rounded-xl bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-300 hover:bg-teal-100 dark:hover:bg-teal-900/30 font-medium transition-all duration-200"
           >
             Gửi mã xác nhận lần nữa với email mới
+          </button>
+
+          <button
+            onClick={() => userId && cancelRegistrationApi.mutate({ userId })}
+            disabled={cancelRegistrationApi.isLoading}
+            className="w-full px-6 py-3 border-2 border-red-200 dark:border-red-900 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 font-medium transition-all duration-200 mt-2"
+          >
+            {cancelRegistrationApi.isLoading ? 'Đang hủy...' : 'Hủy đăng ký tài khoản này'}
           </button>
         </div>
       </div>

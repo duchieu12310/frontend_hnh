@@ -60,7 +60,16 @@ class WaybillConfigs extends Configs {
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
     },
-  
+    'fromWarehouse.name': {
+      label: 'Kho lấy hàng',
+      type: EntityPropertyType.STRING,
+      isShowInTable: true,
+    },
+    'shipper.fullname': {
+      label: 'Người vận chuyển',
+      type: EntityPropertyType.STRING,
+      isShowInTable: true,
+    },
     status: {
       label: 'Trạng thái vận đơn',
       type: EntityPropertyType.NUMBER,
