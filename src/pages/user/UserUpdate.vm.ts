@@ -93,10 +93,12 @@ function useUserUpdateViewModel(id: number) {
   useGetAllApi<RoleResponse>(RoleConfigs.resourceUrl, RoleConfigs.resourceKey,
     { sort: 'id,asc', all: 1 },
     (roleListResponse) => {
-      const selectList: SelectOption[] = roleListResponse.content.map((item) => ({
-        value: String(item.id),
-        label: item.name,
-      }));
+      const selectList: SelectOption[] = roleListResponse.content
+        .filter((item) => item.id !== 6)
+        .map((item) => ({
+          value: String(item.id),
+          label: item.name,
+        }));
       setRoleSelectList(selectList);
     }
   );
