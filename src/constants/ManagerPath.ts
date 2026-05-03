@@ -60,6 +60,10 @@ class ManagerPath {
   static CHAT = '/admin/chat';
   static NOTIFICATION = '/admin/notification';
   static ACCOUNT = '/admin/account';
+  static ACCOUNT_PERSONAL = '/admin/account/personal';
+  static ACCOUNT_PHONE = '/admin/account/phone';
+  static ACCOUNT_EMAIL = '/admin/account/email';
+  static ACCOUNT_PASSWORD = '/admin/account/password';
 }
 
 export default ManagerPath;

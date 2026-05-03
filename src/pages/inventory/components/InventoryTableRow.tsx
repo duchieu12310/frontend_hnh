@@ -29,10 +29,19 @@ const InventoryTableRow: React.FC<Props> = ({
   const queryClient = useQueryClient();
   const [adjustment, setAdjustment] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
+  // Lưu số lượng hiện tại tại chỗ — tránh refetch toàn bảng
+  const [localQty, setLocalQty] = useState(row.quantityInLocation);
+  const [localTotal, setLocalTotal] = useState(row.totalVariantQuantity);
+
+  // Sync lại khi row thay đổi từ bên ngoài (lần đầu load)
+  React.useEffect(() => {
+    setLocalQty(row.quantityInLocation);
+    setLocalTotal(row.totalVariantQuantity);
+  }, [row.quantityInLocation, row.totalVariantQuantity]);
 
   // Optimistic derived values - CLAMPED TO 0
-  const displayedQuantity = Math.max(0, row.quantityInLocation + adjustment);
-  const displayedTotal = Math.max(0, row.totalVariantQuantity + adjustment);
+  const displayedQuantity = Math.max(0, localQty + adjustment);
+  const displayedTotal = Math.max(0, localTotal + adjustment);
   
   // Status colors
   const statusColor = adjustment > 0 ? 'teal' : adjustment < 0 ? 'red' : 'blue';
@@ -40,13 +49,22 @@ const InventoryTableRow: React.FC<Props> = ({
   const mutation = useMutation(
     (data: InventoryUpdateDto) => FetchUtils.postWithToken<InventoryUpdateDto, any>(ResourceURL.PRODUCT_INVENTORY_AUTO_SAVE, data),
     {
-      onSuccess: () => {
+      onSuccess: (_, variables) => {
         setIsSaving(false);
-        setAdjustment(0); // AUTO RESET TO 0
-        queryClient.invalidateQueries(InventoryConfigs.productInventoryHierarchyResourceKey);
+        // Cập nhật local state — KHÔNG invalidate để tránh refetch & đổi thứ tự hàng
+        const newQty = variables.newQuantity;
+        const diff = newQty - localQty;
+        setLocalQty(newQty);
+        setLocalTotal(prev => Math.max(0, prev + diff));
+        setAdjustment(0);
+        // Đánh dấu stale nhưng không refetch ngay (background refresh)
+        queryClient.invalidateQueries(InventoryConfigs.productInventoryHierarchyResourceKey, {
+          refetchActive: false,
+        });
       },
       onError: (error: any) => {
         setIsSaving(false);
+        setAdjustment(0); // Reset về 0 khi lỗi
         NotifyUtils.simpleFailed(`Lỗi khi cập nhật SKU: ${row.sku}. ${error.message || ''}`);
       }
     }
@@ -56,7 +74,7 @@ const InventoryTableRow: React.FC<Props> = ({
 
   useEffect(() => {
     if (debouncedAdjustment !== 0) {
-      const finalNewQuantity = Math.max(0, row.quantityInLocation + debouncedAdjustment);
+      const finalNewQuantity = Math.max(0, localQty + debouncedAdjustment);
       setIsSaving(true);
       mutation.mutate({
         warehouseId,

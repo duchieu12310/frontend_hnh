@@ -97,7 +97,7 @@ function ClientHeader() {
                       <span>Danh mục</span>
                     </HeadlessPopover.Button>
 
-                    <HeadlessPopover.Panel className="absolute left-1/2 -translate-x-1/2 mt-3 w-screen max-w-xs sm:max-w-3xl px-4 z-[110]">
+                    <HeadlessPopover.Panel className="absolute left-1/2 -translate-x-1/2 mt-3 w-screen max-w-xs sm:max-w-6xl px-4 z-[110]">
                       <div className="overflow-hidden rounded-2xl shadow-2xl ring-1 ring-black ring-opacity-5 bg-white dark:bg-gray-800 p-2">
                         <CategoryMenu setOpenedCategoryMenu={() => { }} />
                       </div>
@@ -164,8 +164,10 @@ function ClientHeader() {
                   {user ? (
                     <>
                       <MenuLink to="/user" icon={<User size={16} />} label="Tài khoản" />
+                      <MenuLink to="/user/notification" icon={<Bell size={16} />} label="Thông báo" />
                       <MenuLink to="/user/review" icon={<Star size={16} />} label="Đánh giá" />
                       <MenuLink to="/order" icon={<FileBarcode size={16} />} label="Đơn hàng" />
+                      <MenuLink to="/user/wishlist" icon={<Heart size={16} />} label="Sách yêu thích" />
 
                       <div className="p-2">
                         <div className="flex items-center justify-between p-1 bg-gray-50 dark:bg-gray-900 rounded-lg">

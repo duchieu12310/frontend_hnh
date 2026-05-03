@@ -394,8 +394,8 @@ const InventoryManage: React.FC = () => {
       </Stack>
 
       {/* Main Data Table */}
-      <Paper radius="xl" withBorder className="overflow-hidden shadow-sm border-gray-200 bg-white flex flex-col">
-        <div className="relative overflow-x-auto" style={{ maxHeight: 'calc(100vh - 400px)' }}>
+      <Paper radius="xl" withBorder className="shadow-sm border-gray-200 bg-white flex flex-col">
+        <div className="relative overflow-x-auto">
           {isHierarchyLoading && (
             <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
               <Stack align="center" spacing="xs">
@@ -422,15 +422,15 @@ const InventoryManage: React.FC = () => {
           >
             <thead>
               <tr>
-                <th className="text-[11px] font-bold text-white uppercase tracking-wider py-4 border-r border-slate-700 w-32">Danh mục 1</th>
-                <th className="text-[11px] font-bold text-white uppercase tracking-wider py-4 border-r border-slate-700 w-32">Danh mục 2</th>
-                <th className="text-[11px] font-bold text-white uppercase tracking-wider py-4 border-r border-slate-700 w-32">Danh mục 3</th>
-                <th className="text-[11px] font-bold text-white uppercase tracking-wider py-4 border-r border-slate-700">Sản phẩm</th>
-                <th className="text-[11px] font-bold text-white uppercase tracking-wider py-4 border-r border-slate-700">Biến thể</th>
-                <th className="text-[11px] font-bold text-white uppercase tracking-wider py-4 border-r border-slate-700 text-center w-28">Tồn gốc</th>
-                <th className="text-[11px] font-bold text-white uppercase tracking-wider py-4 border-r border-slate-700 text-center w-40">Điều chỉnh (+/-)</th>
-                <th className="text-[11px] font-bold text-white uppercase tracking-wider py-4 border-r border-slate-700 text-center w-32">Tổng hiện tại</th>
-                <th className="text-[11px] font-bold text-white uppercase tracking-wider py-4 text-center w-32">Toàn hệ thống</th>
+                <th className="text-[13px] font-black text-white uppercase tracking-wider py-4 border-r border-slate-700 w-32">Danh mục 1</th>
+                <th className="text-[13px] font-black text-white uppercase tracking-wider py-4 border-r border-slate-700 w-32">Danh mục 2</th>
+                <th className="text-[13px] font-black text-white uppercase tracking-wider py-4 border-r border-slate-700 w-32">Danh mục 3</th>
+                <th className="text-[13px] font-black text-white uppercase tracking-wider py-4 border-r border-slate-700">Sản phẩm</th>
+                <th className="text-[13px] font-black text-white uppercase tracking-wider py-4 border-r border-slate-700">Biến thể</th>
+                <th className="text-[13px] font-black text-white uppercase tracking-wider py-4 border-r border-slate-700 text-center w-28">Tồn gốc</th>
+                <th className="text-[13px] font-black text-white uppercase tracking-wider py-4 border-r border-slate-700 text-center w-40">Điều chỉnh (+/-)</th>
+                <th className="text-[13px] font-black text-white uppercase tracking-wider py-4 border-r border-slate-700 text-center w-32">Tổng hiện tại</th>
+                <th className="text-[13px] font-black text-white uppercase tracking-wider py-4 text-center w-32">Toàn hệ thống</th>
                 <th className="w-12 border-l border-slate-700"></th>
               </tr>
             </thead>

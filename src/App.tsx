@@ -71,6 +71,12 @@ import ClientSignup from 'pages/client-signup';
 import ClientForgotPassword, { ClientChangePassword } from 'pages/client-forgot-password';
 import ClientContact from 'pages/client-contact';
 import ShipperWaybillManage from 'pages/shipper-waybill/ShipperWaybillManage';
+import {
+  AdminAccountPersonal,
+  AdminAccountPhone,
+  AdminAccountEmail,
+  AdminAccountPassword
+} from 'pages/admin-account-setting';
 
 const queryClient = new QueryClient();
 
@@ -286,6 +292,10 @@ function App() {
 
                   <Route path={ManagerPath.NOTIFICATION} element={<AdminNotification/>}/>
                   <Route path={ManagerPath.ACCOUNT} element={<AdminAccount/>}/>
+                  <Route path={ManagerPath.ACCOUNT_PERSONAL} element={<AdminAccountPersonal/>}/>
+                  <Route path={ManagerPath.ACCOUNT_PHONE} element={<AdminAccountPhone/>}/>
+                  <Route path={ManagerPath.ACCOUNT_EMAIL} element={<AdminAccountEmail/>}/>
+                  <Route path={ManagerPath.ACCOUNT_PASSWORD} element={<AdminAccountPassword/>}/>
                 </Route>
                 <Route path="/payment/success" element={<ClientPaymentSuccess/>}/>
                 <Route path="/payment/cancel" element={<ClientPaymentCancel/>}/>

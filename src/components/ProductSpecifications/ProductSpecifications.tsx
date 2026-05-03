@@ -16,12 +16,12 @@ function ProductSpecifications({
   specificationSelectList,
   setSpecificationSelectList,
 }: ProductSpecificationsProps) {
-  const isDisabledCreateProductSpecificationButton = specifications?.content.length === specificationSelectList.length;
+  const isDisabledCreateProductSpecificationButton = (specifications?.content?.length || 0) === specificationSelectList.length;
 
   const handleCreateProductSpecificationButton = () => {
     let currentSpecificationItems: SpecificationItem[] = [];
 
-    if (specifications && specifications.content.length < specificationSelectList.length) {
+    if (specifications?.content && specifications.content.length < specificationSelectList.length) {
       currentSpecificationItems = [...specifications.content];
     }
 
@@ -29,7 +29,7 @@ function ProductSpecifications({
     setSpecifications(new CollectionWrapper(currentSpecificationItems));
   };
 
-  const productSpecificationsFragment = specifications?.content.map((specification, index) => (
+  const productSpecificationsFragment = specifications?.content?.map((specification, index) => (
     <ProductSpecificationRow
       key={index}
       specification={specification}
