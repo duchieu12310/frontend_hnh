@@ -3,11 +3,21 @@ import PropertyConfigs from 'pages/property/PropertyConfigs';
 import { PropertyRequest, PropertyResponse } from 'models/Property';
 import useCreateApi from 'hooks/use-create-api';
 import { SelectOption } from 'types';
+import { useSmartImport } from 'hooks/use-smart-import';
 
 function usePropertyCreateViewModel() {
   const form = useForm({
     initialValues: PropertyConfigs.initialCreateUpdateFormValues,
     schema: zodResolver(PropertyConfigs.createUpdateFormSchema),
+  });
+
+  const { smartImport, isAutoFilling } = useSmartImport({
+    endpoint: 'property',
+    onSuccess: (suggestions) => {
+      if (suggestions.name) form.setFieldValue('name', suggestions.name);
+      if (suggestions.code) form.setFieldValue('code', suggestions.code);
+      if (suggestions.description) form.setFieldValue('description', suggestions.description);
+    }
   });
 
   const createApi = useCreateApi<PropertyRequest, PropertyResponse>(PropertyConfigs.resourceUrl, PropertyConfigs.resourceKey);
@@ -37,6 +47,8 @@ function usePropertyCreateViewModel() {
     form,
     handleFormSubmit,
     statusSelectList,
+    smartImport,
+    isAutoFilling,
   };
 }
 

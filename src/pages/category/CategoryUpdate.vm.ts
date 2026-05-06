@@ -50,6 +50,35 @@ function useCategoryUpdateViewModel(id: number) {
     { activeOnly: true }
   );
 
+  const [isAutoFilling, setIsAutoFilling] = useState(false);
+
+  const smartImport = async (rawText: string) => {
+    if (!rawText.trim()) return;
+
+    setIsAutoFilling(true);
+    try {
+        const response = await fetch('http://localhost:8085/api/ai/parse-category-raw-text', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ rawText })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const jsonMatch = data.raw.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                const suggestions = JSON.parse(jsonMatch[0]);
+                if (suggestions.name) form.setFieldValue('name', suggestions.name);
+                if (suggestions.slug) form.setFieldValue('slug', suggestions.slug);
+            }
+        }
+    } catch (error) {
+        console.error('Error smart importing category:', error);
+    } finally {
+        setIsAutoFilling(false);
+    }
+  };
+
   const handleFormSubmit = form.onSubmit((formValues) => {
     setPrevFormValues(formValues);
     if (!MiscUtils.isEquals(formValues, prevFormValues)) {
@@ -92,6 +121,8 @@ function useCategoryUpdateViewModel(id: number) {
     handleFormSubmit,
     categorySelectList,
     statusSelectList,
+    smartImport,
+    isAutoFilling,
   };
 }
 

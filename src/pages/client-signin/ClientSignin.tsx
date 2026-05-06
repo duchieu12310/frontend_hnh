@@ -223,6 +223,15 @@ function ClientSignin() {
                     Đăng ký ngay
                   </Link>
                 </p>
+                <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm">
+                  Bạn là đối tác?{' '}
+                  <Link
+                    to="/partner-signup"
+                    className="font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                  >
+                    Đăng ký tại đây
+                  </Link>
+                </p>
               </div>
             </div>
           </div>

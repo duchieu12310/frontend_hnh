@@ -3,11 +3,20 @@ import TagConfigs from 'pages/tag/TagConfigs';
 import { TagRequest, TagResponse } from 'models/Tag';
 import useCreateApi from 'hooks/use-create-api';
 import { SelectOption } from 'types';
+import { useSmartImport } from 'hooks/use-smart-import';
 
 function useTagCreateViewModel() {
   const form = useForm({
     initialValues: TagConfigs.initialCreateUpdateFormValues,
     schema: zodResolver(TagConfigs.createUpdateFormSchema),
+  });
+
+  const { smartImport, isAutoFilling } = useSmartImport({
+    endpoint: 'tag',
+    onSuccess: (suggestions) => {
+      if (suggestions.name) form.setFieldValue('name', suggestions.name);
+      if (suggestions.slug) form.setFieldValue('slug', suggestions.slug);
+    }
   });
 
   const createApi = useCreateApi<TagRequest, TagResponse>(TagConfigs.resourceUrl, TagConfigs.resourceKey);
@@ -36,6 +45,8 @@ function useTagCreateViewModel() {
     form,
     handleFormSubmit,
     statusSelectList,
+    smartImport,
+    isAutoFilling,
   };
 }
 

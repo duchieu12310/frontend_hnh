@@ -5,6 +5,7 @@ class ManagerPath {
   static WARD = '/admin/address/ward';
 
   static USER = '/admin/user';
+  static PARTNER_APPROVAL = '/admin/user/approval';
   static ROLE = '/admin/user/role';
 
   static EMPLOYEE = '/admin/employee';

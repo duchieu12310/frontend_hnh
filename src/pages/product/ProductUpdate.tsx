@@ -6,7 +6,10 @@ import {
   Tabs,
   Textarea,
   TextInput,
+  Modal,
+  Group,
 } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { useParams } from 'react-router-dom';
 import {
   CreateUpdateTitle,
@@ -26,6 +29,9 @@ const TabsTab = Tabs.Tab as any;
 
 function ProductUpdate() {
   const { id } = useParams();
+  const [opened, { open, close }] = useDisclosure(false);
+  const [rawText, setRawText] = useState('');
+
   const {
     product,
     form,
@@ -45,6 +51,8 @@ function ProductUpdate() {
     productPropertySelectList, setProductPropertySelectList,
     selectedVariantIndexes, setSelectedVariantIndexes,
     resetForm,
+    smartImport,
+    isAutoFilling,
   } = useProductUpdateViewModel(Number(id));
 
   const [showVariants, setShowVariants] = useState(true);
@@ -68,6 +76,43 @@ function ProductUpdate() {
         createdBy="1"
         updatedBy="1"
       />
+
+      <Modal opened={opened} onClose={close} title="✨ Nhập dữ liệu thông minh từ văn bản thô" size="lg">
+        <div className="flex flex-col gap-4">
+          <p className="text-xs text-slate-500 italic">Dán đoạn văn bản chứa thông tin sản phẩm, AI sẽ tự động tách và cập nhật vào form.</p>
+          <Textarea 
+            placeholder="Ví dụ: Tên sách: Đắc Nhân Tâm, Tác giả: Dale Carnegie, Giá 120k..." 
+            minRows={8}
+            value={rawText}
+            onChange={(e) => setRawText(e.currentTarget.value)}
+          />
+          <Group position="right">
+            <Button variant="default" onClick={close}>Hủy</Button>
+            <Button 
+                loading={isAutoFilling} 
+                onClick={async () => {
+                    await smartImport(rawText);
+                    close();
+                    setRawText('');
+                }}
+            >
+                Cập nhật form
+            </Button>
+          </Group>
+        </div>
+      </Modal>
+
+      <div className="flex justify-end">
+        <Button 
+            variant="light" 
+            color="blue" 
+            size="xs" 
+            leftIcon={<span>✨</span>}
+            onClick={open}
+        >
+            Nhập nhanh từ văn bản
+        </Button>
+      </div>
 
       <form onSubmit={handleFormSubmit}>
         <div className="flex gap-5 items-start">

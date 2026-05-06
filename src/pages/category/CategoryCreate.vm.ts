@@ -8,6 +8,8 @@ import { SelectOption } from 'types';
 import { useQueryClient } from 'react-query';
 import { useSearchParams } from 'react-router-dom';
 
+import { useSmartImport } from 'hooks/use-smart-import';
+
 function useCategoryCreateViewModel() {
   const [searchParams] = useSearchParams();
   const parentCategoryIdParam = searchParams.get('parentCategoryId');
@@ -60,6 +62,14 @@ function useCategoryCreateViewModel() {
     });
   });
 
+  const { smartImport, isAutoFilling } = useSmartImport({
+    endpoint: 'category',
+    onSuccess: (suggestions) => {
+        if (suggestions.name) form.setFieldValue('name', suggestions.name);
+        if (suggestions.slug) form.setFieldValue('slug', suggestions.slug);
+    }
+  });
+
   const statusSelectList: SelectOption[] = [
     {
       value: '1',
@@ -76,6 +86,8 @@ function useCategoryCreateViewModel() {
     handleFormSubmit,
     categorySelectList,
     statusSelectList,
+    smartImport,
+    isAutoFilling,
   };
 }
 

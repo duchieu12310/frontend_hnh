@@ -547,8 +547,12 @@ function ClientSignupStepTwo({ nextStep, userId, setActive }: { nextStep: () => 
       updateCurrentSignupUserId(null);
       setActive(0);
       navigate('/signup', { replace: true });
+    } else if (error.message.includes('đã được kích hoạt')) {
+      NotifyUtils.simpleFailed(error, 'Tài khoản đã kích hoạt');
+      updateCurrentSignupUserId(null);
+      navigate('/signin', { replace: true });
     } else {
-      NotifyUtils.simpleFailed(error.message || 'Thao tác không thành công');
+      NotifyUtils.simpleFailed(error);
     }
   };
 

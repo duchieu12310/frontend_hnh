@@ -34,6 +34,8 @@ import { PropertyResponse } from 'models/Property';
 import PropertyConfigs from 'pages/property/PropertyConfigs';
 import { VariantRequest } from 'models/Variant';
 
+import { useSmartImport } from 'hooks/use-smart-import';
+
 function useProductCreateViewModel() {
   const [searchParams] = useSearchParams();
   const categoryIdParam = searchParams.get('categoryId');
@@ -271,6 +273,32 @@ function useProductCreateViewModel() {
     setThumbnailName('');
   };
 
+  const { smartImport, isAutoFilling } = useSmartImport({
+    endpoint: 'product',
+    onSuccess: (suggestions) => {
+        if (suggestions.name) form.setFieldValue('name', suggestions.name);
+        if (suggestions.slug) form.setFieldValue('slug', suggestions.slug);
+        if (suggestions.code) form.setFieldValue('code', suggestions.code);
+        if (suggestions.shortDescription) form.setFieldValue('shortDescription', suggestions.shortDescription);
+        if (suggestions.description) form.setFieldValue('description', suggestions.description);
+        
+        if (suggestions.price && form.values.variants.length > 0) {
+            const updatedVariants = [...form.values.variants];
+            updatedVariants[0] = { ...updatedVariants[0], price: Number(suggestions.price) };
+            form.setFieldValue('variants', updatedVariants);
+        }
+
+        if (suggestions.brand && brandSelectList.length > 0) {
+            const foundBrand = brandSelectList.find(b => b.label.toLowerCase().includes(suggestions.brand.toLowerCase()));
+            if (foundBrand) form.setFieldValue('brandId', foundBrand.value);
+        }
+        if (suggestions.category && categorySelectList.length > 0) {
+            const foundCat = categorySelectList.find(c => c.label.toLowerCase().includes(suggestions.category.toLowerCase()));
+            if (foundCat) form.setFieldValue('categoryIds', [Number(foundCat.value)]);
+        }
+    }
+  });
+
   const statusSelectList: SelectOption[] = [
     {
       value: '1',
@@ -299,6 +327,8 @@ function useProductCreateViewModel() {
     productPropertySelectList, setProductPropertySelectList,
     selectedVariantIndexes, setSelectedVariantIndexes,
     resetForm,
+    smartImport,
+    isAutoFilling,
   };
 }
 

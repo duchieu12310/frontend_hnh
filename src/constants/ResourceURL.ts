@@ -120,8 +120,12 @@ class ResourceURL {
   static CLIENT_REGISTRATION_CONFIRM = apiPath + '/auth/registration/confirm';
   static CLIENT_REGISTRATION_CHANGE_EMAIL = (userId: number) => apiPath + `/auth/registration/${userId}/change-email`;
   static CLIENT_REGISTRATION_CANCEL = (userId: number) => apiPath + `/auth/registration/${userId}/cancel`;
+  static PARTNER_REGISTRATION = apiPath + '/auth/registration/role';
   static CLIENT_FORGOT_PASSWORD = apiPath + '/auth/forgot-password';
   static CLIENT_RESET_PASSWORD = apiPath + '/auth/reset-password';
+
+  static ADMIN_APPROVE_USER = (userId: number) => apiPath + `/admin/users/${userId}/approve`;
+  static ADMIN_REJECT_USER = (userId: number) => apiPath + `/admin/users/${userId}/reject`;
 }
 
 export default ResourceURL;

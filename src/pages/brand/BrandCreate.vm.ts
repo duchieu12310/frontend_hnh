@@ -3,11 +3,21 @@ import BrandConfigs from 'pages/brand/BrandConfigs';
 import { BrandRequest, BrandResponse } from 'models/Brand';
 import useCreateApi from 'hooks/use-create-api';
 import { SelectOption } from 'types';
+import { useSmartImport } from 'hooks/use-smart-import';
 
 function useBrandCreateViewModel() {
   const form = useForm({
     initialValues: BrandConfigs.initialCreateUpdateFormValues,
     schema: zodResolver(BrandConfigs.createUpdateFormSchema),
+  });
+
+  const { smartImport, isAutoFilling } = useSmartImport({
+    endpoint: 'brand',
+    onSuccess: (suggestions) => {
+      if (suggestions.name) form.setFieldValue('name', suggestions.name);
+      if (suggestions.code) form.setFieldValue('code', suggestions.code);
+      if (suggestions.description) form.setFieldValue('description', suggestions.description);
+    }
   });
 
   const createApi = useCreateApi<BrandRequest, BrandResponse>(BrandConfigs.resourceUrl, BrandConfigs.resourceKey);
@@ -37,6 +47,8 @@ function useBrandCreateViewModel() {
     form,
     handleFormSubmit,
     statusSelectList,
+    smartImport,
+    isAutoFilling,
   };
 }
 

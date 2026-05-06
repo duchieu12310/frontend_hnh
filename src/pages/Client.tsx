@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { ActionIcon, Affix, Anchor, Button, Card, Group, Tooltip, useMantineColorScheme } from '@mantine/core';
-import { ClientFooter, ClientHeader, LoadingMiddleware } from 'components';
+import { ClientFooter, ClientHeader, LoadingMiddleware, ChatBox } from 'components';
 import { Messages, MoonStars, Sun } from 'tabler-icons-react';
 import { useDisclosure, useHotkeys } from '@mantine/hooks';
 import { useIsFetching } from 'react-query';
@@ -50,6 +50,7 @@ function Client() {
         <Outlet/>
         <ClientFooter/>
       </LoadingMiddleware>
+      <ChatBox />
       {user && <ChatButton/>}
       <Shortcut/>
     </>

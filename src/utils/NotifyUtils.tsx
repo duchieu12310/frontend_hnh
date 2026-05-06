@@ -46,15 +46,28 @@ class NotifyUtils {
    * Hiển thị thông báo lỗi chi tiết.
    * Chấp nhận chuỗi thông báo hoặc đối tượng ErrorMessage từ API.
    */
-  static simpleFailed = (error: ToastMessage | ErrorMessage, fallbackMessage: string = 'Thao tác không thành công') => {
+  static simpleFailed = (error: ToastMessage | ErrorMessage | any, fallbackMessage: string = 'Thao tác không thành công') => {
     let finalMessage: ToastMessage;
-    
-    if (typeof error === 'object' && error !== null && 'message' in error) {
-      // Nếu là ErrorMessage từ API
+    let detailMessage: string = '';
+
+    if (typeof error === 'object' && error !== null) {
+      // 1. Lấy message gốc
+      detailMessage = error.message || error.description || '';
+
+      // 2. Kiểm tra nếu message lại là một chuỗi JSON lồng nhau (Nested JSON)
+      if (typeof detailMessage === 'string' && detailMessage.trim().startsWith('{')) {
+        try {
+          const nestedError = JSON.parse(detailMessage);
+          detailMessage = nestedError.message || detailMessage;
+        } catch (e) {
+          // Nếu không parse được thì giữ nguyên
+        }
+      }
+
       finalMessage = (
         <div className="flex flex-col gap-0.5">
           <span className="font-bold">{fallbackMessage}</span>
-          <span className="text-xs opacity-90">{error.message || error.description}</span>
+          <span className="text-xs opacity-90">{detailMessage}</span>
         </div>
       );
     } else {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; // Rebuild trigger
 import { Route, Routes } from 'react-router-dom';
 import 'dayjs/locale/vi';
 import '@smastrom/react-rating/style.css';
@@ -14,7 +14,7 @@ import AdminDashboard from 'pages/AdminDashboard';
 import AddressManage, { AddressCreate, AddressUpdate } from 'pages/address';
 import ProvinceManage, { ProvinceCreate, ProvinceUpdate } from 'pages/province';
 import DistrictManage, { DistrictCreate, DistrictUpdate } from 'pages/district';
-import UserManage, { UserCreate, UserUpdate } from 'pages/user';
+import UserManage, { UserCreate, UserUpdate, PartnerApproval } from 'pages/user';
 import RoleManage, { RoleCreate, RoleUpdate } from 'pages/role';
 import ProductManage, { ProductCreate, ProductUpdate, ProductCategoryEntry } from 'pages/product';
 import CategoryManage, { CategoryCreate, CategoryUpdate, CategoryDetail } from 'pages/category';
@@ -68,6 +68,7 @@ import ClientPaymentCancel from 'pages/client-payment-cancel';
 import AdminNotification from 'pages/admin-notification';
 import AdminAccount from 'pages/admin-account';
 import ClientSignup from 'pages/client-signup';
+import PartnerSignup from 'pages/partner-signup/PartnerSignup';
 import ClientForgotPassword, { ClientChangePassword } from 'pages/client-forgot-password';
 import ClientContact from 'pages/client-contact';
 import ShipperWaybillManage from 'pages/shipper-waybill/ShipperWaybillManage';
@@ -119,6 +120,7 @@ function App() {
               <Routes>
                 <Route path="/signin" element={<ClientSignin/>}/>
                 <Route path="/signup" element={<ClientSignup/>}/>
+                <Route path="/partner-signup" element={<PartnerSignup/>}/>
                 <Route path="/forgot" element={<ClientForgotPassword/>}/>
                 <Route path="/change-password" element={<ClientChangePassword/>}/>
                 <Route path="/" element={<Client/>}>
@@ -211,6 +213,7 @@ function App() {
                   {/* USER & ROLE (ADMIN ONLY) */}
                   <Route element={<AdminGuard allowedRoles={['ADMIN']} />}>
                     <Route path={ManagerPath.USER} element={<UserManage/>}/>
+                    <Route path={ManagerPath.PARTNER_APPROVAL} element={<PartnerApproval/>}/>
                     <Route path={ManagerPath.USER + '/create'} element={<UserCreate/>}/>
                     <Route path={ManagerPath.USER + '/update/:id'} element={<UserUpdate/>}/>
                     <Route path={ManagerPath.ROLE} element={<RoleManage/>}/>

@@ -63,6 +63,10 @@ const navbarLinks: NavbarLink[] = [
     icon: Fingerprint,
     childLinks: [
       {
+        link: '/admin/user/approval',
+        label: 'Phê duyệt đối tác',
+      },
+      {
         link: '/admin/user/role',
         label: 'Quyền',
       },

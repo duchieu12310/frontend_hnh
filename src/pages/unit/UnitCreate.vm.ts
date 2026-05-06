@@ -3,11 +3,19 @@ import UnitConfigs from 'pages/unit/UnitConfigs';
 import { UnitRequest, UnitResponse } from 'models/Unit';
 import useCreateApi from 'hooks/use-create-api';
 import { SelectOption } from 'types';
+import { useSmartImport } from 'hooks/use-smart-import';
 
 function useUnitCreateViewModel() {
   const form = useForm({
     initialValues: UnitConfigs.initialCreateUpdateFormValues,
     schema: zodResolver(UnitConfigs.createUpdateFormSchema),
+  });
+
+  const { smartImport, isAutoFilling } = useSmartImport({
+    endpoint: 'unit',
+    onSuccess: (suggestions) => {
+      if (suggestions.name) form.setFieldValue('name', suggestions.name);
+    }
   });
 
   const createApi = useCreateApi<UnitRequest, UnitResponse>(UnitConfigs.resourceUrl, UnitConfigs.resourceKey);
@@ -35,6 +43,8 @@ function useUnitCreateViewModel() {
     form,
     handleFormSubmit,
     statusSelectList,
+    smartImport,
+    isAutoFilling,
   };
 }
 

@@ -1,15 +1,21 @@
-import React from 'react';
-import { Switch,  Button, Divider, Grid, Group, Paper, Select, Stack, Textarea, TextInput  } from '@mantine/core';
+import React, { useState } from 'react';
+import { Switch,  Button, Divider, Grid, Group, Paper, Select, Stack, Textarea, TextInput, Modal  } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { CreateUpdateTitle, DefaultPropertyPanel } from 'components';
 import CategoryConfigs from 'pages/category/CategoryConfigs';
 import useCategoryCreateViewModel from 'pages/category/CategoryCreate.vm';
 
 function CategoryCreate() {
+  const [opened, { open, close }] = useDisclosure(false);
+  const [rawText, setRawText] = useState('');
+
   const {
     form,
     handleFormSubmit,
     categorySelectList,
     statusSelectList,
+    smartImport,
+    isAutoFilling,
   } = useCategoryCreateViewModel();
 
   return (
@@ -20,6 +26,41 @@ function CategoryCreate() {
       />
 
       <DefaultPropertyPanel/>
+
+      <Modal opened={opened} onClose={close} title="✨ Nhập danh mục thông minh" size="lg">
+        <Stack>
+          <Textarea 
+            placeholder="Dán thông tin danh mục vào đây..." 
+            minRows={6}
+            value={rawText}
+            onChange={(e) => setRawText(e.currentTarget.value)}
+          />
+          <Group position="right">
+            <Button variant="default" onClick={close}>Hủy</Button>
+            <Button 
+                loading={isAutoFilling} 
+                onClick={async () => {
+                    await smartImport(rawText);
+                    close();
+                    setRawText('');
+                }}
+            >
+                Điền form
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+
+      <div className="flex justify-end mb-2">
+        <Button 
+            variant="light" 
+            size="xs" 
+            leftIcon={<span>✨</span>}
+            onClick={open}
+        >
+            Nhập nhanh
+        </Button>
+      </div>
 
       <form onSubmit={handleFormSubmit}>
         <input type="hidden" {...form.getInputProps('level')} value={1} />

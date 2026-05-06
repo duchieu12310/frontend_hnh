@@ -65,6 +65,7 @@ import ClientError from 'components/ClientError/ClientError';
 import ProtectedRoute from 'components/ProtectedRoute/ProtectedRoute';
 import ClientUserNavbar from 'components/ClientUserNavbar/ClientUserNavbar';
 import ReviewStarGroup from 'components/ReviewStarGroup/ReviewStarGroup';
+import ChatBox from 'components/ChatBox/ChatBox';
 
 export {
   CreateUpdateTitle,
@@ -124,4 +125,5 @@ export {
   ProtectedRoute,
   ClientUserNavbar,
   ReviewStarGroup,
+  ChatBox,
 };

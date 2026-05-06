@@ -17,7 +17,7 @@ function UnitCreate() {
         title={UnitConfigs.createTitle}
       />
 
-      <DefaultPropertyPanel/>
+      <DefaultPropertyPanel />
 
       <form onSubmit={handleFormSubmit}>
         <div className="p-4 rounded-md shadow-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">

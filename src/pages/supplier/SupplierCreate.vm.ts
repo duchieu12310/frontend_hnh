@@ -10,11 +10,38 @@ import ProvinceConfigs from 'pages/province/ProvinceConfigs';
 import { DistrictResponse } from 'models/District';
 import DistrictConfigs from 'pages/district/DistrictConfigs';
 import { AddressRequest } from 'models/Address';
+import { useSmartImport } from 'hooks/use-smart-import';
 
 function useSupplierCreateViewModel() {
   const form = useForm({
     initialValues: SupplierConfigs.initialCreateUpdateFormValues,
     schema: zodResolver(SupplierConfigs.createUpdateFormSchema),
+  });
+
+  const { smartImport, isAutoFilling } = useSmartImport({
+    endpoint: 'supplier',
+    onSuccess: (suggestions) => {
+      if (suggestions.displayName) form.setFieldValue('displayName', suggestions.displayName);
+      if (suggestions.code) form.setFieldValue('code', suggestions.code);
+      if (suggestions.contactFullname) form.setFieldValue('contactFullname', suggestions.contactFullname);
+      if (suggestions.contactEmail) form.setFieldValue('contactEmail', suggestions.contactEmail);
+      if (suggestions.contactPhone) form.setFieldValue('contactPhone', suggestions.contactPhone);
+      if (suggestions.companyName) form.setFieldValue('companyName', suggestions.companyName);
+      if (suggestions.taxCode) form.setFieldValue('taxCode', suggestions.taxCode);
+      if (suggestions.email) form.setFieldValue('email', suggestions.email);
+      if (suggestions.phone) form.setFieldValue('phone', suggestions.phone);
+      if (suggestions.fax) form.setFieldValue('fax', suggestions.fax);
+      if (suggestions.website) form.setFieldValue('website', suggestions.website);
+      if (suggestions.addressLine) form.setFieldValue('address.line', suggestions.addressLine);
+      if (suggestions.description) form.setFieldValue('description', suggestions.description);
+      if (suggestions.note) form.setFieldValue('note', suggestions.note);
+
+      // Tìm và khớp Tỉnh/Thành phố nếu AI trả về (giả định suggestions có province hoặc city)
+      if (suggestions.province && provinceSelectList.length > 0) {
+        const foundProvince = provinceSelectList.find(p => p.label.toLowerCase().includes(suggestions.province.toLowerCase()));
+        if (foundProvince) form.setFieldValue('address.provinceId', foundProvince.value);
+      }
+    }
   });
 
   const [provinceSelectList, setProvinceSelectList] = useState<SelectOption[]>([]);
@@ -86,6 +113,8 @@ function useSupplierCreateViewModel() {
     provinceSelectList,
     districtSelectList,
     statusSelectList,
+    smartImport,
+    isAutoFilling,
   };
 }
 

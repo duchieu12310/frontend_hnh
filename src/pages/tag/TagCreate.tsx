@@ -1,13 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Button, Modal, Stack, Textarea } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { CreateUpdateTitle, DefaultPropertyPanel } from 'components';
 import TagConfigs from 'pages/tag/TagConfigs';
 import useTagCreateViewModel from 'pages/tag/TagCreate.vm';
 
 function TagCreate() {
+  const [opened, { open, close }] = useDisclosure(false);
+  const [rawText, setRawText] = useState('');
+
   const {
     form,
     handleFormSubmit,
     statusSelectList,
+    smartImport,
+    isAutoFilling,
   } = useTagCreateViewModel();
 
   return (
@@ -18,6 +25,41 @@ function TagCreate() {
       />
 
       <DefaultPropertyPanel/>
+
+      <Modal opened={opened} onClose={close} title="✨ Nhập Tag thông minh" size="lg">
+        <Stack>
+          <Textarea 
+            placeholder="Dán tên tag vào đây..." 
+            minRows={4}
+            value={rawText}
+            onChange={(e) => setRawText(e.currentTarget.value)}
+          />
+          <div className="flex justify-end gap-2 mt-2">
+            <Button variant="default" onClick={close}>Hủy</Button>
+            <Button 
+                loading={isAutoFilling} 
+                onClick={async () => {
+                    await smartImport(rawText);
+                    close();
+                    setRawText('');
+                }}
+            >
+                Điền form
+            </Button>
+          </div>
+        </Stack>
+      </Modal>
+
+      <div className="flex justify-end mb-2">
+        <Button 
+            variant="light" 
+            size="xs" 
+            leftIcon={<span>✨</span>}
+            onClick={open}
+        >
+            Nhập nhanh
+        </Button>
+      </div>
 
       <form onSubmit={handleFormSubmit}>
         <div className="p-4 rounded-md shadow-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">

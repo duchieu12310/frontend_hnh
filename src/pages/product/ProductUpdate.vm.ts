@@ -316,6 +316,59 @@ function useProductUpdateViewModel(id: number) {
     setThumbnailName('');
   };
 
+  const [isAutoFilling, setIsAutoFilling] = useState(false);
+
+  const smartImport = async (rawText: string) => {
+    if (!rawText.trim()) return;
+
+    setIsAutoFilling(true);
+    try {
+        const response = await fetch('http://localhost:8085/api/ai/parse-product-raw-text', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ rawText })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const rawContent = data.raw;
+            
+            const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
+            if (!jsonMatch) {
+                alert('AI không trả về đúng định dạng JSON. Nội dung nhận được: ' + rawContent);
+                return;
+            }
+            
+            const suggestions = JSON.parse(jsonMatch[0]);
+            
+            if (suggestions.name) form.setFieldValue('name', suggestions.name);
+            if (suggestions.slug) form.setFieldValue('slug', suggestions.slug);
+            if (suggestions.code) form.setFieldValue('code', suggestions.code);
+            if (suggestions.shortDescription) form.setFieldValue('shortDescription', suggestions.shortDescription);
+            if (suggestions.description) form.setFieldValue('description', suggestions.description);
+            
+            if (suggestions.price && form.values.variants.length > 0) {
+                const updatedVariants = [...form.values.variants];
+                updatedVariants[0] = { ...updatedVariants[0], price: Number(suggestions.price) };
+                form.setFieldValue('variants', updatedVariants);
+            }
+
+            if (suggestions.brand && brandSelectList.length > 0) {
+                const foundBrand = brandSelectList.find(b => b.label.toLowerCase().includes(suggestions.brand.toLowerCase()));
+                if (foundBrand) form.setFieldValue('brandId', foundBrand.value);
+            }
+            if (suggestions.category && categorySelectList.length > 0) {
+                const foundCat = categorySelectList.find(c => c.label.toLowerCase().includes(suggestions.category.toLowerCase()));
+                if (foundCat) form.setFieldValue('categoryIds', [Number(foundCat.value)]);
+            }
+        }
+    } catch (error) {
+        console.error('Error smart importing:', error);
+    } finally {
+        setIsAutoFilling(false);
+    }
+  };
+
   const statusSelectList: SelectOption[] = [
     {
       value: '1',
@@ -346,6 +399,8 @@ function useProductUpdateViewModel(id: number) {
     productPropertySelectList, setProductPropertySelectList,
     selectedVariantIndexes, setSelectedVariantIndexes,
     resetForm,
+    smartImport,
+    isAutoFilling,
   };
 }
 
