@@ -253,6 +253,7 @@ class ProductConfigs extends Configs {
       totalElements: z.number(),
     }).nullable(),
     variants: z.array(z.object({
+      id: z.number().nullable().optional(),
       sku: z.string(),
       cost: z.number(),
       price: z.number(),
