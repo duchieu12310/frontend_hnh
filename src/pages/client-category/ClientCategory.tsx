@@ -149,33 +149,44 @@ function ClientCategory() {
                 </div>
 
                 <div className="p-4 flex flex-col gap-6">
-                  <div className="flex items-center gap-2">
-                    <ChartCandle size={20} />
-                    <p className="font-medium text-gray-900 dark:text-gray-100">Bộ lọc</p>
-                  </div>
-                  <button
-                    onClick={handleResetButton}
-                    disabled={disabledResetButton}
-                    className="px-2 py-1 text-xs flex items-center gap-1 text-pink-600 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-900/20 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <X size={10} />
-                    Đặt mặc định
-                  </button>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <p className="font-medium text-gray-900 dark:text-gray-100">Tìm kiếm</p>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Search size={16} className="text-gray-400" />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <ChartCandle size={20} className="text-blue-500" />
+                      <p className="font-bold text-[14px] text-gray-800 dark:text-gray-200 uppercase">Bộ lọc</p>
                     </div>
-                    <input
-                      type="text"
-                      placeholder={'Tìm kiếm trong ' + category.categoryName}
-                      value={searchQuery || ''}
-                      onChange={(event) => setSearchQuery(event.currentTarget.value || null)}
-                      className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
+                    <button
+                      onClick={handleResetButton}
+                      disabled={disabledResetButton}
+                      className="px-2 py-1 text-[11px] font-bold flex items-center gap-1 text-pink-600 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-900/20 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 border border-transparent hover:border-pink-200 dark:hover:border-pink-800"
+                    >
+                      <X size={12} />
+                      Đặt mặc định
+                    </button>
+                  </div>
+
+                  {/* ── SEARCH WITHIN CATEGORY ── */}
+                  <div className="flex flex-col gap-2.5">
+                    <p className="font-bold text-[11px] text-gray-400 dark:text-gray-500 uppercase tracking-wider">Tìm kiếm</p>
+                    <div className="relative group">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                        <Search size={16} className="text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                      </div>
+                      <input
+                        type="text"
+                        placeholder={'Tìm kiếm sách...'}
+                        value={searchQuery || ''}
+                        onChange={(event) => setSearchQuery(event.currentTarget.value || null)}
+                        className="w-full pl-10 pr-10 py-2.5 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl text-sm placeholder-gray-400 focus:bg-white dark:focus:bg-gray-800 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/30 transition-all outline-none"
+                      />
+                      {searchQuery && (
+                        <button 
+                          onClick={() => setSearchQuery(null)}
+                          className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                        >
+                          <X size={14} />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
 

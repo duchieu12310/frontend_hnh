@@ -8,8 +8,19 @@ import {
   BrandYoutube
 } from 'tabler-icons-react';
 import { Link } from 'react-router-dom';
+import { useQuery } from 'react-query';
+import FetchUtils, { ErrorMessage, ListResponse } from 'utils/FetchUtils';
+import ResourceURL from 'constants/ResourceURL';
+import { ClientCategoryResponse } from 'types';
 
 function ClientFooter() {
+  const { data: categoryResponses } = useQuery<ListResponse<ClientCategoryResponse>, ErrorMessage>(
+    ['client-api', 'categories', 'getAllCategories'],
+    () => FetchUtils.get(ResourceURL.CLIENT_CATEGORY),
+    { refetchOnWindowFocus: false, keepPreviousData: true }
+  );
+
+  const categories = categoryResponses?.content || [];
 
   return (
     <footer className="mt-12 pt-12 pb-12 bg-black dark:bg-gray-950">
@@ -41,24 +52,19 @@ function ClientFooter() {
                 DANH MỤC SÁCH
               </h3>
               <div className="flex flex-col gap-2">
-                <Link to="/category/van-hoc-trong-nuoc" className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-amber-400 hover:translate-x-1 hover:font-medium">
-                  Văn học trong nước
-                </Link>
-                <Link to="/category/van-hoc-nuoc-ngoai" className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-amber-400 hover:translate-x-1 hover:font-medium">
-                  Văn học nước ngoài
-                </Link>
-                <Link to="/category/kinh-te" className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-amber-400 hover:translate-x-1 hover:font-medium">
-                  Kinh tế - Khởi nghiệp
-                </Link>
-                <Link to="/category/ky-nang-song" className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-amber-400 hover:translate-x-1 hover:font-medium">
-                  Kỹ năng sống
-                </Link>
-                <Link to="/category/thieu-nhi" className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-amber-400 hover:translate-x-1 hover:font-medium">
-                  Sách thiếu nhi
-                </Link>
-                <Link to="/category/ngoai-ngu" className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-amber-400 hover:translate-x-1 hover:font-medium">
-                  Sách ngoại ngữ
-                </Link>
+                {categories.length > 0 ? (
+                  categories.map((cat) => (
+                    <Link 
+                      key={cat.categorySlug} 
+                      to={`/category/${cat.categorySlug}`} 
+                      className="text-sm text-gray-300 no-underline transition-all duration-200 hover:text-amber-400 hover:translate-x-1 hover:font-medium"
+                    >
+                      {cat.categoryName}
+                    </Link>
+                  ))
+                ) : (
+                  <p className="text-xs text-gray-500 italic">Đang tải danh mục...</p>
+                )}
               </div>
             </div>
           </div>
@@ -70,19 +76,19 @@ function ClientFooter() {
                 QUY ĐỊNH & CHÍNH SÁCH
               </h3>
               <div className="flex flex-col gap-2">
-                <Link to="/" className="text-sm text-white no-underline transition-all duration-200 hover:text-blue-400 hover:translate-x-1 hover:font-medium">
+                <Link to="/policy/dieu-khoan-chung" className="text-sm text-white no-underline transition-all duration-200 hover:text-blue-400 hover:translate-x-1 hover:font-medium">
                   Điều khoản và quy định chung
                 </Link>
-                <Link to="/" className="text-sm text-white no-underline transition-all duration-200 hover:text-blue-400 hover:translate-x-1 hover:font-medium">
+                <Link to="/policy/chinh-sach-bao-mat" className="text-sm text-white no-underline transition-all duration-200 hover:text-blue-400 hover:translate-x-1 hover:font-medium">
                   Chính sách bảo mật thông tin
                 </Link>
-                <Link to="/" className="text-sm text-white no-underline transition-all duration-200 hover:text-blue-400 hover:translate-x-1 hover:font-medium">
+                <Link to="/policy/phuong-thuc-thanh-toan" className="text-sm text-white no-underline transition-all duration-200 hover:text-blue-400 hover:translate-x-1 hover:font-medium">
                   Phương thức thanh toán
                 </Link>
-                <Link to="/" className="text-sm text-white no-underline transition-all duration-200 hover:text-blue-400 hover:translate-x-1 hover:font-medium">
+                <Link to="/policy/chinh-sach-van-chuyen" className="text-sm text-white no-underline transition-all duration-200 hover:text-blue-400 hover:translate-x-1 hover:font-medium">
                   Chính sách vận chuyển và kiểm hàng
                 </Link>
-                <Link to="/" className="text-sm text-white no-underline transition-all duration-200 hover:text-blue-400 hover:translate-x-1 hover:font-medium">
+                <Link to="/policy/chinh-sach-bao-hanh" className="text-sm text-white no-underline transition-all duration-200 hover:text-blue-400 hover:translate-x-1 hover:font-medium">
                   Chính sách bảo hành và đổi trả
                 </Link>
               </div>

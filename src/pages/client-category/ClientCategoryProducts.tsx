@@ -51,15 +51,29 @@ function ClientCategoryProducts({ categorySlug }: ClientCategoryProductsProps) {
     );
   }
 
+  // Frontend-only filtering logic
+  const filteredProducts = products?.content?.filter(product => {
+    if (!activeSearch) return true;
+    const searchLower = activeSearch.toLowerCase();
+    return (
+      product.productName.toLowerCase().includes(searchLower)
+    );
+  }) || [];
+
   return (
     <>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        {products.content.map((product, index) => (
+        {filteredProducts.map((product, index) => (
           <div key={index}>
             <ClientProductCard product={product} search={activeSearch || ''}/>
           </div>
         ))}
       </div>
+      {filteredProducts.length === 0 && activeSearch && (
+        <div className="flex flex-col items-center gap-4 py-8 text-gray-500">
+          <p>Không tìm thấy sản phẩm phù hợp với "{activeSearch}" trong trang này</p>
+        </div>
+      )}
 
       <div className="flex items-center justify-between mt-6">
         <div className="flex items-center gap-1">
@@ -117,7 +131,6 @@ function useGetAllCategoryProductsApi(categorySlug: string) {
     size: ApplicationConstants.DEFAULT_CLIENT_CATEGORY_PAGE_SIZE,
     filter: [activeBrandFilter, activePriceFilter].filter(Boolean).join(';') || undefined,
     sort: activeSort,
-    search: activeSearch,
     saleable: activeSaleable,
   };
 

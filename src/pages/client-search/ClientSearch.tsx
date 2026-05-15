@@ -14,7 +14,7 @@ import {
   Title,
   useMantineTheme
 } from '@mantine/core';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { AlertTriangle, ArrowsDownUp, ChartCandle, Marquee } from 'tabler-icons-react';
 import { ClientProductCard } from 'components';
 import ApplicationConstants from 'constants/ApplicationConstants';
@@ -28,7 +28,8 @@ import useTitle from 'hooks/use-title';
 function ClientSearch() {
   const theme = useMantineTheme();
 
-  const searchQuery = new URLSearchParams(useLocation().search).get('q');
+  const queryParams = new URLSearchParams(useLocation().search);
+  const searchQuery = queryParams.get('q') || queryParams.get('brand');
   useTitle(searchQuery ? `Kết quả tìm kiếm cho "${searchQuery}"` : 'Tất cả sản phẩm');
 
   const [activePage, setActivePage] = useState(1);
@@ -45,33 +46,32 @@ function ClientSearch() {
   };
 
   const {
-    data: productResponses,
-    isLoading: isLoadingProductResponses,
-    isError: isErrorProductResponses,
-  } = useQuery<ListResponse<ClientListedProductResponse>, ErrorMessage>(
-    ['client-api', 'products', 'getAllProducts', requestParams],
-    () => FetchUtils.get(ResourceURL.CLIENT_PRODUCT, requestParams),
+    data: searchResults,
+    isLoading: isLoadingSearch,
+    isError: isErrorSearch,
+  } = useQuery<any, ErrorMessage>(
+    ['client-api', 'search', 'global', searchQuery],
+    () => FetchUtils.get(ResourceURL.CLIENT_SEARCH, { query: searchQuery || '' }),
     {
       onError: () => NotifyUtils.simpleFailed('Lấy dữ liệu không thành công'),
       refetchOnWindowFocus: false,
-      keepPreviousData: true,
+      enabled: !!searchQuery,
     }
   );
-  const products = productResponses as ListResponse<ClientListedProductResponse>;
 
   let resultFragment;
 
-  if (isLoadingProductResponses) {
+  if (isLoadingSearch) {
     resultFragment = (
       <Stack>
         {Array(5).fill(0).map((_, index) => (
-          <Skeleton key={index} height={50} radius="md"/>
+          <Skeleton key={index} height={100} radius="md"/>
         ))}
       </Stack>
     );
   }
 
-  if (isErrorProductResponses) {
+  if (isErrorSearch) {
     resultFragment = (
       <Stack my={theme.spacing.xl} sx={{ alignItems: 'center', color: theme.colors.pink[6] }}>
         <AlertTriangle size={125} strokeWidth={1}/>
@@ -80,7 +80,11 @@ function ClientSearch() {
     );
   }
 
-  if (products && products.totalElements === 0) {
+  const products = searchResults?.products || [];
+  const categories = searchResults?.categories || [];
+  const brands = searchResults?.brands || [];
+
+  if (searchResults && products.length === 0 && categories.length === 0 && brands.length === 0) {
     resultFragment = (
       <Stack my={theme.spacing.xl} sx={{ alignItems: 'center', color: theme.colors.blue[6] }}>
         <Marquee size={125} strokeWidth={1}/>
@@ -89,29 +93,84 @@ function ClientSearch() {
     );
   }
 
-  if (products && products.totalElements > 0) {
+  if (products.length > 0 || categories.length > 0 || brands.length > 0) {
     resultFragment = (
-      <>
-        <Grid mt={theme.spacing.xs}>
-          {products.content.map((product, index) => (
-            <Grid.Col key={index} span={6} sm={4} md={3}>
-              <ClientProductCard product={product} search={searchQuery || ''}/>
-            </Grid.Col>
-          ))}
-        </Grid>
+      <Stack spacing="xl">
+        {/* Categories Section */}
+        {categories.length > 0 && (
+          <Card radius="md" p="md" withBorder>
+            <Text weight={700} size="sm" color="dimmed" mb="xs" sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
+              Thể loại phù hợp
+            </Text>
+            <Group spacing="xs">
+              {categories.map((cat: any) => (
+                <Card 
+                  key={cat.categorySlug} 
+                  component={Link} 
+                  to={`/category/${cat.categorySlug}`}
+                  p="xs" 
+                  radius="md" 
+                  withBorder 
+                  sx={{ 
+                    cursor: 'pointer', 
+                    '&:hover': { backgroundColor: theme.colors.blue[0], borderColor: theme.colors.blue[4] } 
+                  }}
+                >
+                  <Text size="sm" weight={500}>{cat.categoryName}</Text>
+                </Card>
+              ))}
+            </Group>
+          </Card>
+        )}
 
-        <Group position="apart" mt={theme.spacing.lg}>
-          <Pagination
-            page={activePage}
-            total={products.totalPages}
-            onChange={(page: number) => (page !== activePage) && setActivePage(page)}
-          />
-          <Text>
-            <Text component="span" weight={500}>Trang {activePage}</Text>
-            <span> / {products.totalPages}</span>
+        {/* Brands/Authors Section */}
+        {brands.length > 0 && (
+          <Card radius="md" p="md" withBorder>
+            <Text weight={700} size="sm" color="dimmed" mb="xs" sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
+              Tác giả & Nhà xuất bản
+            </Text>
+            <Group spacing="xs">
+              {brands.map((brand: any) => (
+                <Card 
+                  key={brand.brandId} 
+                  component={Link} 
+                  to={`/search?brand=${brand.brandName}`}
+                  p="xs" 
+                  radius="md" 
+                  withBorder 
+                  sx={{ 
+                    cursor: 'pointer', 
+                    '&:hover': { backgroundColor: theme.colors.blue[0], borderColor: theme.colors.blue[4] } 
+                  }}
+                >
+                  <Text size="sm" weight={500}>{brand.brandName}</Text>
+                </Card>
+              ))}
+            </Group>
+          </Card>
+        )}
+
+        {/* Products Section */}
+        <div>
+          <Text weight={700} size="sm" color="dimmed" mb="xs" sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
+            Sách tìm thấy ({products.length})
           </Text>
-        </Group>
-      </>
+          <Grid>
+            {products.map((product: any, index: number) => (
+              <Grid.Col key={index} span={6} sm={4} md={3}>
+                <ClientProductCard 
+                  product={{
+                    ...product,
+                    id: product.productId,
+                    price: product.productPriceRange[0]
+                  } as any} 
+                  search={searchQuery || ''}
+                />
+              </Grid.Col>
+            ))}
+          </Grid>
+        </div>
+      </Stack>
     );
   }
 
@@ -143,7 +202,7 @@ function ClientSearch() {
                   <Radio value="highest-price" label="Giá cao → thấp"/>
                 </RadioGroup>
               </Group>
-              <Text>{products?.totalElements || 0} sản phẩm</Text>
+              <Text>{products.length} sản phẩm</Text>
             </Group>
 
             <Group spacing="xs">

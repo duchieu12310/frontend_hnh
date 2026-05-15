@@ -78,6 +78,7 @@ import {
   AdminAccountEmail,
   AdminAccountPassword
 } from 'pages/admin-account-setting';
+import ClientPolicy from 'pages/client-policy/ClientPolicy';
 
 const queryClient = new QueryClient();
 
@@ -205,6 +206,7 @@ function App() {
                   )}/>
                   <Route path="/contact" element={<ClientContact/>}/>
                   <Route path="/lien-he" element={<ClientContact/>}/>
+                  <Route path="/policy/:slug" element={<ClientPolicy/>}/>
                 </Route>
                 <Route path="/admin" element={<Admin/>}>
                   <Route path="/admin/*" element={<AdminError/>}/>

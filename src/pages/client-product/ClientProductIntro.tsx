@@ -169,7 +169,7 @@ function ClientProductIntro({ product }: ClientProductIntroProps) {
                 {product.productBrand && (
                   <div className="flex items-center gap-1 text-sm">
                     <span className="text-gray-600 dark:text-gray-400">Tác giả:</span>
-                    <Link to={'/brand/' + product.productBrand.brandId} className="text-blue-600 dark:text-blue-400 font-medium hover:underline text-sm">
+                    <Link to={`/search?brand=${product.productBrand.brandName}`} className="text-blue-600 dark:text-blue-400 font-bold hover:underline text-sm">
                       {product.productBrand.brandName}
                     </Link>
                   </div>
