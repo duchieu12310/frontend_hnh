@@ -49,13 +49,29 @@ function ClientSearch() {
     data: searchResults,
     isLoading: isLoadingSearch,
     isError: isErrorSearch,
-  } = useQuery<any, ErrorMessage>(
-    ['client-api', 'search', 'global', searchQuery],
-    () => FetchUtils.get(ResourceURL.CLIENT_SEARCH, { query: searchQuery || '' }),
+  } = useQuery<ListResponse<ClientListedProductResponse>, ErrorMessage>(
+    ['client-api', 'products', 'shop', activePage, activeSort, activeSaleable, searchQuery],
+    () => FetchUtils.get(ResourceURL.CLIENT_PRODUCT_SHOP, {
+      page: activePage,
+      size: ApplicationConstants.DEFAULT_CLIENT_SEARCH_PAGE_SIZE,
+      sort: activeSort || '',
+      saleable: activeSaleable,
+      search: searchQuery || '',
+    }),
     {
       onError: () => NotifyUtils.simpleFailed('Lấy dữ liệu không thành công'),
       refetchOnWindowFocus: false,
+      keepPreviousData: true,
+    }
+  );
+
+  // Parallel query to retrieve matching categories and brands/authors when searching
+  const { data: globalSearchResults } = useQuery<any, ErrorMessage>(
+    ['client-api', 'search', 'global-metadata', searchQuery],
+    () => FetchUtils.get(ResourceURL.CLIENT_SEARCH, { query: searchQuery || '' }),
+    {
       enabled: !!searchQuery,
+      refetchOnWindowFocus: false,
     }
   );
 
@@ -80,11 +96,14 @@ function ClientSearch() {
     );
   }
 
-  const products = searchResults?.products || [];
-  const categories = searchResults?.categories || [];
-  const brands = searchResults?.brands || [];
+  const products = searchResults?.content || [];
+  const totalPages = searchResults?.totalPages || 1;
+  const totalElements = searchResults?.totalElements || 0;
 
-  if (searchResults && products.length === 0 && categories.length === 0 && brands.length === 0) {
+  const categories = globalSearchResults?.categories || [];
+  const brands = globalSearchResults?.brands || [];
+
+  if (searchResults && products.length === 0) {
     resultFragment = (
       <Stack my={theme.spacing.xl} sx={{ alignItems: 'center', color: theme.colors.blue[6] }}>
         <Marquee size={125} strokeWidth={1}/>
@@ -151,25 +170,37 @@ function ClientSearch() {
         )}
 
         {/* Products Section */}
-        <div>
-          <Text weight={700} size="sm" color="dimmed" mb="xs" sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
-            Sách tìm thấy ({products.length})
-          </Text>
-          <Grid>
-            {products.map((product: any, index: number) => (
-              <Grid.Col key={index} span={6} sm={4} md={3}>
-                <ClientProductCard 
-                  product={{
-                    ...product,
-                    id: product.productId,
-                    price: product.productPriceRange[0]
-                  } as any} 
-                  search={searchQuery || ''}
+        {products.length > 0 && (
+          <div>
+            <Text weight={700} size="sm" color="dimmed" mb="xs" sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
+              Sách tìm thấy ({totalElements})
+            </Text>
+            <Grid>
+              {products.map((product: any, index: number) => (
+                <Grid.Col key={index} span={6} sm={4} md={3}>
+                  <ClientProductCard 
+                    product={{
+                      ...product,
+                      id: product.productId,
+                      price: product.productPriceRange[0]
+                    } as any} 
+                    search={searchQuery || ''}
+                  />
+                </Grid.Col>
+              ))}
+            </Grid>
+            
+            {totalPages > 1 && (
+              <Group position="center" mt="xl">
+                <Pagination
+                  page={activePage}
+                  onChange={setActivePage}
+                  total={totalPages}
                 />
-              </Grid.Col>
-            ))}
-          </Grid>
-        </div>
+              </Group>
+            )}
+          </div>
+        )}
       </Stack>
     );
   }
@@ -195,14 +226,17 @@ function ClientSearch() {
                 <Text weight={500} mr={theme.spacing.xs}>Sắp xếp theo</Text>
                 <RadioGroup
                   value={activeSort || ''}
-                  onChange={(value) => setActiveSort((value as '' | 'lowest-price' | 'highest-price') || null)}
+                  onChange={(value) => {
+                    setActiveSort((value as '' | 'lowest-price' | 'highest-price') || null);
+                    setActivePage(1);
+                  }}
                 >
                   <Radio value="" label="Mới nhất"/>
                   <Radio value="lowest-price" label="Giá thấp → cao"/>
                   <Radio value="highest-price" label="Giá cao → thấp"/>
                 </RadioGroup>
               </Group>
-              <Text>{products.length} sản phẩm</Text>
+              <Text>{totalElements} sản phẩm</Text>
             </Group>
 
             <Group spacing="xs">
