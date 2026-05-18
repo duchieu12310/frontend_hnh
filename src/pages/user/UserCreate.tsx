@@ -215,19 +215,6 @@ function UserCreate() {
               </div>
               {/* Ẩn Vĩ độ và Kinh độ vì Backend tự động lấy */}
 
-              <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {UserConfigs.properties.avatar.label}
-                </label>
-                <input
-                  type="text"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  {...form.getInputProps('avatar')}
-                />
-                {form.errors.avatar && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{form.errors.avatar}</p>
-                )}
-              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {UserConfigs.properties.status.label} <span className="text-red-500">*</span>

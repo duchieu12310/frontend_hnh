@@ -62,9 +62,6 @@ function UserManage() {
       </td>
       <td>{entity.gender === 'M' ? 'Nam' : 'Nữ'}</td>
       <td>
-        <img src={entity.avatar || undefined} alt={entity.fullname} className="w-8 h-8 rounded-full object-cover" />
-      </td>
-      <td>
         <div className="flex flex-col gap-1 items-start">
           {entity.roles.map((role, index) => (
             <span key={index} className="px-2 py-0.5 text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 rounded flex items-center gap-1">
@@ -133,12 +130,7 @@ function UserManage() {
         <td>{UserConfigs.properties['address.district.code'].label}</td>
         <td>{entity.address.district?.code}</td>
       </tr>
-      <tr>
-        <td>{UserConfigs.properties.avatar.label}</td>
-        <td>
-          <img src={entity.avatar || undefined} alt={entity.fullname} className="w-8 h-8 rounded-full object-cover" />
-        </td>
-      </tr>
+
       <tr>
         <td>{UserConfigs.properties.status.label}</td>
         <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={UserConfigs.resourceUrl} resourceKey={UserConfigs.resourceKey} /></td>

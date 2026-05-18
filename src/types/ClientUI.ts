@@ -27,6 +27,8 @@ export interface ClientListedProductResponse {
   productVariants: ClientListedVariantResponse[];
   productSaleable: boolean;
   productPromotion: ClientPromotionResponse | null;
+  productUpcomingPromotion?: ClientPromotionResponse | null;
+  productCategories: ClientCategoryResponse[];
 }
 
 interface ClientListedVariantResponse {
@@ -92,6 +94,7 @@ export interface ClientProductResponse {
   productCountReviews: number;
   productRelatedProducts: ClientListedProductResponse[];
   productPromotion: ClientPromotionResponse | null;
+  productUpcomingPromotion?: ClientPromotionResponse | null;
   productGuarantee: ClientProductResponse_ClientGuaranteeResponse | null;
   productSupplier: ClientProductResponse_ClientSupplierResponse | null;
   productUnit: ClientProductResponse_ClientUnitResponse | null;
@@ -337,6 +340,9 @@ export interface ClientWaybillLogResponse {
 export interface ClientPromotionResponse {
   promotionId: number;
   promotionPercent: number;
+  promotionName?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 // CHAT

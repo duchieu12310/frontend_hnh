@@ -96,7 +96,7 @@ function ClientHeader() {
           </Link>
 
           {/* Center: Navigation - Hidden when searching for more space */}
-          <nav className={`transition-all duration-500 overflow-hidden ${showResults ? 'max-w-0 opacity-0 pointer-events-none' : 'max-w-4xl opacity-100'} hidden lg:flex items-center bg-gray-100/50 dark:bg-gray-800/50 p-1 rounded-full border border-gray-200/20 dark:border-gray-700/20`}>
+          <nav className={`transition-all duration-500 ${showResults ? 'max-w-0 opacity-0 pointer-events-none overflow-hidden' : 'max-w-4xl opacity-100'} hidden lg:flex items-center bg-gray-100/50 dark:bg-gray-800/50 p-1 rounded-full border border-gray-200/20 dark:border-gray-700/20`}>
             <NavLink to="/promotion-products">Khuyến Mãi</NavLink>
             <NavLink to="/search">Cửa Hàng</NavLink>
 
@@ -107,7 +107,7 @@ function ClientHeader() {
             ))}
 
             <HeadlessPopover className="relative">
-              {({ open }) => {
+              {({ open, close }) => {
                 const isInCategoryPage = pathname.startsWith('/category/');
                 const isMainCategory = categoryResponses?.content.slice(0, 2).some((cat: any) => pathname === `/category/${cat.categorySlug}`);
                 const isActive = (isInCategoryPage && !isMainCategory) || open;
@@ -126,7 +126,7 @@ function ClientHeader() {
 
                     <HeadlessPopover.Panel className="absolute left-1/2 -translate-x-1/2 mt-4 w-screen max-w-xs sm:max-w-6xl px-4 z-[110] transition-all duration-300">
                       <div className="overflow-hidden rounded-3xl shadow-2xl ring-1 ring-black/5 bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl p-4 border border-gray-100 dark:border-gray-800">
-                        <CategoryMenu setOpenedCategoryMenu={() => { }} />
+                        <CategoryMenu setOpenedCategoryMenu={() => close()} />
                       </div>
                     </HeadlessPopover.Panel>
                   </>

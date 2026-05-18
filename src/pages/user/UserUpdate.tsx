@@ -138,12 +138,7 @@ function UserUpdate() {
               </Grid.Col>
               {/* Ẩn Vĩ độ và Kinh độ vì Backend tự động lấy */}
 
-              <Grid.Col>
-                <TextInput
-                  label={UserConfigs.properties.avatar.label}
-                  {...form.getInputProps('avatar')}
-                />
-              </Grid.Col>
+
               <Grid.Col xs={6}>
                 <Switch
                   size="md"

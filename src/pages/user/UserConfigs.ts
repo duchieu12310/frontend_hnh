@@ -81,7 +81,6 @@ class UserConfigs extends Configs {
     avatar: {
       label: 'Ảnh đại diện',
       type: EntityPropertyType.STRING,
-      isShowInTable: true,
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
     },

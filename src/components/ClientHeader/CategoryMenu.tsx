@@ -7,7 +7,7 @@ import ResourceURL from 'constants/ResourceURL';
 import NotifyUtils from 'utils/NotifyUtils';
 import { AlertTriangle, ChevronRight, LayoutGrid } from 'tabler-icons-react';
 
-function CategoryMenu({ setOpenedCategoryMenu }: { setOpenedCategoryMenu: Dispatch<SetStateAction<boolean>> }) {
+function CategoryMenu({ setOpenedCategoryMenu }: { setOpenedCategoryMenu: (opened: boolean) => void }) {
   const [activeTab, setActiveTab] = useState(0);
   const navigate = useNavigate();
 

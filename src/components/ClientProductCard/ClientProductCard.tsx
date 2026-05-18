@@ -91,6 +91,21 @@ function ClientProductCard({ product, search }: ClientProductCardProps) {
     );
   };
 
+  const formatPromotionDate = (dateStr?: string) => {
+    if (!dateStr) return '';
+    try {
+      const date = new Date(dateStr);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${day}/${month}/${year} ${hours}:${minutes}`;
+    } catch (e) {
+      return dateStr;
+    }
+  };
+
   return (
     <Link
       to={'/product/' + product.productSlug}
@@ -101,12 +116,12 @@ function ClientProductCard({ product, search }: ClientProductCardProps) {
       <div className="flex flex-col gap-2">
         <div className="relative">
           <img
-            src={product.productThumbnail || undefined}
+            src={product.productThumbnail || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23f3f4f6" width="200" height="200"/%3E%3Ctext fill="%239ca3af" font-family="sans-serif" font-size="14" dy="4" font-weight="bold" x="50%25" y="50%25" text-anchor="middle"%3EBookstore%3C/text%3E%3C/svg%3E'}
             alt={product.productName}
             className="w-full rounded-md aspect-square object-cover"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23ddd" width="200" height="200"/%3E%3Ctext fill="%23999" font-family="sans-serif" font-size="14" dy="10.5" font-weight="bold" x="50%25" y="50%25" text-anchor="middle"%3ENo Image%3C/text%3E%3C/svg%3E';
+              target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23f3f4f6" width="200" height="200"/%3E%3Ctext fill="%239ca3af" font-family="sans-serif" font-size="14" dy="4" font-weight="bold" x="50%25" y="50%25" text-anchor="middle"%3EBookstore%3C/text%3E%3C/svg%3E';
             }}
           />
           <div
@@ -178,23 +193,46 @@ function ClientProductCard({ product, search }: ClientProductCardProps) {
               return null;
             })()}
           </div>
-          <p className="font-medium text-pink-600">
-            {product.productPriceRange
-              .map(price => product.productPromotion
-                ? MiscUtils.calculateDiscountedPrice(price, product.productPromotion.promotionPercent)
-                : price)
-              .map(MiscUtils.formatPrice).join('–') + '\u00A0₫'}
-          </p>
-          {product.productPromotion && (
-            <div className="flex items-center gap-2">
-              <p className="text-sm line-through text-gray-500">
-                {product.productPriceRange.map(MiscUtils.formatPrice).join('–') + '\u00A0₫'}
-              </p>
-              <span className="px-2 py-1 text-xs font-semibold text-white bg-pink-600 rounded">
-                -{product.productPromotion.promotionPercent}%
-              </span>
-            </div>
-          )}
+          {(() => {
+            const activePromo = product.productPromotion;
+            const upcomingPromo = product.productUpcomingPromotion;
+            const promoPercent = activePromo ? activePromo.promotionPercent : (upcomingPromo ? upcomingPromo.promotionPercent : 0);
+            const hasPromo = promoPercent > 0;
+
+            return (
+              <>
+                <p className="font-medium text-pink-600">
+                  {product.productPriceRange
+                    .map(price => hasPromo
+                      ? MiscUtils.calculateDiscountedPrice(price, promoPercent)
+                      : price)
+                    .map(MiscUtils.formatPrice).join('–') + '\u00A0₫'}
+                </p>
+                {hasPromo && (
+                  <div className="flex flex-col gap-1.5 mt-0.5">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm line-through text-gray-500">
+                        {product.productPriceRange.map(MiscUtils.formatPrice).join('–') + '\u00A0₫'}
+                      </p>
+                      <span className={`px-2 py-0.5 text-xs font-semibold text-white rounded whitespace-nowrap ${
+                        activePromo ? 'bg-pink-600' : 'bg-purple-600'
+                      }`}>
+                        {activePromo ? `-${promoPercent}%` : `Sắp giảm -${promoPercent}%`}
+                      </span>
+                    </div>
+                    {!activePromo && upcomingPromo && upcomingPromo.startDate && (
+                      <div className="text-[10px] font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1 mt-0.5 bg-purple-50 dark:bg-purple-950/30 px-2 py-0.5 rounded w-max">
+                        <svg className="w-3 h-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Từ: {formatPromotionDate(upcomingPromo.startDate)}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            );
+          })()}
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {product.productVariants.length} phiên bản
           </p>
