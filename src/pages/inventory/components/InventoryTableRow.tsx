@@ -132,7 +132,7 @@ const InventoryTableRow: React.FC<Props> = ({
       <td className="px-4 py-2.5 border-b border-r border-gray-100 dark:border-gray-800 bg-gray-50/30">
          <Center>
             <Text sx={{ fontSize: 13 }} weight={800} color="dimmed">
-                {row.quantityInLocation}
+                {localQty}
             </Text>
          </Center>
       </td>
