@@ -60,6 +60,13 @@ class WaybillConfigs extends Configs {
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
     },
+    products: {
+      label: 'Đơn hàng cần chuyển',
+      type: EntityPropertyType.PLACEHOLDER,
+      isShowInTable: true,
+      isNotAddToSortCriteria: true,
+      isNotAddToFilterCriteria: true,
+    },
     'fromWarehouse.name': {
       label: 'Kho lấy hàng',
       type: EntityPropertyType.STRING,
@@ -68,7 +75,7 @@ class WaybillConfigs extends Configs {
     'shipper.fullname': {
       label: 'Người vận chuyển',
       type: EntityPropertyType.STRING,
-      isShowInTable: true,
+      isShowInTable: false,
     },
     status: {
       label: 'Trạng thái vận đơn',

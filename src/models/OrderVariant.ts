@@ -16,6 +16,7 @@ interface VariantResponse extends BaseResponse {
   price: number;
   properties: CollectionWrapper<VariantPropertyItem> | null;
   status: number;
+  quantity?: number;
 }
 
 interface ProductResponse extends BaseResponse {

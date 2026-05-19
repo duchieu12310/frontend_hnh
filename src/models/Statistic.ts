@@ -15,7 +15,9 @@ export interface StatisticResponse {
   totalCustomer: number;
   totalProduct: number;
   totalOrder: number;
+  totalDeliveredOrder: number;
   totalWaybill: number;
+  totalCompletedWaybill: number;
   totalReview: number;
   totalActivePromotion: number;
   totalSupplier: number;

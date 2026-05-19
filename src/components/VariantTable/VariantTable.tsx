@@ -52,7 +52,7 @@ function VariantTable({
             {type === EntityType.PURCHASE_ORDER && <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Giá vốn</th>}
             {type === EntityType.ORDER && <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Giá bán</th>}
             {type !== EntityType.COUNT && <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Số lượng</th>}
-            {type === EntityType.COUNT && <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tồn kho</th>}
+            {[EntityType.COUNT, EntityType.ORDER].includes(type) && <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tồn kho</th>}
             {type === EntityType.COUNT && <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Kiểm thực tế</th>}
             {type === EntityType.COUNT && <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Chênh lệch</th>}
             {[EntityType.PURCHASE_ORDER, EntityType.ORDER].includes(type) &&
@@ -107,6 +107,11 @@ function VariantTable({
                       className="w-24 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
+                </td>
+              )}
+              {type === EntityType.ORDER && (
+                <td className="px-3 py-2 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {variant.quantity ?? 0}
                 </td>
               )}
               {type === EntityType.COUNT && handleActualInventoryInput && (

@@ -151,87 +151,79 @@ function ClientCart() {
         <div className="md:col-span-9">
           <div className="p-0 rounded-md shadow-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
             <div className="overflow-auto max-h-[600px]">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="border-b border-gray-200 dark:border-gray-700">
-                    <th className="p-4 text-center min-w-[50px]">
-                      <input
-                        type="checkbox"
-                        checked={cart.cartItems.length > 0 && selectedItems.size === cart.cartItems.length}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedItems(new Set(cart.cartItems.map(item => item.cartItemVariant.variantId)));
-                          } else {
-                            setSelectedItems(new Set());
-                          }
-                        }}
-                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                      />
-                    </th>
-                    <th className="p-4 text-left min-w-[325px]">
-                      <p className="text-sm font-normal text-gray-600 dark:text-gray-400">
-                        Cuốn sách
-                      </p>
-                    </th>
-                    <th className="p-4 text-left min-w-[125px]">
-                      <p className="text-sm font-normal text-gray-600 dark:text-gray-400">
-                        Đơn giá
-                      </p>
-                    </th>
-                    <th className="p-4 text-left min-w-[150px]">
-                      <p className="text-sm font-normal text-gray-600 dark:text-gray-400">
-                        Số lượng
-                      </p>
-                    </th>
-                    <th className="p-4 text-left min-w-[125px]">
-                      <p className="text-sm font-normal text-gray-600 dark:text-gray-400">
-                        Thành tiền
-                      </p>
-                    </th>
-                    <th className="p-4 text-center min-w-[80px]">
-                      <p className="text-sm font-normal text-gray-600 dark:text-gray-400">
-                        Thao tác
-                      </p>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {cart.cartItems.map((cartItem) => (
-                    <CartItemTableRow
-                      key={
-                        cartItem.cartItemVariant
-                          .variantId
-                      }
-                      cartItem={cartItem}
-                      isSelected={selectedItems.has(cartItem.cartItemVariant.variantId)}
-                      onToggleSelect={(variantId) => {
-                        const newSelected = new Set(selectedItems);
-                        if (newSelected.has(variantId)) {
-                          newSelected.delete(variantId);
-                        } else {
-                          newSelected.add(variantId);
-                        }
-                        setSelectedItems(newSelected);
-                      }}
-                    />
-                  ))}
-                  {cart.cartItems.length === 0 && (
-                    <tr>
-                      <td colSpan={6} className="p-8">
-                        <div className="flex flex-col items-center gap-4 my-8 text-blue-600 dark:text-blue-400">
-                          <Marquee
-                            size={125}
-                            strokeWidth={1}
-                          />
-                          <p className="text-xl font-medium">
-                            Chưa có cuốn sách nào
-                          </p>
-                        </div>
-                      </td>
+              {cart.cartItems.length > 0 ? (
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="border-b border-gray-200 dark:border-gray-700">
+                      <th className="p-4 text-center min-w-[50px]">
+                        <input
+                          type="checkbox"
+                          checked={cart.cartItems.length > 0 && selectedItems.size === cart.cartItems.length}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedItems(new Set(cart.cartItems.map(item => item.cartItemVariant.variantId)));
+                            } else {
+                              setSelectedItems(new Set());
+                            }
+                          }}
+                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                      </th>
+                      <th className="p-4 text-left min-w-[325px]">
+                        <p className="text-sm font-normal text-gray-600 dark:text-gray-400">
+                          Cuốn sách
+                        </p>
+                      </th>
+                      <th className="p-4 text-left min-w-[125px]">
+                        <p className="text-sm font-normal text-gray-600 dark:text-gray-400">
+                          Đơn giá
+                        </p>
+                      </th>
+                      <th className="p-4 text-left min-w-[150px]">
+                        <p className="text-sm font-normal text-gray-600 dark:text-gray-400">
+                          Số lượng
+                        </p>
+                      </th>
+                      <th className="p-4 text-left min-w-[125px]">
+                        <p className="text-sm font-normal text-gray-600 dark:text-gray-400">
+                          Thành tiền
+                        </p>
+                      </th>
+                      <th className="p-4 text-center min-w-[80px]">
+                        <p className="text-sm font-normal text-gray-600 dark:text-gray-400">
+                          Thao tác
+                        </p>
+                      </th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {cart.cartItems.map((cartItem) => (
+                      <CartItemTableRow
+                        key={
+                          cartItem.cartItemVariant
+                            .variantId
+                        }
+                        cartItem={cartItem}
+                        isSelected={selectedItems.has(cartItem.cartItemVariant.variantId)}
+                        onToggleSelect={(variantId) => {
+                          const newSelected = new Set(selectedItems);
+                          if (newSelected.has(variantId)) {
+                            newSelected.delete(variantId);
+                          } else {
+                            newSelected.add(variantId);
+                          }
+                          setSelectedItems(newSelected);
+                        }}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="flex flex-col items-center gap-4 py-16 text-blue-600 dark:text-blue-400">
+                  <Marquee size={125} strokeWidth={1} />
+                  <p className="text-xl font-medium">Chưa có cuốn sách nào</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -799,6 +791,7 @@ function CartItemTableRow({
 function ConfirmedOrder({ onClose, selectedItems }: { onClose: () => void; selectedItems: Set<number> }) {
   const { updateCurrentTotalCartItems, currentCartId, user } = useAuthStore();
   const queryClient = useQueryClient();
+  const saveCartApi = useSaveCartApi();
   const {
     mutate: createClientOrder,
     data: clientConfirmedOrderResponse,
@@ -828,12 +821,27 @@ function ConfirmedOrder({ onClose, selectedItems }: { onClose: () => void; selec
         if (cartResponse && Object.hasOwn(cartResponse, 'cartId')) {
           const cart = cartResponse as ClientCartResponse;
           // Find items to remove (not selected)
-          const itemsToRemove = cart.cartItems
-            .filter(item => !selectedItems.has(item.cartItemVariant.variantId))
-            .map(item => ({
-              cartId: currentCartId as number,
-              variantId: item.cartItemVariant.variantId,
-            }));
+          const unselectedItems = cart.cartItems.filter(item => !selectedItems.has(item.cartItemVariant.variantId));
+          const itemsToRemove = unselectedItems.map(item => ({
+            cartId: currentCartId as number,
+            variantId: item.cartItemVariant.variantId,
+          }));
+
+          const restoreUnselectedItems = () => {
+            if (unselectedItems.length > 0 && user) {
+              const cartRequest: ClientCartRequest = {
+                cartId: null,
+                userId: user.id,
+                cartItems: unselectedItems.map((item) => ({
+                  variantId: item.cartItemVariant.variantId,
+                  quantity: item.cartItemQuantity,
+                })),
+                status: 1,
+                updateQuantityType: UpdateQuantityType.OVERRIDE,
+              };
+              saveCartApi.mutate(cartRequest);
+            }
+          };
 
           if (itemsToRemove.length > 0) {
             // Remove unselected items before creating order
@@ -843,7 +851,9 @@ function ConfirmedOrder({ onClose, selectedItems }: { onClose: () => void; selec
                 const request: ClientSimpleOrderRequest = {
                   paymentMethodType: currentPaymentMethod,
                 };
-                createClientOrder(request);
+                createClientOrder(request, {
+                  onSuccess: restoreUnselectedItems
+                });
               },
               onError: () => {
                 // Even if delete fails (items might already be deleted), proceed with order
@@ -851,7 +861,9 @@ function ConfirmedOrder({ onClose, selectedItems }: { onClose: () => void; selec
                 const request: ClientSimpleOrderRequest = {
                   paymentMethodType: currentPaymentMethod,
                 };
-                createClientOrder(request);
+                createClientOrder(request, {
+                  onSuccess: restoreUnselectedItems
+                });
               },
             });
           } else {
@@ -872,7 +884,7 @@ function ConfirmedOrder({ onClose, selectedItems }: { onClose: () => void; selec
 
       processOrder();
     }
-  }, [checkoutPaypalStatus, queryClient, selectedItems, currentCartId, deleteCartItemsApi, createClientOrder, currentPaymentMethod]);
+  }, [checkoutPaypalStatus, queryClient, selectedItems, currentCartId, deleteCartItemsApi, createClientOrder, currentPaymentMethod, user, saveCartApi]);
 
   const { newNotifications } = useClientSiteStore();
 

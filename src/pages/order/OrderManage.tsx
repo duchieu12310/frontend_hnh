@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   FilterPanel,
   ManageHeader,
@@ -23,17 +24,43 @@ import MiscUtils from 'utils/MiscUtils';
 import { Clipboard, Plus } from 'tabler-icons-react';
 import NotifyUtils from 'utils/NotifyUtils';
 import ManagerPath from 'constants/ManagerPath';
+import FilterUtils from 'utils/FilterUtils';
 
 function OrderManage() {
   useResetManagePageState(OrderConfigs.resourceKey);
   useInitFilterPanelState(OrderConfigs.properties);
 
+  const { activePage, activePageSize, activeFilter, searchToken, setActivePage } = useAppStore();
+  const [quickFilter, setQuickFilter] = useState<'all' | 'undelivered' | 'delivered'>('all');
+
+  const activeFilterRSQL = FilterUtils.convertToFilterRSQL(activeFilter);
+
+  let customFilter = '';
+  if (quickFilter === 'undelivered') {
+    customFilter = 'status!=4;status!=5';
+  } else if (quickFilter === 'delivered') {
+    customFilter = 'status==4';
+  }
+
+  const requestParams = {
+    page: activePage,
+    size: activePageSize,
+    sort: FilterUtils.convertToSortRSQL(activeFilter),
+    filter: activeFilterRSQL ? (customFilter ? `${activeFilterRSQL};${customFilter}` : activeFilterRSQL) : customFilter,
+    search: searchToken,
+  };
+
   const {
     isLoading,
     data: listResponse = PageConfigs.initialListResponse as ListResponse<OrderResponse>,
-  } = useGetAllApi<OrderResponse>(OrderConfigs.resourceUrl, OrderConfigs.resourceKey);
+  } = useGetAllApi<OrderResponse>(OrderConfigs.resourceUrl, OrderConfigs.resourceKey, requestParams);
 
-  const { searchToken } = useAppStore();
+  const handleQuickFilterChange = (filter: 'all' | 'undelivered' | 'delivered') => {
+    setQuickFilter(filter);
+    setActivePage(1);
+  };
+
+
 
   const highlightText = (text: string, highlight: string, className?: string) => {
     if (!highlight) return <span className={className}>{text}</span>;
@@ -94,6 +121,24 @@ function OrderManage() {
             <span className="text-xs text-gray-500 dark:text-gray-400">{highlightText(entity.toProvinceName, searchToken, '')}</span>
           </div>
         </td>
+        <td>
+          <div className="flex flex-col gap-1.5 min-w-[200px] max-w-[250px] max-h-[140px] overflow-y-auto pr-1 text-left">
+            {entity.orderVariants?.map((ov, index) => (
+              <div key={index} className="flex flex-col gap-0.5 p-1.5 border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 shadow-sm">
+                <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 line-clamp-2" title={ov.variant.product.name}>{ov.variant.product.name}</span>
+                {ov.variant.properties?.content && ov.variant.properties.content.length > 0 && (
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                    {ov.variant.properties.content.map(p => p.value).join(' | ')}
+                  </span>
+                )}
+                <div className="flex justify-between items-center mt-0.5 pt-1 border-t border-slate-100 dark:border-slate-700/50">
+                  <span className="text-[10px] text-slate-600 dark:text-slate-400">SL Đặt: <strong className="text-blue-600 dark:text-blue-400 text-xs">{ov.quantity}</strong></span>
+                  <span className="text-[10px] text-slate-600 dark:text-slate-400">Tồn Kho: <strong className="text-slate-800 dark:text-slate-200 text-xs">{ov.variant.quantity ?? 0}</strong></span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </td>
         <td className="text-right">
           <div className="flex flex-col items-end gap-1">
             <p className="font-medium text-sm">{MiscUtils.formatPrice(entity.totalPay) + ' ₫'}</p>
@@ -101,15 +146,21 @@ function OrderManage() {
           </div>
         </td>
         <td>
-          <a
-            href={ManagerPath.WAYBILL + '/create?orderId=' + entity.id}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors inline-block"
-            title="Tạo vận đơn"
-          >
-            <Plus size={20} />
-          </a>
+          {(entity as any).waybill || (entity as any).orderWaybill || entity.status === 2 || entity.status === 3 || entity.status === 4 ? (
+            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+              Đã vận đơn
+            </span>
+          ) : entity.status === 1 ? (
+            <Link
+              to={ManagerPath.WAYBILL + '/create?orderId=' + entity.id}
+              className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors inline-block"
+              title="Tạo vận đơn"
+            >
+              <Plus size={20} />
+            </Link>
+          ) : (
+            <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">—</span>
+          )}
         </td>
       
         <td>
@@ -136,6 +187,40 @@ function OrderManage() {
       </ManageHeader>
 
       <SearchPanel/>
+
+      {/* Quick Filters */}
+      <div className="flex items-center gap-2 bg-slate-100/50 dark:bg-slate-800/40 p-1.5 rounded-xl w-fit border border-slate-200/50 dark:border-slate-700/50 shadow-sm">
+        <button
+          onClick={() => handleQuickFilterChange('all')}
+          className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
+            quickFilter === 'all'
+              ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          Tất cả đơn hàng
+        </button>
+        <button
+          onClick={() => handleQuickFilterChange('undelivered')}
+          className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
+            quickFilter === 'undelivered'
+              ? 'bg-amber-500 text-white shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400'
+          }`}
+        >
+          Đơn hàng chưa giao
+        </button>
+        <button
+          onClick={() => handleQuickFilterChange('delivered')}
+          className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
+            quickFilter === 'delivered'
+              ? 'bg-green-600 text-white shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400'
+          }`}
+        >
+          Đã giao hàng
+        </button>
+      </div>
 
       <FilterPanel/>
 

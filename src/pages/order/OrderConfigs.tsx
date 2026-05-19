@@ -49,6 +49,13 @@ class OrderConfigs extends Configs {
       isNotAddToSortCriteria: true,
       isNotAddToFilterCriteria: true,
     },
+    products: {
+      label: 'Sản phẩm',
+      type: EntityPropertyType.PLACEHOLDER,
+      isShowInTable: true,
+      isNotAddToSortCriteria: true,
+      isNotAddToFilterCriteria: true,
+    },
     totalPay: {
       label: 'Tổng tiền trả',
       type: EntityPropertyType.NUMBER,

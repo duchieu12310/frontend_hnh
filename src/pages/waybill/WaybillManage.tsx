@@ -24,17 +24,41 @@ import useGetAllApi from 'hooks/use-get-all-api';
 import useAppStore from 'stores/use-app-store';
 import MiscUtils from 'utils/MiscUtils';
 import OrderConfigs from 'pages/order/OrderConfigs';
+import FilterUtils from 'utils/FilterUtils';
 
 function WaybillManage() {
   useResetManagePageState(WaybillConfigs.resourceKey);
   useInitFilterPanelState(WaybillConfigs.properties);
 
+  const { activePage, activePageSize, activeFilter, searchToken, setActivePage } = useAppStore();
+  const [quickFilter, setQuickFilter] = useState<'all' | 'active' | 'inactive'>('all');
+
+  const activeFilterRSQL = FilterUtils.convertToFilterRSQL(activeFilter);
+
+  let customFilter = '';
+  if (quickFilter === 'active') {
+    customFilter = 'status==1';
+  } else if (quickFilter === 'inactive') {
+    customFilter = 'status!=1';
+  }
+
+  const requestParams = {
+    page: activePage,
+    size: activePageSize,
+    sort: FilterUtils.convertToSortRSQL(activeFilter),
+    filter: activeFilterRSQL ? (customFilter ? `${activeFilterRSQL};${customFilter}` : activeFilterRSQL) : customFilter,
+    search: searchToken,
+  };
+
   const {
     isLoading,
     data: listResponse = PageConfigs.initialListResponse as ListResponse<WaybillResponse>,
-  } = useGetAllApi<WaybillResponse>(WaybillConfigs.resourceUrl, WaybillConfigs.resourceKey);
+  } = useGetAllApi<WaybillResponse>(WaybillConfigs.resourceUrl, WaybillConfigs.resourceKey, requestParams);
 
-  const { searchToken } = useAppStore();
+  const handleQuickFilterChange = (filter: 'all' | 'active' | 'inactive') => {
+    setQuickFilter(filter);
+    setActivePage(1);
+  };
 
   const [viewOrderModalId, setViewOrderModalId] = useState<number | null>(null);
 
@@ -84,9 +108,25 @@ function WaybillManage() {
             <p className="text-xs">Chiều cao: <b>{entity.height}</b> (cm)</p>
           </div>
         </td>
+        <td>
+          <div className="flex flex-col gap-1.5 min-w-[200px] max-w-[250px] max-h-[140px] overflow-y-auto pr-1 text-left">
+            {entity.order?.orderVariants?.map((ov, index) => (
+              <div key={index} className="flex flex-col gap-0.5 p-1.5 border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 shadow-sm">
+                <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 line-clamp-2" title={ov.variant.product.name}>{ov.variant.product.name}</span>
+                {ov.variant.properties?.content && ov.variant.properties.content.length > 0 && (
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                    {ov.variant.properties.content.map(p => p.value).join(' | ')}
+                  </span>
+                )}
+                <div className="flex justify-between items-center mt-0.5 pt-1 border-t border-slate-100 dark:border-slate-700/50">
+                  <span className="text-[10px] text-slate-600 dark:text-slate-400">SL Đặt: <strong className="text-blue-600 dark:text-blue-400 text-xs">{ov.quantity}</strong></span>
+                  <span className="text-[10px] text-slate-600 dark:text-slate-400">Tồn Kho: <strong className="text-slate-800 dark:text-slate-200 text-xs">{ov.variant.quantity ?? 0}</strong></span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </td>
         <td>{entity.fromWarehouse?.name}</td>
-        <td>{entity.shipper?.fullname || 'Chưa phân công'}</td>
-      
         <td><StatusToggle status={entity.status} entityId={entity.id} resourceUrl={WaybillConfigs.resourceUrl} resourceKey={WaybillConfigs.resourceKey} /></td></>
     );
   };
@@ -182,6 +222,40 @@ function WaybillManage() {
       </ManageHeader>
 
       <SearchPanel/>
+
+      {/* Quick Filters */}
+      <div className="flex items-center gap-2 bg-slate-100/50 dark:bg-slate-800/40 p-1.5 rounded-xl w-fit border border-slate-200/50 dark:border-slate-700/50 shadow-sm">
+        <button
+          onClick={() => handleQuickFilterChange('all')}
+          className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
+            quickFilter === 'all'
+              ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          Tất cả vận đơn
+        </button>
+        <button
+          onClick={() => handleQuickFilterChange('active')}
+          className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
+            quickFilter === 'active'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400'
+          }`}
+        >
+          Vận đơn đang bật
+        </button>
+        <button
+          onClick={() => handleQuickFilterChange('inactive')}
+          className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
+            quickFilter === 'inactive'
+              ? 'bg-red-500 text-white shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400'
+          }`}
+        >
+          Vận đơn đang tắt
+        </button>
+      </div>
 
       <FilterPanel/>
 

@@ -9,7 +9,7 @@ import NotifyUtils from 'utils/NotifyUtils';
 
 function ClientHomeLatestProducts() {
 
-  const requestParams = { size: 12, newable: true, saleable: true };
+  const requestParams = { size: 8, saleable: true, sort: 'updatedAt,desc' };
 
   const { 
     data: productResponses,

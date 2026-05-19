@@ -171,6 +171,28 @@ function WaybillCreate() {
                             </div>
                           </Group>
                         </Grid.Col>
+
+                        <Grid.Col span={12}>
+                          <Stack spacing={8}>
+                            <Text size="xs" color="dimmed" weight={500}>Chi tiết sản phẩm</Text>
+                            {selectedOrder.orderVariants?.map((orderVariant, index) => (
+                              <Paper key={index} withBorder p="xs" radius="md">
+                                <Group position="apart" noWrap>
+                                  <div className="flex flex-col gap-0.5 overflow-hidden">
+                                    <Text size="sm" weight={600} className="truncate">{orderVariant.variant.product.name}</Text>
+                                    <Text size="xs" color="dimmed" className="truncate">
+                                      {orderVariant.variant.properties?.content.map(p => `${p.name}: ${p.value}`).join(' | ')}
+                                    </Text>
+                                  </div>
+                                  <div className="flex flex-col gap-0.5 items-end shrink-0">
+                                    <Text size="sm">SL đặt: <Text component="span" weight={600} color="blue">{orderVariant.quantity}</Text></Text>
+                                    <Text size="xs" color="dimmed">Tồn kho: <Text component="span" weight={500}>{orderVariant.variant.quantity ?? 0}</Text></Text>
+                                  </div>
+                                </Group>
+                              </Paper>
+                            ))}
+                          </Stack>
+                        </Grid.Col>
                       </Grid>
                     </Stack>
                   </Paper>

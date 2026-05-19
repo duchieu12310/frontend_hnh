@@ -9,15 +9,65 @@ import NotifyUtils from 'utils/NotifyUtils';
 
 function ClientHomeTopSellingProducts() {
 
-  const requestParams = { size: 12, topSelling: true, saleable: true };
-
   const { 
     data: productResponses,
     isLoading: isLoadingProductResponses,
     isError: isErrorProductResponses,
   } = useQuery<ListResponse<ClientListedProductResponse>, ErrorMessage>(
-    ['client-api', 'products', 'getAllProducts', requestParams],
-    () => FetchUtils.get(ResourceURL.CLIENT_PRODUCT, requestParams),
+    ['client-api', 'products', 'getTopSellingWithAdminFallback'],
+    async () => {
+      let topIds: number[] = [];
+      try {
+        const stats = await FetchUtils.getWithToken<any>(`${ResourceURL.STATISTIC}?period=month`);
+        if (stats && stats.topSellingProducts) {
+          topIds = stats.topSellingProducts.map((p: any) => p.productId);
+        }
+      } catch (e) {
+        // Fallback or ignore if admin stats cannot be fetched (e.g. unauthenticated guest)
+      }
+      topIds = topIds.slice(0, 8);
+
+      let topProducts: ClientListedProductResponse[] = [];
+
+      // Fetch top selling from IDs
+      if (topIds.length > 0) {
+        const filter = `id=in=(${topIds.join(',')})`;
+        const response = await FetchUtils.get<ListResponse<ClientListedProductResponse>>(
+          ResourceURL.CLIENT_PRODUCT, 
+          { size: 8, saleable: true, filter }
+        );
+        if (response && response.content) {
+          topProducts = response.content;
+          topProducts.sort((a, b) => topIds.indexOf(a.productId) - topIds.indexOf(b.productId));
+        }
+      }
+
+      // Pad remaining to 8
+      if (topProducts.length < 8) {
+        const needed = 8 - topProducts.length;
+        const excludeFilter = topIds.length > 0 ? `id=out=(${topIds.join(',')})` : undefined;
+        const fallbackParams = { 
+          size: needed, 
+          saleable: true, 
+          topSelling: true,
+          sort: 'updatedAt,desc',
+          filter: excludeFilter 
+        };
+        const fallbackResponse = await FetchUtils.get<ListResponse<ClientListedProductResponse>>(
+          ResourceURL.CLIENT_PRODUCT, 
+          fallbackParams
+        );
+        if (fallbackResponse && fallbackResponse.content) {
+          topProducts = [...topProducts, ...fallbackResponse.content];
+        }
+      }
+
+      return {
+        content: topProducts,
+        totalElements: topProducts.length,
+        page: 1, size: 8, totalPages: 1, last: true
+      } as ListResponse<ClientListedProductResponse>;
+    },
     {
       onError: () => NotifyUtils.simpleFailed('Lấy dữ liệu không thành công'),
       refetchOnWindowFocus: false,

@@ -168,7 +168,7 @@ function ClientFooter() {
         <div className="mt-12 pt-6 pb-4 flex justify-center items-center gap-4">
           <div className="flex-1 h-px bg-white/20 max-w-[200px]" />
           <p className="text-sm font-medium text-gray-400 text-center whitespace-nowrap">
-            Bản quyền 2025 © FashionHub.com
+            Bản quyền 2026 ©  hieubookstore.com
           </p>
           <div className="flex-1 h-px bg-white/20 max-w-[200px]" />
         </div>

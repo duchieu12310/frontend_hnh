@@ -1,5 +1,6 @@
-import React from 'react';
-import { Card, Grid, Group, MantineColor, Paper, Stack, Table, Text, Title, useMantineTheme } from '@mantine/core';
+import React, { useState } from 'react';
+import { Card, Grid, Group, MantineColor, Paper, SegmentedControl, Stack, Table, Text, Title, useMantineTheme } from '@mantine/core';
+import dayjs from 'dayjs';
 import {
   Box,
   BrandApple,
@@ -14,7 +15,7 @@ import {
   TrendingUp,
   Users
 } from 'tabler-icons-react';
-import { Bar, BarChart, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useQuery } from 'react-query';
 import FetchUtils, { ErrorMessage } from 'utils/FetchUtils';
 import ResourceURL from 'constants/ResourceURL';
@@ -22,6 +23,8 @@ import NotifyUtils from 'utils/NotifyUtils';
 import { ProductSalesStatistic, StatisticResource, StatisticResponse } from 'models/Statistic';
 import DateUtils from 'utils/DateUtils';
 import MiscUtils from 'utils/MiscUtils';
+import { useNavigate } from 'react-router-dom';
+import ManagerPath from 'constants/ManagerPath';
 
 const dateReducerForStatisticResources = (statisticResources: StatisticResource[]) => statisticResources.map((statisticResource) => ({
   date: DateUtils.isoDateToString(statisticResource.date, 'DD/MM/YY'),
@@ -56,20 +59,76 @@ const groupByDate = (data: Array<{ date: string, total: number }>): Array<{ date
 
 // Filter dữ liệu chỉ lấy năm hiện tại
 const filterCurrentYear = (statisticResources: StatisticResource[]): StatisticResource[] => {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const yearStart = new Date(currentYear, 0, 1); // 1/1 của năm hiện tại
-  
+  const cutoff = dayjs().startOf('year');
   return statisticResources.filter(item => {
-    const itemDate = new Date(item.date);
-    return itemDate >= yearStart && itemDate <= now;
+    const itemDate = dayjs(item.date);
+    return itemDate.isAfter(cutoff) || itemDate.isSame(cutoff);
   });
 };
 
-function AdminDashboard() {
-  const theme = useMantineTheme();
+// Filter dữ liệu trong khoảng N ngày gần nhất
+const filterLastDays = (statisticResources: StatisticResource[], days: number): StatisticResource[] => {
+  const cutoff = dayjs().subtract(days, 'day').startOf('day');
+  return statisticResources.filter(item => {
+    const itemDate = dayjs(item.date);
+    return itemDate.isAfter(cutoff) || itemDate.isSame(cutoff);
+  });
+};
 
-  const { statisticResponse } = useGetStatisticApi();
+// Group dữ liệu theo tháng của năm hiện tại
+const groupByMonthForCurrentYear = (statisticResources: StatisticResource[]): Array<{ date: string, total: number }> => {
+  const currentYear = dayjs().year();
+  const monthlyTotals = new Map<number, number>();
+  for (let i = 1; i <= 12; i++) {
+    monthlyTotals.set(i, 0);
+  }
+
+  statisticResources.forEach(item => {
+    const itemDate = dayjs(item.date);
+    if (itemDate.year() === currentYear) {
+      const month = itemDate.month() + 1; // 1-indexed
+      monthlyTotals.set(month, (monthlyTotals.get(month) || 0) + item.total);
+    }
+  });
+
+  return Array.from(monthlyTotals.entries()).map(([month, total]) => ({
+    date: `Thg ${month}`,
+    total,
+  }));
+};
+
+const getRevenueChartData = (data: StatisticResource[], period: 'week' | 'month' | 'year') => {
+  if (!data) return [];
+  if (period === 'week') {
+    const filtered = filterLastDays(data, 7);
+    return dateReducerForStatisticResources(filtered);
+  } else if (period === 'month') {
+    const filtered = filterLastDays(data, 30);
+    return dateReducerForStatisticResources(filtered);
+  } else {
+    return groupByMonthForCurrentYear(data);
+  }
+};
+
+const getOrderChartData = (data: StatisticResource[], period: 'week' | 'month' | 'year') => {
+  if (!data) return [];
+  if (period === 'week') {
+    const filtered = filterLastDays(data, 7);
+    return groupByDate(dateReducerForStatisticResources(filtered));
+  } else if (period === 'month') {
+    const filtered = filterLastDays(data, 30);
+    return groupByDate(dateReducerForStatisticResources(filtered));
+  } else {
+    return groupByMonthForCurrentYear(data);
+  }
+};
+
+function AdminDashboard() {
+  const navigate = useNavigate();
+  const theme = useMantineTheme();
+  const [period, setPeriod] = useState<'week' | 'month' | 'year'>('month');
+
+  const { statisticResponse } = useGetStatisticApi(period);
   const statistic = statisticResponse as StatisticResponse;
 
   // Tính doanh thu tuần (7 ngày gần nhất)
@@ -126,26 +185,44 @@ function AdminDashboard() {
 
   return (
     <Stack mb={30}>
-      <Title order={3}>Thống kê hệ thống</Title>
+      <Group position="apart">
+        <Title order={3}>Thống kê hệ thống</Title>
+        <SegmentedControl
+          value={period}
+          onChange={(value: 'week' | 'month' | 'year') => setPeriod(value)}
+          data={[
+            { label: 'Theo tuần', value: 'week' },
+            { label: 'Theo tháng', value: 'month' },
+            { label: 'Theo năm', value: 'year' },
+          ]}
+          size="sm"
+        />
+      </Group>
 
       <Paper shadow="xs" p="md">
         <Stack>
           <Text size="lg" weight={500} color="dimmed">Tổng quan</Text>
           <Grid>
             <Grid.Col span={3}>
-              <OverviewCard title="Tổng số khách hàng" number={statistic.totalCustomer} color="blue" icon={Users}/>
+              <OverviewCard title="Tổng số khách hàng" number={statistic.totalCustomer} color="blue" icon={Users} onClick={() => navigate(ManagerPath.USER)} />
             </Grid.Col>
             <Grid.Col span={3}>
-              <OverviewCard title="Tổng số sản phẩm" number={statistic.totalProduct} color="orange" icon={Box}/>
+              <OverviewCard title="Tổng số sản phẩm" number={statistic.totalProduct} color="orange" icon={Box} onClick={() => navigate(ManagerPath.PRODUCT)} />
             </Grid.Col>
             <Grid.Col span={3}>
-              <OverviewCard title="Tổng số đơn hàng" number={statistic.totalOrder} color="teal" icon={FileBarcode}/>
+              <OverviewCard title="Tổng số đơn hàng" number={statistic.totalOrder} color="teal" icon={FileBarcode} onClick={() => navigate(ManagerPath.ORDER)} />
             </Grid.Col>
             <Grid.Col span={3}>
-              <OverviewCard title="Tổng số vận đơn" number={statistic.totalWaybill} color="grape" icon={Truck}/>
+              <OverviewCard title="Tổng số vận đơn" number={statistic.totalWaybill} color="grape" icon={Truck} onClick={() => navigate(ManagerPath.WAYBILL)} />
             </Grid.Col>
             <Grid.Col span={3}>
-              <OverviewCard title="Tổng số đánh giá" number={statistic.totalReview} color="yellow" icon={Star}/>
+              <OverviewCard title="Đơn hàng đã giao" number={statistic.totalDeliveredOrder} color="green" icon={FileBarcode} onClick={() => navigate(ManagerPath.ORDER)} />
+            </Grid.Col>
+            <Grid.Col span={3}>
+              <OverviewCard title="Vận đơn đã hoàn thành" number={statistic.totalCompletedWaybill} color="indigo" icon={Truck} onClick={() => navigate(ManagerPath.WAYBILL)} />
+            </Grid.Col>
+            <Grid.Col span={3}>
+              <OverviewCard title="Tổng số đánh giá" number={statistic.totalReview} color="yellow" icon={Star} onClick={() => navigate(ManagerPath.REVIEW)} />
             </Grid.Col>
             <Grid.Col span={3}>
               <OverviewCard
@@ -153,6 +230,7 @@ function AdminDashboard() {
                 number={statistic.totalActivePromotion}
                 color="pink"
                 icon={Percentage}
+                onClick={() => navigate(ManagerPath.PROMOTION)}
               />
             </Grid.Col>
 
@@ -236,33 +314,35 @@ function AdminDashboard() {
             <Stack>
               <Group position="apart">
                 <Text size="lg" weight={500} color="dimmed">Doanh thu</Text>
-                <Text size="sm" color="dimmed">7 ngày gần nhất</Text>
+                <Text size="sm" color="dimmed">
+                  {period === 'week' ? '7 ngày gần nhất' : period === 'month' ? '30 ngày gần nhất' : 'Các tháng trong năm'}
+                </Text>
               </Group>
 
-              <BarChart
-                width={650}
-                height={275}
-                data={dateReducerForStatisticResources(filterCurrentYear(statistic.statisticRevenue || []))}
-                margin={{ top: 10, right: 5, bottom: 0, left: -10 }}
-              >
-                <XAxis dataKey="date"/>
-                <YAxis 
-                  tickFormatter={(value) => {
-                    if (value >= 1000000) {
-                      return `${(value / 1000000).toFixed(1)}M`;
-                    } else if (value >= 1000) {
-                      return `${(value / 1000).toFixed(0)}K`;
-                    }
-                    return value.toString();
-                  }}
-                />
-                <Tooltip formatter={(value: number) => `${MiscUtils.formatPrice(value)} VNĐ`}/>
-                <Bar
-                  name="Doanh thu"
-                  dataKey="total"
-                  fill={theme.colors.green[5]}
-                />
-              </BarChart>
+              <ResponsiveContainer width="100%" height={275}>
+                <BarChart
+                  data={getRevenueChartData(statistic.statisticRevenue, period)}
+                  margin={{ top: 10, right: 5, bottom: 0, left: -10 }}
+                >
+                  <XAxis dataKey="date"/>
+                  <YAxis 
+                    tickFormatter={(value) => {
+                      if (value >= 1000000) {
+                        return `${(value / 1000000).toFixed(1)}M`;
+                      } else if (value >= 1000) {
+                        return `${(value / 1000).toFixed(0)}K`;
+                      }
+                      return value.toString();
+                    }}
+                  />
+                  <Tooltip formatter={(value: number) => `${MiscUtils.formatPrice(value)} VNĐ`}/>
+                  <Bar
+                    name="Doanh thu"
+                    dataKey="total"
+                    fill={theme.colors.green[5]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
             </Stack>
           </Paper>
         </Grid.Col>
@@ -271,30 +351,32 @@ function AdminDashboard() {
              <Stack>
                <Group position="apart">
                  <Text size="lg" weight={500} color="dimmed">Lượt đặt hàng</Text>
-                 <Text size="sm" color="dimmed">7 ngày gần nhất</Text>
+                 <Text size="sm" color="dimmed">
+                   {period === 'week' ? '7 ngày gần nhất' : period === 'month' ? '30 ngày gần nhất' : 'Các tháng trong năm'}
+                 </Text>
                </Group>
 
-               <LineChart
-                 width={650}
-                 height={275}
-                 data={groupByDate(dateReducerForStatisticResources(filterCurrentYear(statistic.statisticOrder)))}
-                 margin={{ top: 10, right: 5, bottom: 0, left: -10 }}
-               >
-                 <XAxis dataKey="date"/>
-                 <YAxis 
-                   allowDecimals={false}
-                   tickFormatter={(value) => Math.round(value).toString()}
-                 />
-                 <Tooltip/>
-                 <Line
-                   name="Số lượt đặt hàng"
-                   type="monotone"
-                   dataKey="total"
-                   stroke={theme.colors.teal[5]}
-                   strokeWidth={2}
-                   dot={{ r: 4 }}
-                 />
-               </LineChart>
+               <ResponsiveContainer width="100%" height={275}>
+                 <LineChart
+                   data={getOrderChartData(statistic.statisticOrder, period)}
+                   margin={{ top: 10, right: 5, bottom: 0, left: -10 }}
+                 >
+                   <XAxis dataKey="date"/>
+                   <YAxis 
+                     allowDecimals={false}
+                     tickFormatter={(value) => Math.round(value).toString()}
+                   />
+                   <Tooltip/>
+                   <Line
+                     name="Số lượt đặt hàng"
+                     type="monotone"
+                     dataKey="total"
+                     stroke={theme.colors.teal[5]}
+                     strokeWidth={2}
+                     dot={{ r: 4 }}
+                   />
+                 </LineChart>
+               </ResponsiveContainer>
              </Stack>
            </Paper>
          </Grid.Col>
@@ -309,7 +391,9 @@ function AdminDashboard() {
                   <TrendingUp size={20} color={theme.colors.green[6]} />
                   <Text size="lg" weight={500} color="dimmed">Sản phẩm bán chạy</Text>
                 </Group>
-                <Text size="sm" color="dimmed">30 ngày gần nhất</Text>
+                <Text size="sm" color="dimmed">
+                  {period === 'week' ? '7 ngày gần nhất' : period === 'month' ? '30 ngày gần nhất' : '365 ngày gần nhất'}
+                </Text>
               </Group>
 
               {statistic.topSellingProducts && statistic.topSellingProducts.length > 0 ? (
@@ -337,7 +421,7 @@ function AdminDashboard() {
                 </Table>
               ) : (
                 <Text size="sm" color="dimmed" align="center" py="md">
-                  Chưa có dữ liệu sản phẩm bán chạy
+                  Chưa có dữ liệu sản phẩm bán chạy trong {period === 'week' ? 'tuần' : period === 'month' ? 'tháng' : 'năm'} này
                 </Text>
               )}
             </Stack>
@@ -352,7 +436,9 @@ function AdminDashboard() {
                   <TrendingDown size={20} color={theme.colors.red[6]} />
                   <Text size="lg" weight={500} color="dimmed">Sản phẩm bán chậm</Text>
                 </Group>
-                <Text size="sm" color="dimmed">30 ngày gần nhất</Text>
+                <Text size="sm" color="dimmed">
+                  {period === 'week' ? '7 ngày gần nhất' : period === 'month' ? '30 ngày gần nhất' : '365 ngày gần nhất'}
+                </Text>
               </Group>
 
               {statistic.slowSellingProducts && statistic.slowSellingProducts.length > 0 ? (
@@ -380,7 +466,7 @@ function AdminDashboard() {
                 </Table>
               ) : (
                 <Text size="sm" color="dimmed" align="center" py="md">
-                  Tất cả sản phẩm đều có bán trong tháng
+                  Tất cả sản phẩm đều có bán trong {period === 'week' ? 'tuần' : period === 'month' ? 'tháng' : 'năm'} này
                 </Text>
               )}
             </Stack>
@@ -397,18 +483,28 @@ interface OverviewCardProps {
   number: number;
   color: MantineColor;
   icon: Icon;
+  onClick?: () => void;
 }
 
-function OverviewCard({ title, number, color, icon }: OverviewCardProps) {
+function OverviewCard({ title, number, color, icon, onClick }: OverviewCardProps) {
   const theme = useMantineTheme();
 
   const Icon = icon;
 
   return (
-    <Card sx={{
-      backgroundColor: theme.colors[color][theme.colorScheme === 'dark' ? 9 : 1],
-      color: theme.colorScheme === 'dark' ? theme.white : theme.black,
-    }}>
+    <Card 
+      onClick={onClick}
+      sx={{
+        backgroundColor: theme.colors[color][theme.colorScheme === 'dark' ? 9 : 1],
+        color: theme.colorScheme === 'dark' ? theme.white : theme.black,
+        cursor: onClick ? 'pointer' : 'default',
+        transition: 'transform 0.2s, box-shadow 0.2s',
+        '&:hover': onClick ? {
+          transform: 'translateY(-2px)',
+          boxShadow: theme.shadows.md,
+        } : undefined
+      }}
+    >
       <Group>
         <Icon size={40} strokeWidth={1.25}/>
         <Stack spacing={2.5}>
@@ -424,7 +520,9 @@ const defaultStatisticResponse: StatisticResponse = {
   totalCustomer: 0,
   totalProduct: 0,
   totalOrder: 0,
+  totalDeliveredOrder: 0,
   totalWaybill: 0,
+  totalCompletedWaybill: 0,
   totalReview: 0,
   totalActivePromotion: 0,
   totalSupplier: 0,
@@ -438,14 +536,14 @@ const defaultStatisticResponse: StatisticResponse = {
   slowSellingProducts: [],
 };
 
-function useGetStatisticApi() {
+function useGetStatisticApi(period: string) {
   const {
     data: statisticResponse,
     isLoading: isLoadingStatisticResponse,
     isError: isErrorStatisticResponse,
   } = useQuery<StatisticResponse, ErrorMessage>(
-    ['api', 'stats', 'getStatistic'],
-    () => FetchUtils.getWithToken(ResourceURL.STATISTIC),
+    ['api', 'stats', 'getStatistic', period],
+    () => FetchUtils.getWithToken(`${ResourceURL.STATISTIC}?period=${period}`),
     {
       onError: () => NotifyUtils.simpleFailed('Lấy dữ liệu không thành công'),
       keepPreviousData: true,
