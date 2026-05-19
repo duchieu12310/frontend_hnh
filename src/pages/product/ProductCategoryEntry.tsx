@@ -65,11 +65,13 @@ const ProductCategoryEntry: React.FC = () => {
     } = useGetAllApi<CategoryResponse>(CategoryConfigs.resourceUrl, CategoryConfigs.resourceKey, categoryRequestParams);
 
     // 3. Fetch products in this category (with local pagination)
+    const isSearchActive = !!searchToken;
     const productRequestParams = {
-        page: productPage,
-        size: productPageSize,
+        page: isSearchActive ? 1 : productPage,
+        size: isSearchActive ? 10000 : productPageSize,
+        all: isSearchActive ? 1 : undefined,
         filter: `categories.id==${parentId}`,
-        search: searchToken,
+        search: undefined,
     };
 
     const {
@@ -82,6 +84,35 @@ const ProductCategoryEntry: React.FC = () => {
         undefined,
         { enabled: !!parentId }
     );
+
+    const processedProductListResponse = useMemo(() => {
+        if (!isSearchActive) return productListResponse;
+
+        const query = searchToken.toLowerCase().trim();
+        const filtered = productListResponse.content.filter((entity) => {
+            return (
+                entity.name?.toLowerCase().includes(query) ||
+                entity.code?.toLowerCase().includes(query) ||
+                entity.id?.toString().includes(query) ||
+                entity.categories?.some((cat) => cat.name?.toLowerCase().includes(query)) ||
+                entity.tags?.some((tag) => tag.name?.toLowerCase().includes(query))
+            );
+        });
+
+        const totalElements = filtered.length;
+        const totalPages = Math.ceil(totalElements / productPageSize) || 1;
+        const startIndex = (productPage - 1) * productPageSize;
+        const paginatedContent = filtered.slice(startIndex, startIndex + productPageSize);
+
+        return {
+            content: paginatedContent,
+            page: productPage,
+            size: productPageSize,
+            totalElements,
+            totalPages,
+            last: productPage >= totalPages,
+        };
+    }, [productListResponse, searchToken, isSearchActive, productPage, productPageSize]);
 
     // 4. Breadcrumbs logic
     const breadcrumbs = useMemo(() => {
@@ -349,26 +380,30 @@ const ProductCategoryEntry: React.FC = () => {
                             </Box>
                         )}
                         
-                        {productListResponse.content.length === 0 ? (
+                        {processedProductListResponse.content.length === 0 ? (
                             <Paper withBorder p="xl" radius="lg" className="bg-slate-50/50 border-dashed border-2">
                                 <Stack align="center" spacing="xs">
                                     <InfoCircle size={32} className="text-slate-300" />
-                                    <Text size="sm" color="dimmed">Chưa có sản phẩm nào cho danh mục này</Text>
-                                    <Button 
-                                        component={Link}
-                                        to={`${ManagerPath.PRODUCT}/create?categoryId=${parentId}`}
-                                        variant="light" 
-                                        size="xs" 
-                                        leftIcon={<Plus size={14} />}
-                                    >
-                                        Thêm ngay sản phẩm đầu tiên
-                                    </Button>
+                                    <Text size="sm" color="dimmed">
+                                        {isSearchActive ? 'Không tìm thấy sản phẩm nào khớp với từ khóa tìm kiếm' : 'Chưa có sản phẩm nào cho danh mục này'}
+                                    </Text>
+                                    {!isSearchActive && (
+                                        <Button 
+                                            component={Link}
+                                            to={`${ManagerPath.PRODUCT}/create?categoryId=${parentId}`}
+                                            variant="light" 
+                                            size="xs" 
+                                            leftIcon={<Plus size={14} />}
+                                        >
+                                            Thêm ngay sản phẩm đầu tiên
+                                        </Button>
+                                    )}
                                 </Stack>
                             </Paper>
                         ) : (
                             <Stack spacing="md">
                                 <ManageTable
-                                    listResponse={productListResponse}
+                                    listResponse={processedProductListResponse}
                                     properties={ProductConfigs.properties}
                                     resourceUrl={ProductConfigs.resourceUrl}
                                     resourceKey={ProductConfigs.resourceKey}
@@ -382,7 +417,7 @@ const ProductCategoryEntry: React.FC = () => {
                                     <Pagination 
                                         page={productPage} 
                                         onChange={setProductPage} 
-                                        total={Math.ceil(productListResponse.totalElements / productPageSize)} 
+                                        total={processedProductListResponse.totalPages} 
                                         size="sm"
                                         radius="md"
                                     />

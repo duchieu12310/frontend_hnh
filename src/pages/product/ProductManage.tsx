@@ -41,12 +41,15 @@ function ProductManage() {
   const activeFilterRSQL = FilterUtils.convertToFilterRSQL(activeFilter);
   const defaultFilter = categoryId ? `categories.id==${categoryId}` : '';
 
+  const isSearchActive = !!searchToken;
+
   const requestParams = {
-    page: activePage,
-    size: activePageSize,
+    page: isSearchActive ? 1 : activePage,
+    size: isSearchActive ? 10000 : activePageSize,
+    all: isSearchActive ? 1 : undefined,
     sort: FilterUtils.convertToSortRSQL(activeFilter),
     filter: activeFilterRSQL ? (defaultFilter ? `${activeFilterRSQL};${defaultFilter}` : activeFilterRSQL) : defaultFilter,
-    search: searchToken,
+    search: undefined,
   };
 
   const {
@@ -54,7 +57,36 @@ function ProductManage() {
     data: listResponse = PageConfigs.initialListResponse as ListResponse<ProductResponse>,
   } = useGetAllApi<ProductResponse>(ProductConfigs.resourceUrl, ProductConfigs.resourceKey, requestParams);
 
-    const highlightText = (text: string, highlight: string) => {
+  const processedListResponse = React.useMemo(() => {
+    if (!isSearchActive) return listResponse;
+
+    const query = searchToken.toLowerCase().trim();
+    const filtered = listResponse.content.filter((entity) => {
+      return (
+        entity.name?.toLowerCase().includes(query) ||
+        entity.code?.toLowerCase().includes(query) ||
+        entity.id?.toString().includes(query) ||
+        entity.categories?.some((cat) => cat.name?.toLowerCase().includes(query)) ||
+        entity.tags?.some((tag) => tag.name?.toLowerCase().includes(query))
+      );
+    });
+
+    const totalElements = filtered.length;
+    const totalPages = Math.ceil(totalElements / activePageSize) || 1;
+    const startIndex = (activePage - 1) * activePageSize;
+    const paginatedContent = filtered.slice(startIndex, startIndex + activePageSize);
+
+    return {
+      content: paginatedContent,
+      page: activePage,
+      size: activePageSize,
+      totalElements,
+      totalPages,
+      last: activePage >= totalPages,
+    };
+  }, [listResponse, searchToken, isSearchActive, activePage, activePageSize]);
+
+  const highlightText = (text: string, highlight: string) => {
     if (!text) return '';
     if (!highlight) return text;
     const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
@@ -340,7 +372,7 @@ function ProductManage() {
             </button>
           )}
           <ManageHeaderButtons
-            listResponse={listResponse}
+            listResponse={processedListResponse}
             resourceUrl={ProductConfigs.resourceUrl}
             resourceKey={ProductConfigs.resourceKey}
           />
@@ -352,11 +384,11 @@ function ProductManage() {
       <FilterPanel/>
 
       <ManageMain
-        listResponse={listResponse}
+        listResponse={processedListResponse}
         isLoading={isLoading}
       >
         <ManageTable
-          listResponse={listResponse}
+          listResponse={processedListResponse}
           properties={ProductConfigs.properties}
           resourceUrl={ProductConfigs.resourceUrl}
           resourceKey={ProductConfigs.resourceKey}
@@ -365,7 +397,7 @@ function ProductManage() {
         />
       </ManageMain>
 
-      <ManagePagination listResponse={listResponse}/>
+      <ManagePagination listResponse={processedListResponse}/>
     </div>
   );
 }

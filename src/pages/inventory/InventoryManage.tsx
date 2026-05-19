@@ -15,7 +15,8 @@ import {
   MultiSelect,
   Pagination,
   Badge as MantineBadge,
-  Loader
+  Loader,
+  Select
 } from '@mantine/core';
 import { 
   Refresh, 
@@ -51,7 +52,7 @@ const InventoryManage: React.FC = () => {
   
   // Pagination State
   const [activePage, setActivePage] = useState(1);
-  const pageSize = 20;
+  const [pageSize, setPageSize] = useState<number>(10);
 
   // 1. Fetch Warehouses
   const { data: warehousesResponse = { content: [] } as ListResponse<WarehouseResponse>, isLoading: isWarehousesLoading } = useQuery(
@@ -477,29 +478,61 @@ const InventoryManage: React.FC = () => {
         </div>
 
         {/* Beautiful Pagination Footer */}
-        {totalPages > 1 && (
-          <Box px="xl" py="md" className="bg-gray-50/30 border-t border-gray-100 flex items-center justify-between rounded-b-3xl">
-            <Text size="sm" weight={600} color="dimmed">
-              Hiển thị <span className="font-extrabold text-gray-700">{Math.min(filteredRows.length, (activePage - 1) * pageSize + 1)}-{Math.min(filteredRows.length, activePage * pageSize)}</span> trong số <span className="font-extrabold text-gray-700">{filteredRows.length}</span> kết quả
-            </Text>
-            <Pagination 
-              page={activePage} 
-              onChange={setActivePage} 
-              total={totalPages} 
-              radius="lg"
-              size="md"
-              styles={{
-                item: {
-                  fontWeight: 800,
-                  border: '1px solid #f1f5f9',
-                  color: '#475569',
-                  '&[data-active]': {
-                    backgroundColor: '#2563eb',
-                    color: '#ffffff',
+        {filteredRows.length > 0 && (
+          <Box px="xl" py="md" className="bg-gray-50/30 border-t border-gray-100 flex items-center justify-between rounded-b-3xl flex-wrap gap-4">
+            <Group spacing="xl">
+              <Text size="sm" weight={600} color="dimmed">
+                Hiển thị <span className="font-extrabold text-gray-700">{Math.min(filteredRows.length, (activePage - 1) * pageSize + 1)}-{Math.min(filteredRows.length, activePage * pageSize)}</span> trong số <span className="font-extrabold text-gray-700">{filteredRows.length}</span> kết quả
+              </Text>
+              
+              <Group spacing="xs">
+                <Text size="xs" weight={700} color="dimmed" transform="uppercase">Số dòng hiển thị:</Text>
+                <Select
+                  value={String(pageSize)}
+                  onChange={(val) => {
+                    setPageSize(Number(val));
+                    setActivePage(1);
+                  }}
+                  data={[
+                    { value: '10', label: '10' },
+                    { value: '15', label: '15' },
+                    { value: '20', label: '20' }
+                  ]}
+                  size="xs"
+                  radius="md"
+                  styles={{
+                    input: {
+                      width: 70,
+                      fontWeight: 700,
+                      color: '#1e293b',
+                      borderColor: '#e2e8f0',
+                      textAlign: 'center'
+                    }
+                  }}
+                />
+              </Group>
+            </Group>
+
+            {totalPages > 1 && (
+              <Pagination 
+                page={activePage} 
+                onChange={setActivePage} 
+                total={totalPages} 
+                radius="lg"
+                size="md"
+                styles={{
+                  item: {
+                    fontWeight: 800,
+                    border: '1px solid #f1f5f9',
+                    color: '#475569',
+                    '&[data-active]': {
+                      backgroundColor: '#2563eb',
+                      color: '#ffffff',
+                    }
                   }
-                }
-              }}
-            />
+                }}
+              />
+            )}
           </Box>
         )}
       </Paper>

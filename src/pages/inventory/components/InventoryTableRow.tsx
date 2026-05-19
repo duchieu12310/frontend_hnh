@@ -57,10 +57,8 @@ const InventoryTableRow: React.FC<Props> = ({
         setLocalQty(newQty);
         setLocalTotal(prev => Math.max(0, prev + diff));
         setAdjustment(0);
-        // Đánh dấu stale nhưng không refetch ngay (background refresh)
-        queryClient.invalidateQueries(InventoryConfigs.productInventoryHierarchyResourceKey, {
-          refetchActive: false,
-        });
+        // Tự động tải lại nhà kho để cập nhật dữ liệu và Dashboard Stats ngay lập tức
+        queryClient.invalidateQueries(InventoryConfigs.productInventoryHierarchyResourceKey);
       },
       onError: (error: any) => {
         setIsSaving(false);
