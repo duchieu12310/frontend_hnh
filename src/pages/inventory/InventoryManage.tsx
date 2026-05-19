@@ -475,6 +475,33 @@ const InventoryManage: React.FC = () => {
             </tbody>
           </Table>
         </div>
+
+        {/* Beautiful Pagination Footer */}
+        {totalPages > 1 && (
+          <Box px="xl" py="md" className="bg-gray-50/30 border-t border-gray-100 flex items-center justify-between rounded-b-3xl">
+            <Text size="sm" weight={600} color="dimmed">
+              Hiển thị <span className="font-extrabold text-gray-700">{Math.min(filteredRows.length, (activePage - 1) * pageSize + 1)}-{Math.min(filteredRows.length, activePage * pageSize)}</span> trong số <span className="font-extrabold text-gray-700">{filteredRows.length}</span> kết quả
+            </Text>
+            <Pagination 
+              page={activePage} 
+              onChange={setActivePage} 
+              total={totalPages} 
+              radius="lg"
+              size="md"
+              styles={{
+                item: {
+                  fontWeight: 800,
+                  border: '1px solid #f1f5f9',
+                  color: '#475569',
+                  '&[data-active]': {
+                    backgroundColor: '#2563eb',
+                    color: '#ffffff',
+                  }
+                }
+              }}
+            />
+          </Box>
+        )}
       </Paper>
     </Stack>
   );

@@ -355,11 +355,10 @@ function ClientProductIntro({ product }: ClientProductIntroProps) {
                     product.productVariants[selectedVariantIndex]?.quantity === 0
                       ? (
                         <button
-                          onClick={handleCreatePreorderButton}
-                          className="px-6 py-3 flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md transition-colors"
+                          disabled
+                          className="px-6 py-3 flex items-center gap-2 bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 font-medium rounded-md cursor-not-allowed"
                         >
-                          <BellPlus size={20} />
-                          Đặt trước
+                          Hết hàng
                         </button>
                       )
                       : (

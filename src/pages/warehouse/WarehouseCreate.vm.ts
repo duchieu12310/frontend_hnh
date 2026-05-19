@@ -166,30 +166,37 @@ function useWarehouseCreateViewModel() {
    * RECURSIVE EXPANSION Logic
    */
   const expandAllProducts = (nodeId: string | null, type: SelectionNode['type'], map: Map<number, Set<number>>) => {
-    const collectFromL3 = (l3: any) => {
-      if (!l3.products) return;
-      if (!map.has(l3.id)) map.set(l3.id, new Set());
-      l3.products.forEach((p: any) => map.get(l3.id)!.add(p.productId));
-    };
+    const processCategory = (cat: any) => {
+        if (!cat) return;
+        if (cat.products && cat.products.length > 0) {
+            if (!map.has(cat.id)) map.set(cat.id, new Set());
+            cat.products.forEach((p: any) => map.get(cat.id)!.add(p.productId));
+        }
+        if (cat.children) {
+            cat.children.forEach(processCategory);
+        }
+    }
 
-    const collectFromL2 = (l2: any) => l2.children?.forEach(collectFromL3);
-    const collectFromL1 = (l1: any) => l1.children?.forEach(collectFromL2);
+    if (!nodeId) {
+        globalHierarchy.forEach(processCategory);
+        return;
+    }
 
     if (type === 'L1') {
-      const roots = nodeId ? globalHierarchy.filter(c => String(c.id) === nodeId) : globalHierarchy;
-      roots.forEach(collectFromL1);
+        const target = globalHierarchy.find(c => String(c.id) === nodeId);
+        if (target) processCategory(target);
     } else if (type === 'L2') {
-      for (const l1 of globalHierarchy) {
-        const matches = nodeId ? l1.children?.filter(c => String(c.id) === nodeId) : l1.children;
-        matches?.forEach(collectFromL2);
-      }
-    } else if (type === 'L3') {
-      for (const l1 of globalHierarchy) {
-        for (const l2 of l1.children || []) {
-          const matches = nodeId ? l2.children?.filter(c => String(c.id) === nodeId) : l2.children;
-          matches?.forEach(collectFromL3);
+        for (const l1 of globalHierarchy) {
+            const target = l1.children?.find(c => String(c.id) === nodeId);
+            if (target) { processCategory(target); break; }
         }
-      }
+    } else if (type === 'L3') {
+        for (const l1 of globalHierarchy) {
+            for (const l2 of l1.children || []) {
+                const target = l2.children?.find(c => String(c.id) === nodeId);
+                if (target) { processCategory(target); return; }
+            }
+        }
     }
   };
 
