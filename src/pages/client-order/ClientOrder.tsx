@@ -12,16 +12,30 @@ import DateUtils from 'utils/DateUtils';
 import { Link } from 'react-router-dom';
 import MiscUtils from 'utils/MiscUtils';
 
+const ORDER_TABS = [
+  { label: 'Tất cả', filter: '' },
+  { label: 'Đơn mới', filter: 'status==1' },
+  { label: 'Đang xử lý', filter: 'status==2' },
+  { label: 'Đã giao', filter: 'status==4' },
+  { label: 'Đã hủy', filter: 'status==5' },
+];
+
 function ClientOrder() {
   useTitle();
 
   const [activePage, setActivePage] = useState(1);
+  const [activeTab, setActiveTab] = useState(0);
+
+  const handleTabChange = (index: number) => {
+    setActiveTab(index);
+    setActivePage(1);
+  };
 
   const {
     orderResponses,
     isLoadingOrderResponses,
     isErrorOrderResponses,
-  } = useGetAllOrdersApi(activePage);
+  } = useGetAllOrdersApi(activePage, ORDER_TABS[activeTab].filter);
   const orders = orderResponses as ListResponse<ClientSimpleOrderResponse>;
 
   let ordersContentFragment;
@@ -60,7 +74,7 @@ function ClientOrder() {
       const maxButtons = 7;
       let startPage = Math.max(1, activePage - Math.floor(maxButtons / 2));
       let endPage = Math.min(orders.totalPages, startPage + maxButtons - 1);
-      
+
       if (endPage - startPage < maxButtons - 1) {
         startPage = Math.max(1, endPage - maxButtons + 1);
       }
@@ -143,10 +157,27 @@ function ClientOrder() {
 
           <div className="md:col-span-9">
             <div className="p-6 rounded-md shadow-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-4">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   Đơn hàng của tôi
                 </h2>
+
+                {/* Tab lọc theo trạng thái */}
+                <div className="flex items-center gap-1 border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
+                  {ORDER_TABS.map((tab, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleTabChange(index)}
+                      className={`px-4 py-2 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
+                        activeTab === index
+                          ? 'border-blue-600 text-blue-600 dark:text-blue-400'
+                          : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
 
                 {ordersContentFragment}
               </div>
@@ -162,29 +193,35 @@ function ClientOrderCard({ order }: { order: ClientSimpleOrderResponse }) {
   const orderStatusBadgeFragment = (status: number) => {
     switch (status) {
     case 1:
-      return <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">Đơn hàng mới</span>;
+      return <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full">Đơn hàng mới</span>;
     case 2:
-      return <span className="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 rounded">Đang xử lý</span>;
+      return <span className="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full">Đang xử lý</span>;
     case 3:
-      return <span className="px-2 py-1 text-xs font-medium bg-violet-100 dark:bg-violet-900/20 text-violet-700 dark:text-violet-400 rounded">Đang giao hàng</span>;
+      return <span className="px-2 py-1 text-xs font-medium bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 rounded-full">Đang giao hàng</span>;
     case 4:
-      return <span className="px-2 py-1 text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded">Đã giao hàng</span>;
+      return <span className="px-2 py-1 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full">Đã giao hàng</span>;
     case 5:
-      return <span className="px-2 py-1 text-xs font-medium bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded">Hủy bỏ</span>;
+      return <span className="px-2 py-1 text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full">Đã hủy</span>;
     }
   };
 
   const orderPaymentStatusBadgeFragment = (paymentStatus: number) => {
     switch (paymentStatus) {
     case 1:
-      return <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">Chưa thanh toán</span>;
+      return <span className="px-2 py-1 text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-500 rounded-full">Chưa thanh toán</span>;
     case 2:
-      return <span className="px-2 py-1 text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded">Đã thanh toán</span>;
+      return <span className="px-2 py-1 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full">Đã thanh toán</span>;
     }
   };
 
+  const isCancelled = order.orderStatus === 5;
+
   return (
-    <div className="p-4 rounded-md bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
+    <div className={`p-4 rounded-md border transition-colors ${
+      isCancelled
+        ? 'bg-red-50/50 dark:bg-red-900/10 border-red-200 dark:border-red-800/50'
+        : 'bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600'
+    }`}>
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -202,7 +239,7 @@ function ClientOrderCard({ order }: { order: ClientSimpleOrderResponse }) {
         <div className="border-t border-gray-200 dark:border-gray-600"></div>
 
         {order.orderItems.map(orderItem => (
-          <div key={orderItem.orderItemVariant.variantId} className="flex items-center justify-between">
+          <div key={orderItem.orderItemVariant.variantId} className={`flex items-center justify-between ${isCancelled ? 'opacity-60' : ''}`}>
             <div className="flex items-center gap-3">
               <img
                 className="rounded-md w-[55px] h-[55px] object-cover"
@@ -242,7 +279,7 @@ function ClientOrderCard({ order }: { order: ClientSimpleOrderResponse }) {
         <div className="flex items-center justify-between">
           <Link
             to={'/order/detail/' + order.orderCode}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm"
           >
             Xem chi tiết
           </Link>
@@ -256,10 +293,14 @@ function ClientOrderCard({ order }: { order: ClientSimpleOrderResponse }) {
   );
 }
 
-function useGetAllOrdersApi(activePage: number) {
+function useGetAllOrdersApi(activePage: number, statusFilter: string) {
+  // Tạo filter tùy chỉnh để bypass filter status==1 mặc định của FetchUtils
+  const customFilter = statusFilter || 'status=gt=0'; // lấy tất cả status > 0
+
   const requestParams = {
     page: activePage,
     size: ApplicationConstants.DEFAULT_CLIENT_ORDER_PAGE_SIZE,
+    filter: customFilter,
   };
 
   const {

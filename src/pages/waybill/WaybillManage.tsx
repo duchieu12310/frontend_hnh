@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Dialog } from '@headlessui/react';
+import React, { useState, useEffect } from 'react';
+import { Dialog, Switch } from '@headlessui/react';
 import {
 
   EntityDetailTable,
@@ -15,8 +15,10 @@ import {
 } from 'components';
 import DateUtils from 'utils/DateUtils';
 import { WaybillResponse } from 'models/Waybill';
-import { ListResponse } from 'utils/FetchUtils';
+import FetchUtils, { ListResponse } from 'utils/FetchUtils';
 import PageConfigs from 'pages/PageConfigs';
+import ApplicationConstants from 'constants/ApplicationConstants';
+import NotifyUtils from 'utils/NotifyUtils';
 import WaybillConfigs from './WaybillConfigs_v2';
 import useResetManagePageState from 'hooks/use-reset-manage-page-state';
 import useInitFilterPanelState from 'hooks/use-init-filter-panel-state';
@@ -32,6 +34,29 @@ function WaybillManage() {
 
   const { activePage, activePageSize, activeFilter, searchToken, setActivePage } = useAppStore();
   const [quickFilter, setQuickFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [autoWaybillEnabled, setAutoWaybillEnabled] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
+
+  useEffect(() => {
+    FetchUtils.getWithToken<{ enabled: boolean }>(ApplicationConstants.API_PATH + '/waybills/auto-waybill/status', undefined, true)
+      .then((res) => setAutoWaybillEnabled(res.enabled))
+      .catch((err) => console.error("Failed to fetch auto waybill status", err));
+  }, []);
+
+  const handleToggleAutoWaybill = async () => {
+    if (isToggling) return;
+    const newValue = !autoWaybillEnabled;
+    setIsToggling(true);
+    try {
+      await FetchUtils.postWithToken(ApplicationConstants.API_PATH + '/waybills/auto-waybill/toggle?enabled=' + newValue, {}, true);
+      setAutoWaybillEnabled(newValue);
+      NotifyUtils.simpleSuccess('Đã ' + (newValue ? 'bật' : 'tắt') + ' tự động vận đơn');
+    } catch (err) {
+      NotifyUtils.simpleFailed('Lỗi khi thay đổi trạng thái tự động vận đơn');
+    } finally {
+      setIsToggling(false);
+    }
+  };
 
   const activeFilterRSQL = FilterUtils.convertToFilterRSQL(activeFilter);
 
@@ -224,7 +249,8 @@ function WaybillManage() {
       <SearchPanel/>
 
       {/* Quick Filters */}
-      <div className="flex items-center gap-2 bg-slate-100/50 dark:bg-slate-800/40 p-1.5 rounded-xl w-fit border border-slate-200/50 dark:border-slate-700/50 shadow-sm">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 bg-slate-100/50 dark:bg-slate-800/40 p-1.5 rounded-xl w-fit border border-slate-200/50 dark:border-slate-700/50 shadow-sm">
         <button
           onClick={() => handleQuickFilterChange('all')}
           className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
@@ -255,6 +281,37 @@ function WaybillManage() {
         >
           Vận đơn đang tắt
         </button>
+        </div>
+
+        <div className={`flex items-center gap-3 p-2.5 rounded-xl border shadow-sm transition-all ${
+            autoWaybillEnabled
+              ? 'bg-blue-50/80 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700'
+              : 'bg-slate-100/50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700'
+          }`}>
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">Tự động vận đơn</span>
+            <span className="text-[10px] text-slate-500 dark:text-slate-400">
+              {isToggling ? 'Đang cập nhật...' : (autoWaybillEnabled ? 'Đang bật — tự động tạo vận đơn' : 'Đang tắt')}
+            </span>
+          </div>
+          <Switch
+            checked={autoWaybillEnabled}
+            onChange={handleToggleAutoWaybill}
+            disabled={isToggling}
+            className={`${
+              isToggling ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+            } ${
+              autoWaybillEnabled ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-600'
+            } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+          >
+            <span className="sr-only">Bật/tắt tự động vận đơn</span>
+            <span
+              className={`${
+                autoWaybillEnabled ? 'translate-x-6' : 'translate-x-1'
+              } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+            />
+          </Switch>
+        </div>
       </div>
 
       <FilterPanel/>
