@@ -55,7 +55,7 @@ class OrderConfigs extends Configs {
       isShowInTable: true,
     },
     warehouse: {
-      label: 'Kho',
+      label: 'Vận đơn',
       type: EntityPropertyType.PLACEHOLDER,
       isShowInTable: true,
       isNotAddToSortCriteria: true,

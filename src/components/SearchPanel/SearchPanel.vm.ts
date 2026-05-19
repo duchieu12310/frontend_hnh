@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import useAppStore from 'stores/use-app-store';
 import { Filter } from 'utils/FilterUtils';
 import { SelectOption } from 'types';
@@ -16,12 +16,27 @@ function useSearchPanelViewModel() {
 
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
+  // Sync ref value with searchToken from the store (handles page switching / resets)
+  useEffect(() => {
+    if (searchInputRef.current) {
+      searchInputRef.current.value = searchToken;
+    }
+  }, [searchToken]);
+
   const filterSelectList: SelectOption[] = filters.map(item => ({ value: item.id, label: item.name }));
   const activeFilterId = activeFilter ? activeFilter.id : null;
 
   const handleSearchInput = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       handleSearchButton();
+    }
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const val = event.target.value;
+    if (val.trim() === '' && searchToken !== '') {
+      setActivePage(1);
+      setSearchToken('');
     }
   };
 
@@ -49,7 +64,7 @@ function useSearchPanelViewModel() {
   };
 
   const handleSearchButton = () => {
-    const currentSearchToken = searchInputRef.current ? searchInputRef.current.value : '';
+    const currentSearchToken = searchInputRef.current ? searchInputRef.current.value.trim() : '';
     if (currentSearchToken !== searchToken || activeFilter !== prevActiveFilter) {
       setActivePage(1);
       setActiveFilter(activeFilter);
@@ -63,6 +78,7 @@ function useSearchPanelViewModel() {
     filterSelectList,
     activeFilterId,
     handleSearchInput,
+    handleInputChange,
     handleFilterSelect,
     handleAddFilterButton,
     handleResetButton,

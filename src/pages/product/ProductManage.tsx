@@ -55,6 +55,7 @@ function ProductManage() {
   } = useGetAllApi<ProductResponse>(ProductConfigs.resourceUrl, ProductConfigs.resourceKey, requestParams);
 
     const highlightText = (text: string, highlight: string) => {
+    if (!text) return '';
     if (!highlight) return text;
     const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
     return parts.map((part, i) =>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Badge, Button, Divider, Grid, Group, Loader, NumberInput, Paper, Select, Stack, Text, Textarea } from '@mantine/core';
 import { CreateUpdateTitle, DefaultPropertyPanel } from 'components';
 import WaybillConfigs from './WaybillConfigs_v2';
@@ -15,6 +16,8 @@ import { User, Phone, MapPin, Coin, ShoppingCart, InfoCircle } from 'tabler-icon
 import MiscUtils from 'utils/MiscUtils';
 
 function WaybillCreate() {
+  const [searchParams] = useSearchParams();
+  const orderIdParam = searchParams.get('orderId');
 
   const {
     form,
@@ -27,6 +30,12 @@ function WaybillCreate() {
   const [orderSelectList, setOrderSelectList] = useState<SelectOption[]>([]);
   const [orders, setOrders] = useState<OrderResponse[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<OrderResponse | null>(null);
+
+  React.useEffect(() => {
+    if (orderIdParam) {
+      form.setFieldValue('orderId', orderIdParam);
+    }
+  }, [orderIdParam]);
 
   React.useEffect(() => {
     if (form.values.orderId) {
@@ -42,7 +51,11 @@ function WaybillCreate() {
   const { isFetching: isFetchingOrderListResponse } = useGetAllApi<OrderResponse>(
     OrderConfigs.resourceUrl,
     OrderConfigs.resourceKey,
-    { size: 5, filter: 'status==1', search: orderSelectDebouncedKeyword },
+    {
+      size: 5,
+      filter: orderIdParam ? `id==${orderIdParam}` : 'status==1',
+      search: orderSelectDebouncedKeyword
+    },
     (orderListResponse) => {
       setOrders(orderListResponse.content);
       const selectList: SelectOption[] = orderListResponse.content.map((item) => ({

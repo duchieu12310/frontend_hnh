@@ -22,7 +22,7 @@ import useAppStore from 'stores/use-app-store';
 import MiscUtils from 'utils/MiscUtils';
 import { Clipboard, Plus } from 'tabler-icons-react';
 import NotifyUtils from 'utils/NotifyUtils';
-import DocketConfigs from 'pages/docket/DocketConfigs';
+import ManagerPath from 'constants/ManagerPath';
 
 function OrderManage() {
   useResetManagePageState(OrderConfigs.resourceKey);
@@ -102,11 +102,11 @@ function OrderManage() {
         </td>
         <td>
           <a
-            href={DocketConfigs.managerPath + '/create'}
+            href={ManagerPath.WAYBILL + '/create?orderId=' + entity.id}
             target="_blank"
             rel="noopener noreferrer"
             className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors inline-block"
-            title="Tạo phiếu xuất kho"
+            title="Tạo vận đơn"
           >
             <Plus size={20} />
           </a>
@@ -150,6 +150,7 @@ function OrderManage() {
           resourceKey={OrderConfigs.resourceKey}
           showedPropertiesFragment={showedPropertiesFragment}
           entityDetailTableRowsFragment={OrderConfigs.entityDetailTableRowsFragment}
+          hideEdit={true}
         />
       </ManageMain>
 

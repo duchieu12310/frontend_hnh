@@ -8,6 +8,7 @@ function SearchPanel() {
     filterSelectList,
     activeFilterId,
     handleSearchInput,
+    handleInputChange,
     handleFilterSelect,
     handleAddFilterButton,
     handleResetButton,
@@ -27,6 +28,7 @@ function SearchPanel() {
               placeholder="Từ khóa"
               ref={searchInputRef}
               onKeyDown={handleSearchInput}
+              onChange={handleInputChange}
               className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>

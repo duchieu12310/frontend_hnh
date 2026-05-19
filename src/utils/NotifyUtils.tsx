@@ -64,6 +64,16 @@ class NotifyUtils {
         }
       }
 
+      // 3. Tối ưu thông báo lỗi liên kết ràng buộc (ConstraintViolationException) khi xóa
+      if (typeof detailMessage === 'string' && (
+        detailMessage.includes('ConstraintViolationException') ||
+        detailMessage.includes('constraint') ||
+        detailMessage.includes('foreign key') ||
+        detailMessage.includes('could not execute statement')
+      )) {
+        detailMessage = 'Dữ liệu này đã được liên kết với các mục khác trong hệ thống (như đơn hàng, hóa đơn, sản phẩm...), không thể xóa.';
+      }
+
       finalMessage = (
         <div className="flex flex-col gap-0.5">
           <span className="font-bold">{fallbackMessage}</span>
@@ -71,7 +81,16 @@ class NotifyUtils {
         </div>
       );
     } else {
-      finalMessage = error as ToastMessage;
+      let errorStr = String(error);
+      if (
+        errorStr.includes('ConstraintViolationException') ||
+        errorStr.includes('constraint') ||
+        errorStr.includes('foreign key') ||
+        errorStr.includes('could not execute statement')
+      ) {
+        errorStr = 'Dữ liệu này đã được liên kết với các mục khác trong hệ thống (như đơn hàng, hóa đơn, sản phẩm...), không thể xóa.';
+      }
+      finalMessage = errorStr;
     }
 
     this.renderToast(finalMessage, <X size={20}/>, '#ef4444', 5000);

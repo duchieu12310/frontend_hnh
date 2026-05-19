@@ -119,7 +119,7 @@ const WarehouseSelectionTree: React.FC<WarehouseSelectionTreeProps> = ({ nodes, 
   };
 
   const updateNode = (path: number[], newNode: SelectionNode) => {
-    const newNodes = [...nodes];
+    const newNodes = JSON.parse(JSON.stringify(nodes));
     let current: any = { children: newNodes };
     path.forEach((index) => {
       current = current.children[index];
@@ -129,7 +129,7 @@ const WarehouseSelectionTree: React.FC<WarehouseSelectionTreeProps> = ({ nodes, 
   };
 
   const removeNode = (path: number[]) => {
-    const newNodes = [...nodes];
+    const newNodes = JSON.parse(JSON.stringify(nodes));
     if (path.length === 1) {
       newNodes.splice(path[0], 1);
     } else {
@@ -143,7 +143,7 @@ const WarehouseSelectionTree: React.FC<WarehouseSelectionTreeProps> = ({ nodes, 
   };
 
   const addChild = (path: number[], type: SelectionNode['type']) => {
-    const newNodes = [...nodes];
+    const newNodes = JSON.parse(JSON.stringify(nodes));
     let current: any = { children: newNodes };
     path.forEach((index) => {
       current = current.children[index];

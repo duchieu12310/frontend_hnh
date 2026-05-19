@@ -29,6 +29,7 @@ function useWarehouseUpdateViewModel(id: number) {
 
   const [warehouse, setWarehouse] = useState<WarehouseResponse>();
   const [prevFormValues, setPrevFormValues] = useState<typeof form.values>();
+  const [hasReconstructed, setHasReconstructed] = useState(false);
   const [provinceSelectList, setProvinceSelectList] = useState<SelectOption[]>([]);
   const [districtSelectList, setDistrictSelectList] = useState<SelectOption[]>([]);
   const [wardSelectList, setWardSelectList] = useState<SelectOption[]>([]);
@@ -46,86 +47,81 @@ function useWarehouseUpdateViewModel(id: number) {
       })
   );
 
+  // RECURSIVE RECONSTRUCTION: Build tree based on manually selected products and their categories
+  const buildTree = (savedProducts: ProductResponse[]): SelectionNode[] => {
+    const l1Map = new Map<string, SelectionNode>();
+
+    savedProducts.forEach(product => {
+      // Each product has categories (usually 1 but many-to-many is supported)
+      product.categories.forEach(leafCat => {
+        // 1. Find the full ancestry of this leaf category in globalHierarchy
+        let l1: any = null, l2: any = null, l3: any = null;
+
+        for (const root of globalHierarchy) {
+          if (root.id === leafCat.id) { l1 = root; break; }
+          for (const child2 of root.children || []) {
+            if (child2.id === leafCat.id) { l1 = root; l2 = child2; break; }
+            for (const child3 of (child2 as any).children || []) {
+              if (child3.id === leafCat.id) { l1 = root; l2 = child2; l3 = child3; break; }
+            }
+            if (l1) break;
+          }
+          if (l1) break;
+        }
+
+        if (!l1) return; // Not found in current global catalog
+
+        // 2. Build/Merge into L1
+        const l1Key = String(l1.id);
+        if (!l1Map.has(l1Key)) {
+          l1Map.set(l1Key, { id: Math.random().toString(36).substr(2, 9), type: 'L1', value: l1Key, children: [] });
+        }
+        const l1Node = l1Map.get(l1Key)!;
+
+        let parentForProduct: SelectionNode = l1Node;
+
+        // 3. Merge L2 if exists
+        if (l2) {
+          const l2Key = String(l2.id);
+          let l2Node = l1Node.children.find(c => c.value === l2Key);
+          if (!l2Node) {
+            l2Node = { id: Math.random().toString(36).substr(2, 9), type: 'L2', value: l2Key, children: [] };
+            l1Node.children.push(l2Node);
+          }
+          parentForProduct = l2Node;
+
+          // 4. Merge L3 if exists
+          if (l3) {
+            const l3Key = String(l3.id);
+            let l3Node = l2Node.children.find(c => c.value === l3Key);
+            if (!l3Node) {
+              l3Node = { id: Math.random().toString(36).substr(2, 9), type: 'L3', value: l3Key, children: [] };
+              l2Node.children.push(l3Node);
+            }
+            parentForProduct = l3Node;
+          }
+        }
+
+        // 5. Add/Update Product node
+        let prodNode = parentForProduct.children.find(c => c.type === 'Product');
+        if (!prodNode) {
+          prodNode = { id: Math.random().toString(36).substr(2, 9), type: 'Product', value: [], children: [] };
+          parentForProduct.children.push(prodNode);
+        }
+        const currentProductIds = prodNode.value as string[];
+        const prodIdStr = String(product.id);
+        if (!currentProductIds.includes(prodIdStr)) {
+           currentProductIds.push(prodIdStr);
+        }
+      });
+    });
+
+    return Array.from(l1Map.values());
+  };
+
   const { refetch } = useGetByIdApi<WarehouseResponse>(WarehouseConfigs.resourceUrl, WarehouseConfigs.resourceKey, id,
     (warehouseResponse) => {
       setWarehouse(warehouseResponse);
-      
-      const categories = warehouseResponse.categories || [];
-      const products = warehouseResponse.products || [];
-      
-      // RECURSIVE RECONSTRUCTION: Build tree based on manually selected products and their categories
-      const buildTree = (savedProducts: ProductResponse[]): SelectionNode[] => {
-        const l1Map = new Map<string, SelectionNode>();
-
-        savedProducts.forEach(product => {
-          // Each product has categories (usually 1 but many-to-many is supported)
-          product.categories.forEach(leafCat => {
-            // 1. Find the full ancestry of this leaf category in globalHierarchy
-            let l1: any = null, l2: any = null, l3: any = null;
-
-            for (const root of globalHierarchy) {
-              if (root.id === leafCat.id) { l1 = root; break; }
-              for (const child2 of root.children || []) {
-                if (child2.id === leafCat.id) { l1 = root; l2 = child2; break; }
-                for (const child3 of (child2 as any).children || []) {
-                  if (child3.id === leafCat.id) { l1 = root; l2 = child2; l3 = child3; break; }
-                }
-                if (l1) break;
-              }
-              if (l1) break;
-            }
-
-            if (!l1) return; // Not found in current global catalog
-
-            // 2. Build/Merge into L1
-            const l1Key = String(l1.id);
-            if (!l1Map.has(l1Key)) {
-              l1Map.set(l1Key, { id: Math.random().toString(36).substr(2, 9), type: 'L1', value: l1Key, children: [] });
-            }
-            const l1Node = l1Map.get(l1Key)!;
-
-            let parentForProduct: SelectionNode = l1Node;
-
-            // 3. Merge L2 if exists
-            if (l2) {
-              const l2Key = String(l2.id);
-              let l2Node = l1Node.children.find(c => c.value === l2Key);
-              if (!l2Node) {
-                l2Node = { id: Math.random().toString(36).substr(2, 9), type: 'L2', value: l2Key, children: [] };
-                l1Node.children.push(l2Node);
-              }
-              parentForProduct = l2Node;
-
-              // 4. Merge L3 if exists
-              if (l3) {
-                const l3Key = String(l3.id);
-                let l3Node = l2Node.children.find(c => c.value === l3Key);
-                if (!l3Node) {
-                  l3Node = { id: Math.random().toString(36).substr(2, 9), type: 'L3', value: l3Key, children: [] };
-                  l2Node.children.push(l3Node);
-                }
-                parentForProduct = l3Node;
-              }
-            }
-
-            // 5. Add/Update Product node
-            let prodNode = parentForProduct.children.find(c => c.type === 'Product');
-            if (!prodNode) {
-              prodNode = { id: Math.random().toString(36).substr(2, 9), type: 'Product', value: [], children: [] };
-              parentForProduct.children.push(prodNode);
-            }
-            const currentProductIds = prodNode.value as string[];
-            const prodIdStr = String(product.id);
-            if (!currentProductIds.includes(prodIdStr)) {
-               currentProductIds.push(prodIdStr);
-            }
-          });
-        });
-
-        return Array.from(l1Map.values());
-      };
-
-      const reconstructedTree = buildTree(products);
 
       const formValues: typeof form.values = {
         code: warehouseResponse.code,
@@ -135,12 +131,24 @@ function useWarehouseUpdateViewModel(id: number) {
         'address.districtId': warehouseResponse.address?.district ? String(warehouseResponse.address.district.id) : null,
         'address.wardId': warehouseResponse.address?.ward ? String(warehouseResponse.address.ward.id) : null,
         status: String(warehouseResponse.status),
-        selectionTree: reconstructedTree
+        selectionTree: []
       };
       form.setValues(formValues);
       setPrevFormValues(formValues);
     }
   );
+
+  useEffect(() => {
+    if (warehouse && globalHierarchy.length > 0 && !hasReconstructed) {
+      const reconstructedTree = buildTree(warehouse.products || []);
+      form.setFieldValue('selectionTree', reconstructedTree);
+      setPrevFormValues(prev => prev ? {
+        ...prev,
+        selectionTree: reconstructedTree
+      } : undefined);
+      setHasReconstructed(true);
+    }
+  }, [warehouse, globalHierarchy, hasReconstructed]);
 
   const updateApi = useUpdateApi<WarehouseRequest, WarehouseResponse>(WarehouseConfigs.resourceUrl, WarehouseConfigs.resourceKey, id);
 

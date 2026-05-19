@@ -54,7 +54,7 @@ function usePromotionCreateViewModel() {
 
   // Automatically check all previewed products when the category selection loads/changes
   useEffect(() => {
-    const list = previewProductsData?.content || [];
+    const list = (previewProductsData?.content || []).filter((p: any) => !p.productPromotion);
     if (list.length > 0) {
       const newChecked = new Set<number>();
       list.forEach((p: any) => {
@@ -82,7 +82,9 @@ function usePromotionCreateViewModel() {
     if (checked) {
       const newChecked = new Set<number>();
       previewProducts.forEach((p: any) => {
-        newChecked.add(p.productId);
+        if (!p.productPromotion) {
+          newChecked.add(p.productId);
+        }
       });
       setCheckedProductIds(newChecked);
     } else {
@@ -168,7 +170,9 @@ function usePromotionCreateViewModel() {
     if (checked) {
       const newChecked = new Set<number>();
       allProductsList.forEach((p: any) => {
-        newChecked.add(p.productId);
+        if (!p.productPromotion) {
+          newChecked.add(p.productId);
+        }
       });
       setCheckedTabProductIds(newChecked);
     } else {

@@ -84,6 +84,14 @@ function PartnerApproval() {
     }
   };
 
+  const partnerApprovalProperties = {
+    ...UserConfigs.properties,
+    status: {
+      ...UserConfigs.properties.status,
+      isShowInTable: false,
+    },
+  };
+
   const showedPropertiesFragment = (entity: UserResponse) => (
     <>
       <td>{entity.id}</td>
@@ -98,31 +106,12 @@ function PartnerApproval() {
       </td>
       <td>{entity.gender === 'M' ? 'Nam' : 'Nữ'}</td>
       <td>
-        <img src={entity.avatar || undefined} alt={entity.fullname} className="w-8 h-8 rounded-full object-cover" />
-      </td>
-      <td>
         <div className="flex flex-col gap-1 items-start">
           {entity.roles.map((role, index) => (
             <span key={index} className="px-2 py-0.5 text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 rounded flex items-center gap-1">
               {role.name}
             </span>
           ))}
-        </div>
-      </td>
-      <td>
-        <div className="flex gap-2">
-          <button
-            onClick={() => handleApprove(entity.id)}
-            className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded shadow-md transition-all transform hover:scale-105"
-          >
-            Duyệt
-          </button>
-          <button
-            onClick={() => handleReject(entity.id)}
-            className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded shadow-md transition-all transform hover:scale-105"
-          >
-            Từ chối
-          </button>
         </div>
       </td>
     </>
@@ -181,11 +170,29 @@ function PartnerApproval() {
       >
         <ManageTable
           listResponse={listResponse}
-          properties={UserConfigs.properties}
+          properties={partnerApprovalProperties}
           resourceUrl={UserConfigs.resourceUrl}
           resourceKey="partner-approval"
           showedPropertiesFragment={showedPropertiesFragment}
           entityDetailTableRowsFragment={entityDetailTableRowsFragment}
+          hideEdit={true}
+          hideDelete={true}
+          actionButtonsFragment={(entity) => (
+            <>
+              <button
+                onClick={() => handleApprove(entity.id)}
+                className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded shadow-md transition-all transform hover:scale-105"
+              >
+                Duyệt
+              </button>
+              <button
+                onClick={() => handleReject(entity.id)}
+                className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded shadow-md transition-all transform hover:scale-105"
+              >
+                Từ chối
+              </button>
+            </>
+          )}
         />
       </ManageMain>
 

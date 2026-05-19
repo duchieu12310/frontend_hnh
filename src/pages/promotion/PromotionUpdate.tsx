@@ -82,6 +82,94 @@ function PromotionUpdate() {
       />
 
       <Grid>
+        <Grid.Col xs={4}>
+          <form onSubmit={handleFormSubmit}>
+            <Paper shadow="xs">
+              <Stack spacing={0}>
+                <Grid p="sm">
+                  <Grid.Col>
+                    <TextInput
+                      required
+                      label={PromotionConfigs.properties.name.label}
+                      {...form.getInputProps('name')}
+                    />
+                  </Grid.Col>
+                  <Grid.Col>
+                    <DatePicker
+                      required
+                      locale="vi"
+                      inputFormat="DD/MM/YYYY"
+                      labelFormat="MM/YYYY"
+                      clearable={false}
+                      minDate={DateUtils.today()}
+                      label="Từ ngày"
+                      placeholder="Chọn hoặc nhập ngày bắt đầu (DD/MM/YYYY)"
+                      value={form.values.range?.[0] || null}
+                      onChange={value => {
+                        const newRange: [Date | null, Date | null] = [value || null, form.values.range?.[1] || null];
+                        form.setFieldValue('range', newRange);
+                      }}
+                      error={form.errors['range.0'] || form.errors.range}
+                      allowFreeInput
+                    />
+                  </Grid.Col>
+                  <Grid.Col>
+                    <DatePicker
+                      required
+                      locale="vi"
+                      inputFormat="DD/MM/YYYY"
+                      labelFormat="MM/YYYY"
+                      clearable={false}
+                      minDate={form.values.range?.[0] || DateUtils.today()}
+                      label="Đến ngày"
+                      placeholder="Chọn hoặc nhập ngày kết thúc (DD/MM/YYYY)"
+                      value={form.values.range?.[1] || null}
+                      onChange={value => {
+                        const newRange: [Date | null, Date | null] = [form.values.range?.[0] || null, value || null];
+                        form.setFieldValue('range', newRange);
+                      }}
+                      error={form.errors['range.1'] || form.errors.range}
+                      allowFreeInput
+                    />
+                  </Grid.Col>
+                  <Grid.Col>
+                    <NumberInput
+                      required
+                      label={PromotionConfigs.properties.percent.label}
+                      min={1}
+                      max={100}
+                      {...form.getInputProps('percent')}
+                    />
+                  </Grid.Col>
+                  <Grid.Col>
+                    <Switch
+                      size="md"
+                      label={PromotionConfigs.properties.status.label}
+                      checked={form.values.status === '1'}
+                      onChange={(event) => form.setFieldValue('status', event.currentTarget.checked ? '1' : '0')}
+                    />
+                  </Grid.Col>
+                </Grid>
+
+                {form.errors.productIds && (
+                  <Paper p="xs" mx="sm" withBorder style={{ borderColor: '#ffc9c9', backgroundColor: '#fff5f5' }}>
+                    <Text size="xs" color="red" weight={600} align="center">
+                      ⚠️ {form.errors.productIds}
+                    </Text>
+                  </Paper>
+                )}
+
+                <Divider mt="xs" />
+
+                <Group position="apart" p="sm">
+                  <Button variant="default" onClick={resetForm}>Mặc định</Button>
+                  <Button type="submit">Cập nhật</Button>
+                </Group>
+              </Stack>
+            </Paper>
+          </form>
+        </Grid.Col>
+
         <Grid.Col xs={8}>
           <Paper shadow="xs" p="sm">
             <Tabs variant="pills" active={activeTab} onTabChange={onTabChange}>
@@ -171,38 +259,72 @@ function PromotionUpdate() {
                       ) : (
                         <Stack spacing="xs">
                           {previewProducts.length > 0 && (
-                            <Checkbox
-                              label={`Chọn tất cả (${previewProducts.length} sản phẩm)`}
-                              checked={checkedProductIds.size === previewProducts.length}
-                              indeterminate={checkedProductIds.size > 0 && checkedProductIds.size < previewProducts.length}
-                              onChange={(e) => handleToggleSelectAll(e.currentTarget.checked)}
-                              styles={{ label: { fontSize: '12px', fontWeight: 600 } }}
-                            />
+                            <Group position="apart">
+                              <Checkbox
+                                label={`Chọn tất cả (${previewProducts.filter((p: any) => !p.productPromotion || p.productPromotion.promotionId === Number(id)).length} sản phẩm có sẵn)`}
+                                checked={checkedProductIds.size === previewProducts.filter((p: any) => !p.productPromotion || p.productPromotion.promotionId === Number(id)).length && previewProducts.filter((p: any) => !p.productPromotion || p.productPromotion.promotionId === Number(id)).length > 0}
+                                indeterminate={checkedProductIds.size > 0 && checkedProductIds.size < previewProducts.filter((p: any) => !p.productPromotion || p.productPromotion.promotionId === Number(id)).length}
+                                onChange={(e) => handleToggleSelectAll(e.currentTarget.checked)}
+                                styles={{ label: { fontSize: '12px', fontWeight: 600 } }}
+                              />
+                              <Button 
+                                variant="outline" 
+                                color="teal" 
+                                size="xs" 
+                                compact
+                                onClick={() => handleToggleSelectAll(true)}
+                              >
+                                Tích nhanh SP chưa KM
+                              </Button>
+                            </Group>
                           )}
                           <Divider />
                           <div style={{ maxHeight: '420px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            {previewProducts.map((p: any) => (
-                              <Group key={p.productId} position="apart" p="xs" style={{ background: '#fff', borderRadius: '8px', border: '1px solid #e9ecef' }}>
-                                <Group spacing="sm">
-                                  <Checkbox
-                                    checked={checkedProductIds.has(p.productId)}
-                                    onChange={() => handleToggleProductChecked(p.productId)}
-                                  />
-                                  {p.productThumbnail && (
-                                    <img
-                                      src={p.productThumbnail}
-                                      alt={p.productName}
-                                      style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '4px' }}
-                                    />
-                                  )}
-                                  <div>
-                                    <Text size="xs" weight={600} lineClamp={1}>{p.productName}</Text>
-                                    <Text size="xs" style={{ fontSize: '10px' }} color="dimmed">Slug: {p.productSlug}</Text>
-                                  </div>
-                                </Group>
-                                <Badge size="xs" color="green">Sẵn sàng</Badge>
-                              </Group>
-                            ))}
+                            {[...previewProducts]
+                              .sort((a: any, b: any) => {
+                                const aPromo = (a.productPromotion !== null && a.productPromotion !== undefined && a.productPromotion.promotionId !== Number(id)) ? 1 : 0;
+                                const bPromo = (b.productPromotion !== null && b.productPromotion !== undefined && b.productPromotion.promotionId !== Number(id)) ? 1 : 0;
+                                return aPromo - bPromo;
+                              })
+                              .map((p: any) => {
+                                const isCurrentPromotion = p.productPromotion !== null && p.productPromotion !== undefined && p.productPromotion.promotionId === Number(id);
+                                const isDisabled = p.productPromotion !== null && p.productPromotion !== undefined && !isCurrentPromotion;
+                                return (
+                                  <Group key={p.productId} position="apart" p="xs" style={{ background: '#fff', borderRadius: '8px', border: '1px solid #e9ecef', opacity: isDisabled ? 0.6 : 1 }}>
+                                    <Group spacing="sm">
+                                      <Checkbox
+                                        disabled={isDisabled}
+                                        checked={checkedProductIds.has(p.productId)}
+                                        onChange={() => handleToggleProductChecked(p.productId)}
+                                      />
+                                      {p.productThumbnail && (
+                                        <img
+                                          src={p.productThumbnail}
+                                          alt={p.productName}
+                                          style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '4px' }}
+                                        />
+                                      )}
+                                      <div>
+                                        <Text size="xs" weight={600} lineClamp={1}>{p.productName}</Text>
+                                        <Text size="xs" style={{ fontSize: '10px' }} color="dimmed">Slug: {p.productSlug}</Text>
+                                        {isDisabled && p.productPromotion && (
+                                          <Text size="xs" color="red" weight={500} style={{ fontSize: '10px', marginTop: '2px' }}>
+                                            Khuyến mãi: {p.productPromotion.promotionName} ({DateUtils.isoDateToString(p.productPromotion.startDate, 'DD/MM/YYYY')} - {DateUtils.isoDateToString(p.productPromotion.endDate, 'DD/MM/YYYY')})
+                                          </Text>
+                                        )}
+                                        {isCurrentPromotion && p.productPromotion && (
+                                          <Text size="xs" color="teal" weight={500} style={{ fontSize: '10px', marginTop: '2px' }}>
+                                            Đang áp dụng trong KM này
+                                          </Text>
+                                        )}
+                                      </div>
+                                    </Group>
+                                    <Badge size="xs" color={isDisabled ? "red" : isCurrentPromotion ? "teal" : "green"}>
+                                      {isDisabled ? "Đang có KM khác" : isCurrentPromotion ? "Hiện tại" : "Sẵn sàng"}
+                                    </Badge>
+                                  </Group>
+                                );
+                              })}
                           </div>
                         </Stack>
                       )}
@@ -248,38 +370,72 @@ function PromotionUpdate() {
                     ) : (
                       <Stack spacing="xs">
                         {allProductsList.length > 0 && (
-                          <Checkbox 
-                            label={`Chọn tất cả (${allProductsList.length} sản phẩm đang hiển thị)`}
-                            checked={checkedTabProductIds.size === allProductsList.length && allProductsList.length > 0}
-                            indeterminate={checkedTabProductIds.size > 0 && checkedTabProductIds.size < allProductsList.length}
-                            onChange={(e) => handleToggleTabSelectAll(e.currentTarget.checked)}
-                            styles={{ label: { fontSize: '12px', fontWeight: 600 } }}
-                          />
+                          <Group position="apart">
+                            <Checkbox 
+                              label={`Chọn tất cả (${allProductsList.filter((p: any) => !p.productPromotion || p.productPromotion.promotionId === Number(id)).length} sản phẩm có sẵn)`}
+                              checked={checkedTabProductIds.size === allProductsList.filter((p: any) => !p.productPromotion || p.productPromotion.promotionId === Number(id)).length && allProductsList.filter((p: any) => !p.productPromotion || p.productPromotion.promotionId === Number(id)).length > 0}
+                              indeterminate={checkedTabProductIds.size > 0 && checkedTabProductIds.size < allProductsList.filter((p: any) => !p.productPromotion || p.productPromotion.promotionId === Number(id)).length}
+                              onChange={(e) => handleToggleTabSelectAll(e.currentTarget.checked)}
+                              styles={{ label: { fontSize: '12px', fontWeight: 600 } }}
+                            />
+                            <Button 
+                              variant="outline" 
+                              color="teal" 
+                              size="xs" 
+                              compact
+                              onClick={() => handleToggleTabSelectAll(true)}
+                            >
+                              Tích nhanh SP chưa KM
+                            </Button>
+                          </Group>
                         )}
                         <Divider />
                         <div style={{ maxHeight: '420px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                          {allProductsList.map((p: any) => (
-                            <Group key={p.productId} position="apart" p="xs" style={{ background: '#fff', borderRadius: '8px', border: '1px solid #e9ecef' }}>
-                              <Group spacing="sm">
-                                <Checkbox 
-                                  checked={checkedTabProductIds.has(p.productId)}
-                                  onChange={() => handleToggleTabProductChecked(p.productId)}
-                                />
-                                {p.productThumbnail && (
-                                  <img 
-                                    src={p.productThumbnail} 
-                                    alt={p.productName} 
-                                    style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '4px' }}
-                                  />
-                                )}
-                                <div>
-                                  <Text size="xs" weight={600} lineClamp={1}>{p.productName}</Text>
-                                  <Text size="xs" style={{ fontSize: '10px' }} color="dimmed">Slug: {p.productSlug}</Text>
-                                </div>
-                              </Group>
-                              <Badge size="xs" color="green">Sẵn sàng</Badge>
-                            </Group>
-                          ))}
+                          {[...allProductsList]
+                            .sort((a: any, b: any) => {
+                              const aPromo = (a.productPromotion !== null && a.productPromotion !== undefined && a.productPromotion.promotionId !== Number(id)) ? 1 : 0;
+                              const bPromo = (b.productPromotion !== null && b.productPromotion !== undefined && b.productPromotion.promotionId !== Number(id)) ? 1 : 0;
+                              return aPromo - bPromo;
+                            })
+                            .map((p: any) => {
+                              const isCurrentPromotion = p.productPromotion !== null && p.productPromotion !== undefined && p.productPromotion.promotionId === Number(id);
+                              const isDisabled = p.productPromotion !== null && p.productPromotion !== undefined && !isCurrentPromotion;
+                              return (
+                                <Group key={p.productId} position="apart" p="xs" style={{ background: '#fff', borderRadius: '8px', border: '1px solid #e9ecef', opacity: isDisabled ? 0.6 : 1 }}>
+                                  <Group spacing="sm">
+                                    <Checkbox 
+                                      disabled={isDisabled}
+                                      checked={checkedTabProductIds.has(p.productId)}
+                                      onChange={() => handleToggleTabProductChecked(p.productId)}
+                                    />
+                                    {p.productThumbnail && (
+                                      <img 
+                                        src={p.productThumbnail} 
+                                        alt={p.productName} 
+                                        style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '4px' }}
+                                      />
+                                    )}
+                                    <div>
+                                      <Text size="xs" weight={600} lineClamp={1}>{p.productName}</Text>
+                                      <Text size="xs" style={{ fontSize: '10px' }} color="dimmed">Slug: {p.productSlug}</Text>
+                                      {isDisabled && p.productPromotion && (
+                                        <Text size="xs" color="red" weight={500} style={{ fontSize: '10px', marginTop: '2px' }}>
+                                          Khuyến mãi: {p.productPromotion.promotionName} ({DateUtils.isoDateToString(p.productPromotion.startDate, 'DD/MM/YYYY')} - {DateUtils.isoDateToString(p.productPromotion.endDate, 'DD/MM/YYYY')})
+                                        </Text>
+                                      )}
+                                      {isCurrentPromotion && p.productPromotion && (
+                                        <Text size="xs" color="teal" weight={500} style={{ fontSize: '10px', marginTop: '2px' }}>
+                                          Đang áp dụng trong KM này
+                                        </Text>
+                                      )}
+                                    </div>
+                                  </Group>
+                                  <Badge size="xs" color={isDisabled ? "red" : isCurrentPromotion ? "teal" : "green"}>
+                                    {isDisabled ? "Đang có KM khác" : isCurrentPromotion ? "Hiện tại" : "Sẵn sàng"}
+                                  </Badge>
+                                </Group>
+                              );
+                            })}
                         </div>
                       </Stack>
                     )}
@@ -338,94 +494,6 @@ function PromotionUpdate() {
               </div>
             </Paper>
           )}
-        </Grid.Col>
-
-        <Grid.Col xs={4}>
-          <form onSubmit={handleFormSubmit}>
-            <Paper shadow="xs">
-              <Stack spacing={0}>
-                <Grid p="sm">
-                  <Grid.Col>
-                    <TextInput
-                      required
-                      label={PromotionConfigs.properties.name.label}
-                      {...form.getInputProps('name')}
-                    />
-                  </Grid.Col>
-                  <Grid.Col>
-                    <DatePicker
-                      required
-                      locale="vi"
-                      inputFormat="DD/MM/YYYY"
-                      labelFormat="MM/YYYY"
-                      clearable={false}
-                      minDate={DateUtils.today()}
-                      label="Từ ngày"
-                      placeholder="Chọn hoặc nhập ngày bắt đầu (DD/MM/YYYY)"
-                      value={form.values.range[0]}
-                      onChange={value => {
-                        const newRange: [Date | null, Date | null] = [value, form.values.range[1]];
-                        form.setFieldValue('range', newRange);
-                      }}
-                      error={form.errors['range.0'] || form.errors.range}
-                      allowFreeInput
-                    />
-                  </Grid.Col>
-                  <Grid.Col>
-                    <DatePicker
-                      required
-                      locale="vi"
-                      inputFormat="DD/MM/YYYY"
-                      labelFormat="MM/YYYY"
-                      clearable={false}
-                      minDate={form.values.range[0] || DateUtils.today()}
-                      label="Đến ngày"
-                      placeholder="Chọn hoặc nhập ngày kết thúc (DD/MM/YYYY)"
-                      value={form.values.range[1]}
-                      onChange={value => {
-                        const newRange: [Date | null, Date | null] = [form.values.range[0], value];
-                        form.setFieldValue('range', newRange);
-                      }}
-                      error={form.errors['range.1'] || form.errors.range}
-                      allowFreeInput
-                    />
-                  </Grid.Col>
-                  <Grid.Col>
-                    <NumberInput
-                      required
-                      label={PromotionConfigs.properties.percent.label}
-                      min={1}
-                      max={100}
-                      {...form.getInputProps('percent')}
-                    />
-                  </Grid.Col>
-                  <Grid.Col>
-                    <Switch
-                      size="md"
-                      label={PromotionConfigs.properties.status.label}
-                      checked={form.values.status === '1'}
-                      onChange={(event) => form.setFieldValue('status', event.currentTarget.checked ? '1' : '0')}
-                    />
-                  </Grid.Col>
-                </Grid>
-
-                {form.errors.productIds && (
-                  <Paper p="xs" mx="sm" withBorder style={{ borderColor: '#ffc9c9', backgroundColor: '#fff5f5' }}>
-                    <Text size="xs" color="red" weight={600} align="center">
-                      ⚠️ {form.errors.productIds}
-                    </Text>
-                  </Paper>
-                )}
-
-                <Divider mt="xs" />
-
-                <Group position="apart" p="sm">
-                  <Button variant="default" onClick={resetForm}>Mặc định</Button>
-                  <Button type="submit">Cập nhật</Button>
-                </Group>
-              </Stack>
-            </Paper>
-          </form>
         </Grid.Col>
       </Grid>
     </Stack>
